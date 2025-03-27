@@ -1,13 +1,23 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import LoginButton from './LoginButton';
+import { Menu, X, User, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +33,11 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <nav 
       className={cn(
@@ -32,28 +47,83 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <a 
-          href="#" 
+        <Link 
+          to="/" 
           className="flex items-center"
         >
           <div className="bg-amber-300/90 rounded-lg px-4 py-2">
             <span className="text-xl font-bold tracking-tight text-slate-900">LUXURY</span>
             <div className="text-xs text-slate-900 text-center">HOTELS</div>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <a href="#home" className="text-white hover:text-white/80 transition-colors">Home</a>
-          <a href="#facilities" className="text-white hover:text-white/80 transition-colors">Facilities</a>
-          <a href="#rooms" className="text-white hover:text-white/80 transition-colors">Rooms</a>
-          <a href="#contact" className="text-white hover:text-white/80 transition-colors">Contact Us</a>
-          <LoginButton />
+          <a href="/#home" className={cn(
+            "transition-colors",
+            isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
+          )}>Home</a>
+          <a href="/#facilities" className={cn(
+            "transition-colors",
+            isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
+          )}>Facilities</a>
+          <Link to="/rooms" className={cn(
+            "transition-colors",
+            isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
+          )}>Rooms</Link>
+          <a href="/#contact" className={cn(
+            "transition-colors",
+            isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
+          )}>Contact Us</a>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className={cn(
+                  "border-2",
+                  isScrolled 
+                    ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white" 
+                    : "border-white text-white hover:bg-white/10"
+                )}>
+                  <User className="h-4 w-4 mr-2" />
+                  Account
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="font-medium text-sm">
+                  {user.email}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/bookings" className="cursor-pointer">My Bookings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline" className={cn(
+                "border-2",
+                isScrolled 
+                  ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white" 
+                  : "border-white text-white hover:bg-white/10"
+              )}>
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden text-white focus:outline-none" 
+          className={cn(
+            "md:hidden focus:outline-none",
+            isScrolled ? "text-slate-900" : "text-white"
+          )}
           onClick={toggleMenu}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -69,40 +139,65 @@ const Navbar = () => {
       >
         <div className="flex flex-col space-y-6 text-center">
           <a 
-            href="#home" 
+            href="/#home" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
             Home
           </a>
           <a 
-            href="#facilities" 
+            href="/#facilities" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
             Facilities
           </a>
-          <a 
-            href="#rooms" 
+          <Link 
+            to="/rooms" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
             Rooms
-          </a>
+          </Link>
           <a 
-            href="#contact" 
+            href="/#contact" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
             Contact Us
           </a>
-          <Link
-            to="/login"
-            className="text-xl font-medium text-slate-900 py-2"
-            onClick={toggleMenu}
-          >
-            Login
-          </Link>
+          
+          {user ? (
+            <>
+              <div className="text-xl font-medium text-slate-900 py-2">
+                {user.email}
+              </div>
+              <Link
+                to="/bookings"
+                className="text-xl font-medium text-slate-900 py-2"
+                onClick={toggleMenu}
+              >
+                My Bookings
+              </Link>
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  toggleMenu();
+                }}
+                className="text-xl font-medium text-red-600 py-2"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="text-xl font-medium text-slate-900 py-2"
+              onClick={toggleMenu}
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>
