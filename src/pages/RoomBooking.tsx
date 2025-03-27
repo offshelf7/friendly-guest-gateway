@@ -6,32 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { CalendarIcon, Wifi, Coffee, Check, Users, CreditCard } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-
-interface Room {
-  id: string;
-  name: string;
-  description: string;
-  price_per_night: number;
-  capacity: number;
-  room_type: string;
-  image_url: string;
-  has_wifi: boolean;
-  has_breakfast: boolean;
-  amenities?: Amenity[];
-}
-
-interface Amenity {
-  id: string;
-  room_id: string;
-  amenity_name: string;
-  amenity_description: string | null;
-  icon: string | null;
-}
+import { Room, Amenity } from '@/types/roomTypes';
 
 const RoomBooking = () => {
   const { roomId } = useParams();
@@ -92,7 +71,7 @@ const RoomBooking = () => {
           
           setRoom({
             ...data,
-            amenities: amenities || []
+            amenities: amenities as Amenity[] || []
           });
         }
       }
@@ -136,7 +115,7 @@ const RoomBooking = () => {
         return;
       }
       
-      // First check if the room is available for these dates
+      // Check if the room is available for these dates using custom RPC function
       const { data: availabilityData, error: availabilityError } = await supabase.rpc(
         'check_room_availability',
         { 

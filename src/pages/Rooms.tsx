@@ -12,27 +12,7 @@ import { Input } from '@/components/ui/input';
 import { CalendarIcon, Wifi, Coffee, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-
-interface Room {
-  id: string;
-  name: string;
-  description: string;
-  price_per_night: number;
-  capacity: number;
-  room_type: string;
-  image_url: string;
-  has_wifi: boolean;
-  has_breakfast: boolean;
-  amenities?: Amenity[];
-}
-
-interface Amenity {
-  id: string;
-  room_id: string;
-  amenity_name: string;
-  amenity_description: string | null;
-  icon: string | null;
-}
+import { Room, Amenity } from '@/types/roomTypes';
 
 const Rooms = () => {
   const { user } = useAuth();
@@ -53,7 +33,7 @@ const Rooms = () => {
     try {
       setLoading(true);
       
-      // Fetch rooms with availability check
+      // Fetch rooms
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
@@ -63,8 +43,8 @@ const Rooms = () => {
       
       // Fetch amenities for each room
       if (roomsData) {
-        const enhancedRooms = await Promise.all(
-          roomsData.map(async (room) => {
+        const enhancedRooms: Room[] = await Promise.all(
+          roomsData.map(async (room: Room) => {
             const { data: amenities, error: amenitiesError } = await supabase
               .from('room_amenities')
               .select('*')
@@ -74,7 +54,7 @@ const Rooms = () => {
             
             return {
               ...room,
-              amenities: amenities || []
+              amenities: amenities as Amenity[] || []
             };
           })
         );

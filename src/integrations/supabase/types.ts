@@ -9,6 +9,56 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          check_in_date: string
+          check_out_date: string
+          created_at: string | null
+          guests_count: number
+          id: string
+          room_id: string | null
+          special_requests: string | null
+          status: string
+          total_price: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          check_in_date: string
+          check_out_date: string
+          created_at?: string | null
+          guests_count: number
+          id?: string
+          room_id?: string | null
+          special_requests?: string | null
+          status?: string
+          total_price: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          check_in_date?: string
+          check_out_date?: string
+          created_at?: string | null
+          guests_count?: number
+          id?: string
+          room_id?: string | null
+          special_requests?: string | null
+          status?: string
+          total_price?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commercial_content: {
         Row: {
           author_id: string | null
@@ -266,6 +316,86 @@ export type Database = {
         }
         Relationships: []
       }
+      room_amenities: {
+        Row: {
+          amenity_description: string | null
+          amenity_name: string
+          created_at: string | null
+          icon: string | null
+          id: string
+          room_id: string | null
+        }
+        Insert: {
+          amenity_description?: string | null
+          amenity_name: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          room_id?: string | null
+        }
+        Update: {
+          amenity_description?: string | null
+          amenity_name?: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          room_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_amenities_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          description: string
+          has_breakfast: boolean | null
+          has_wifi: boolean | null
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          name: string
+          price_per_night: number
+          room_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          capacity: number
+          created_at?: string | null
+          description: string
+          has_breakfast?: boolean | null
+          has_wifi?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name: string
+          price_per_night: number
+          room_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          description?: string
+          has_breakfast?: boolean | null
+          has_wifi?: boolean | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name?: string
+          price_per_night?: number
+          room_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           amount: number | null
@@ -468,6 +598,14 @@ export type Database = {
       }
     }
     Functions: {
+      check_room_availability: {
+        Args: {
+          room_id: string
+          check_in: string
+          check_out: string
+        }
+        Returns: boolean
+      }
       set_admin_role: {
         Args: {
           user_id_param: string
