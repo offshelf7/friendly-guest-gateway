@@ -28,8 +28,8 @@ const RoomFeatures = () => {
           </div>
           <div className="w-full md:w-1/2">
             <BlurImage 
-              src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070&auto=format&fit=crop" 
-              alt="Luxury hotel room" 
+              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop" 
+              alt="Luxury hotel room with ocean view" 
               className="w-full h-80 object-cover"
             />
           </div>
@@ -53,8 +53,8 @@ const RoomFeatures = () => {
           </div>
           <div className="w-full md:w-1/2">
             <BlurImage 
-              src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop" 
-              alt="Beach view" 
+              src="https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?q=80&w=2070&auto=format&fit=crop" 
+              alt="Beachfront view from hotel" 
               className="w-full h-80 object-cover"
             />
           </div>

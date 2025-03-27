@@ -113,23 +113,23 @@ const Login = () => {
           <div className="grid grid-cols-1 gap-4">
             <div className="overflow-hidden rounded-lg">
               <BlurImage 
-                src="/lovable-uploads/85d6b5b3-e2d3-4ed3-9081-ffd2083c941d.png" 
-                alt="Hotel Pool"
+                src="https://images.unsplash.com/photo-1602002418082-dd4a8f7a6376?q=80&w=2070&auto=format&fit=crop" 
+                alt="Beachfront Hotel View"
                 className="w-full h-64 object-cover"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="overflow-hidden rounded-lg">
                 <BlurImage 
-                  src="/lovable-uploads/85d6b5b3-e2d3-4ed3-9081-ffd2083c941d.png" 
-                  alt="Hotel Lobby"
+                  src="https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop" 
+                  alt="Hotel Pool by the Beach"
                   className="w-full h-32 object-cover"
                 />
               </div>
               <div className="overflow-hidden rounded-lg">
                 <BlurImage 
-                  src="/lovable-uploads/85d6b5b3-e2d3-4ed3-9081-ffd2083c941d.png" 
-                  alt="Hotel Room"
+                  src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=2049&auto=format&fit=crop" 
+                  alt="Luxury Room with Ocean View"
                   className="w-full h-32 object-cover"
                 />
               </div>
@@ -137,7 +137,7 @@ const Login = () => {
             <div className="mt-4 text-center">
               <h3 className="text-2xl font-bold mb-2">Find Your Perfect Stay and Book with Confidence</h3>
               <p className="text-gray-600">
-                Elevate your travel experience with our seamless booking platform—explore curated hotels, compare options, and secure the ideal room for your journey.
+                Elevate your travel experience with our seamless booking platform—explore curated beachfront hotels, compare options, and secure the ideal room for your journey.
               </p>
               <div className="flex justify-center mt-4 space-x-2">
                 <div className="h-2 w-2 bg-blue-500 rounded-full"></div>

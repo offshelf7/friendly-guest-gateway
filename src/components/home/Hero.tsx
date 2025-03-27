@@ -18,8 +18,8 @@ const Hero = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <BlurImage
-          src="public/lovable-uploads/f9dbd5af-0ea0-4838-97a4-2e09f08c8c69.png"
-          alt="Luxury hotel by the beach"
+          src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop"
+          alt="Luxury beach hotel"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/20"></div>
