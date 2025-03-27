@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const LoginButton = () => {
   return (
-    <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10">
+    <Button asChild variant="outline" className="border-white text-white hover:bg-white/10 rounded-none">
       <Link to="/login">
         Sign In
       </Link>

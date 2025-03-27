@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import LoginButton from './LoginButton';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -32,33 +34,26 @@ const Navbar = () => {
         {/* Logo */}
         <a 
           href="#" 
-          className="text-2xl font-bold tracking-tight text-slate-900"
+          className="flex items-center"
         >
-          Guest.
+          <div className="bg-amber-300/90 rounded-lg px-4 py-2">
+            <span className="text-xl font-bold tracking-tight text-slate-900">LUXURY</span>
+            <div className="text-xs text-slate-900 text-center">HOTELS</div>
+          </div>
         </a>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <a href="#home" className="text-slate-600 hover:text-slate-900 transition-colors">Home</a>
-          <a href="#features" className="text-slate-600 hover:text-slate-900 transition-colors">About</a>
-          <a href="#promotions" className="text-slate-600 hover:text-slate-900 transition-colors">Promotions</a>
-          <a href="#reservations" className="text-slate-600 hover:text-slate-900 transition-colors">Reservations</a>
-          <a href="#contact" className="text-slate-600 hover:text-slate-900 transition-colors">Contact</a>
-        </div>
-
-        {/* CTA Button */}
-        <div className="hidden md:block">
-          <a 
-            href="#book" 
-            className="btn-shine bg-slate-900 text-white px-6 py-2 rounded-full font-medium transition-all hover:bg-slate-800"
-          >
-            Book Now
-          </a>
+          <a href="#home" className="text-white hover:text-white/80 transition-colors">Home</a>
+          <a href="#facilities" className="text-white hover:text-white/80 transition-colors">Facilities</a>
+          <a href="#rooms" className="text-white hover:text-white/80 transition-colors">Rooms</a>
+          <a href="#contact" className="text-white hover:text-white/80 transition-colors">Contact Us</a>
+          <LoginButton />
         </div>
 
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden text-slate-900 focus:outline-none" 
+          className="md:hidden text-white focus:outline-none" 
           onClick={toggleMenu}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -81,40 +76,33 @@ const Navbar = () => {
             Home
           </a>
           <a 
-            href="#features" 
+            href="#facilities" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
-            About
+            Facilities
           </a>
           <a 
-            href="#promotions" 
+            href="#rooms" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
-            Promotions
-          </a>
-          <a 
-            href="#reservations" 
-            className="text-xl font-medium text-slate-900 py-2"
-            onClick={toggleMenu}
-          >
-            Reservations
+            Rooms
           </a>
           <a 
             href="#contact" 
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
-            Contact
+            Contact Us
           </a>
-          <a 
-            href="#book" 
-            className="btn-shine bg-slate-900 text-white px-6 py-3 rounded-full font-medium mt-4 inline-block mx-auto"
+          <Link
+            to="/login"
+            className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
-            Book Now
-          </a>
+            Login
+          </Link>
         </div>
       </div>
     </nav>

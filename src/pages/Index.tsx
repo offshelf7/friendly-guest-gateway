@@ -2,10 +2,8 @@
 import { useEffect } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Hero from '../components/home/Hero';
-import Features from '../components/home/Features';
+import RoomFeatures from '../components/home/RoomFeatures';
 import Testimonials from '../components/home/Testimonials';
-import Promotion from '../components/home/Promotion';
-import Reservation from '../components/home/Reservation';
 import Footer from '../components/home/Footer';
 
 const Index = () => {
@@ -50,10 +48,8 @@ const Index = () => {
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <Navbar />
       <Hero />
-      <Features />
+      <RoomFeatures />
       <Testimonials />
-      <Promotion />
-      <Reservation />
       <Footer />
     </div>
   );
