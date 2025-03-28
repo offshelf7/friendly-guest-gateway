@@ -13,6 +13,9 @@ export interface Room {
   created_at: string;
   updated_at: string;
   amenities?: Amenity[];
+  room_number?: string;
+  status?: 'available' | 'occupied' | 'maintenance';
+  bed_type?: string;
 }
 
 export interface Amenity {
