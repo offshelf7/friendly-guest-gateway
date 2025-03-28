@@ -1,120 +1,78 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Room } from "@/types/roomTypes";
-import { Card, CardContent } from "@/components/ui/card";
-import { Bed } from "lucide-react";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Room } from '@/types/roomTypes';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PlusIcon } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const AdminRooms = () => {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  const fetchRooms = async () => {
-    try {
-      setLoading(true);
+  const { data: rooms, isLoading, error } = useQuery({
+    queryKey: ['adminRooms'],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from("rooms")
-        .select("*")
-        .order("price_per_night");
+        .from('rooms')
+        .select('*');
 
       if (error) throw error;
-
-      // Assign room numbers if they don't exist and cast data to Room type
-      const roomsWithNumbers = data?.map((room, index) => ({
-        ...room,
-        room_number: room.room_number || `00${index + 1}`,
-        bed_type: getBedType(room.room_type),
-        status: getRoomStatus(room.is_available)
-      })) as Room[];
-
-      setRooms(roomsWithNumbers);
-    } catch (error) {
-      console.error("Error fetching rooms:", error);
-    } finally {
-      setLoading(false);
+      return data as Room[];
     }
-  };
+  });
 
-  const getBedType = (roomType: string): string => {
-    if (roomType.toLowerCase().includes("single")) return "Single Bed";
-    if (roomType.toLowerCase().includes("delux")) return "King Bed";
-    if (roomType.toLowerCase().includes("suite")) return "Queen Bed";
-    return "Queen Bed";
-  };
-
-  const getRoomStatus = (isAvailable: boolean): 'available' | 'occupied' => {
-    return isAvailable ? 'available' : 'occupied';
-  };
+  if (isLoading) return <div>Loading rooms...</div>;
+  if (error) return <div>Error loading rooms: {(error as Error).message}</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Rooms</h1>
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Room Management</h1>
+        <Button>
+          <PlusIcon className="mr-2 h-4 w-4" /> Add New Room
+        </Button>
+      </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {rooms.map((room) => (
-            <Card key={room.id} className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="flex">
-                  <div className="w-[200px] h-[150px] overflow-hidden">
-                    {room.image_url ? (
-                      <img
-                        src={room.image_url}
-                        alt={room.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={`https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=800&auto=format&fit=crop&q=60`}
-                        alt={room.name}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1 p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-semibold">{room.name}</h3>
-                        <div className="flex items-center mt-1 text-slate-600">
-                          <Bed className="w-4 h-4 mr-1" />
-                          <span>{room.bed_type}</span>
-                        </div>
-                      </div>
-                      <div className={`px-2 py-1 rounded text-xs ${
-                        room.status === 'available' 
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {room.status === 'available' ? 'Available' : 'Occupied'}
-                      </div>
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Room Number</TableHead>
+                <TableHead>Capacity</TableHead>
+                <TableHead>Price/Night</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rooms?.map((room) => (
+                <TableRow key={room.id}>
+                  <TableCell className="font-medium">{room.name}</TableCell>
+                  <TableCell>{room.room_type}</TableCell>
+                  <TableCell>{room.room_number || 'N/A'}</TableCell>
+                  <TableCell>{room.capacity} people</TableCell>
+                  <TableCell>${room.price_per_night}</TableCell>
+                  <TableCell>
+                    <Badge variant={room.is_available ? "success" : "destructive"}>
+                      {room.is_available ? 'Available' : 'Not Available'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Edit</Button>
+                      <Button variant="destructive" size="sm">Delete</Button>
                     </div>
-                    <p className="text-slate-600 mt-2">
-                      A cozy and budget friendly option perfect for solo travelers or couples features a queen
-                      bed, private bathroom, work desk, and all essential amenities for a comfortable stay
-                    </p>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="text-slate-600">
-                        Room no #{room.room_number}
-                      </div>
-                      <div className="text-xl font-bold">
-                        ${room.price_per_night}<span className="text-sm text-slate-500">/night</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };

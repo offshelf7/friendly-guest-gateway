@@ -3,8 +3,8 @@ import { ServiceCategory } from "@/types/roomTypes";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Utensils, 
-  Broom, 
-  Spa, 
+  Brush, 
+  Heart, 
   HelpCircle, 
   User, 
   Edit, 
@@ -26,8 +26,10 @@ export const ServiceCategoryCard = ({
   const getIcon = (iconName?: string) => {
     switch (iconName?.toLowerCase()) {
       case 'utensils': return <Utensils className="w-5 h-5" />;
-      case 'broom': return <Broom className="w-5 h-5" />;
-      case 'spa': return <Spa className="w-5 h-5" />;
+      case 'broom': 
+      case 'brush': return <Brush className="w-5 h-5" />;
+      case 'spa': 
+      case 'heart': return <Heart className="w-5 h-5" />;
       case 'concierge-bell': return <User className="w-5 h-5" />;
       case 'person-swimming': return <User className="w-5 h-5" />;
       default: return <HelpCircle className="w-5 h-5" />;
