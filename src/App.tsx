@@ -11,6 +11,7 @@ import Rooms from "./pages/Rooms";
 import RoomBooking from "./pages/RoomBooking";
 import BookingSuccess from "./pages/BookingSuccess";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 // Import Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/booking/:roomId" element={<RoomBooking />} />
             <Route path="/booking-success" element={<BookingSuccess />} />
+            <Route path="/profile" element={<Profile />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />}>
