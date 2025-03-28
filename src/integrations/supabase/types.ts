@@ -396,6 +396,77 @@ export type Database = {
         }
         Relationships: []
       }
+      service_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          is_available: boolean | null
+          name: string
+          price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_available?: boolean | null
+          name: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          is_available?: boolean | null
+          name?: string
+          price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           amount: number | null
@@ -492,6 +563,7 @@ export type Database = {
           id: string
           image: string | null
           name: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
           subscription: string | null
           token_identifier: string
           updated_at: string | null
@@ -507,6 +579,7 @@ export type Database = {
           id: string
           image?: string | null
           name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           subscription?: string | null
           token_identifier: string
           updated_at?: string | null
@@ -522,6 +595,7 @@ export type Database = {
           id?: string
           image?: string | null
           name?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           subscription?: string | null
           token_identifier?: string
           updated_at?: string | null
@@ -624,15 +698,28 @@ export type Database = {
         }
         Returns: undefined
       }
-      set_user_role: {
-        Args: {
-          user_id_param: string
-        }
-        Returns: undefined
-      }
+      set_user_role:
+        | {
+            Args: {
+              user_id_param: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              user_id_param: string
+              role_param: Database["public"]["Enums"]["user_role"]
+            }
+            Returns: undefined
+          }
     }
     Enums: {
-      [_ in never]: never
+      user_role:
+        | "guest"
+        | "staff"
+        | "admin"
+        | "general_manager"
+        | "operational_manager"
     }
     CompositeTypes: {
       [_ in never]: never

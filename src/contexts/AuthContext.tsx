@@ -3,10 +3,12 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
+import { UserRole } from '@/types/roomTypes';
 
 type AuthContextType = {
   session: Session | null;
   user: User | null;
+  userRole: UserRole | null;
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: any | null }>;
   signIn: (email: string, password: string) => Promise<{ error: any | null }>;
@@ -18,8 +20,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return;
+      }
+      
+      if (data?.role) {
+        setUserRole(data.role as UserRole);
+      }
+    } catch (error) {
+      console.error('Error in fetchUserRole:', error);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener first
@@ -27,6 +51,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          fetchUserRole(session.user.id);
+        } else {
+          setUserRole(null);
+        }
         
         if (event === 'SIGNED_IN') {
           toast({
@@ -48,6 +78,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
+      
       setLoading(false);
     });
 
@@ -115,7 +150,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      userRole,
+      loading, 
+      signUp, 
+      signIn, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

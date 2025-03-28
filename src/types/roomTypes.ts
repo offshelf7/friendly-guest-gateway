@@ -13,7 +13,7 @@ export interface Room {
   created_at: string;
   updated_at: string;
   room_number?: string;
-  status?: string;
+  status?: 'available' | 'occupied';
   bed_type?: string;
   amenities?: Amenity[];
 }
@@ -39,4 +39,38 @@ export interface Amenity {
   amenity_description?: string;
   icon?: string;
   created_at: string;
+}
+
+export type UserRole = 'guest' | 'staff' | 'admin' | 'general_manager' | 'operational_manager';
+
+export interface ServiceCategory {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Service {
+  id: string;
+  category_id?: string;
+  name: string;
+  description?: string;
+  price?: number;
+  duration?: number; // in minutes
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  full_name?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at?: string;
+  role: UserRole;
 }
