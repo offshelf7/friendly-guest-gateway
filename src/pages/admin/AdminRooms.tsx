@@ -23,13 +23,13 @@ const AdminRooms = () => {
 
       if (error) throw error;
 
-      // Assign room numbers if they don't exist
+      // Assign room numbers if they don't exist and cast data to Room type
       const roomsWithNumbers = data?.map((room, index) => ({
         ...room,
         room_number: room.room_number || `00${index + 1}`,
         bed_type: getBedType(room.room_type),
         status: getRoomStatus(room.is_available)
-      })) || [];
+      })) as Room[];
 
       setRooms(roomsWithNumbers);
     } catch (error) {
