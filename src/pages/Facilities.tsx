@@ -1,134 +1,138 @@
 
-import Navbar from '../components/layout/Navbar';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Utensils, Wifi, Dumbbell, Cocktail, Car, Coffee, Waves, Shirt } from "lucide-react";
-import Footer from '../components/home/Footer';
-
-interface FacilityProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const FacilityCard = ({ icon, title, description }: FacilityProps) => (
-  <Card className="h-full transition-all hover:shadow-md">
-    <CardHeader>
-      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-        {icon}
-      </div>
-      <CardTitle className="text-xl">{title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <CardDescription className="text-base">{description}</CardDescription>
-    </CardContent>
-  </Card>
-);
+import { Button } from "@/components/ui/button";
+import { Utensils, Coffee, DumbbellIcon, Waves, Spa, Wifi, BookOpen, MapPin, Wine } from "lucide-react";
 
 const Facilities = () => {
+  const [activeTab, setActiveTab] = useState('all');
+  
   const facilities = [
     {
-      icon: <Utensils className="h-6 w-6 text-primary" />,
-      title: "Fine Dining",
-      description: "Experience our award-winning restaurant with cuisine prepared by world-class chefs using locally sourced ingredients."
+      id: 1,
+      name: "Fine Dining Restaurant",
+      description: "Experience exquisite cuisine with our award-winning chefs",
+      icon: <Utensils className="h-8 w-8 mb-2 text-primary" />,
+      category: "dining"
     },
     {
-      icon: <Wifi className="h-6 w-6 text-primary" />,
-      title: "High-Speed WiFi",
-      description: "Stay connected with complimentary high-speed wireless internet access throughout the hotel."
+      id: 2,
+      name: "Coffee Lounge",
+      description: "Relax with premium coffee and pastries throughout the day",
+      icon: <Coffee className="h-8 w-8 mb-2 text-primary" />,
+      category: "dining"
     },
     {
-      icon: <Dumbbell className="h-6 w-6 text-primary" />,
-      title: "Fitness Center",
-      description: "Maintain your fitness routine in our state-of-the-art gym equipped with modern cardio and strength-training equipment."
+      id: 3,
+      name: "Bar & Lounge",
+      description: "Enjoy signature cocktails and an extensive wine selection",
+      icon: <Wine className="h-8 w-8 mb-2 text-primary" />,
+      category: "dining"
     },
     {
-      icon: <Waves className="h-6 w-6 text-primary" />,
-      title: "Swimming Pool",
-      description: "Relax in our temperature-controlled indoor and outdoor swimming pools with dedicated lanes for lap swimming."
+      id: 4,
+      name: "Fitness Center",
+      description: "State-of-the-art equipment and personal training sessions",
+      icon: <DumbbellIcon className="h-8 w-8 mb-2 text-primary" />,
+      category: "wellness"
     },
     {
-      icon: <Cocktail className="h-6 w-6 text-primary" />,
-      title: "Bar & Lounge",
-      description: "Unwind with premium cocktails and beverages in our elegant bar and lounge area with live entertainment."
+      id: 5,
+      name: "Swimming Pool",
+      description: "Indoor and outdoor pools with lounging areas",
+      icon: <Waves className="h-8 w-8 mb-2 text-primary" />,
+      category: "wellness"
     },
     {
-      icon: <Shirt className="h-6 w-6 text-primary" />,
-      title: "Laundry Service",
-      description: "Keep your wardrobe fresh with our prompt laundry and dry-cleaning services available daily."
+      id: 6,
+      name: "Spa & Wellness",
+      description: "Rejuvenating treatments and massages for ultimate relaxation",
+      icon: <Spa className="h-8 w-8 mb-2 text-primary" />,
+      category: "wellness"
     },
     {
-      icon: <Car className="h-6 w-6 text-primary" />,
-      title: "Valet Parking",
-      description: "Enjoy hassle-free arrival and departure with our professional valet parking service."
+      id: 7,
+      name: "High-Speed WiFi",
+      description: "Complimentary high-speed internet throughout the property",
+      icon: <Wifi className="h-8 w-8 mb-2 text-primary" />,
+      category: "services"
     },
     {
-      icon: <Coffee className="h-6 w-6 text-primary" />,
-      title: "Business Center",
-      description: "Access our fully equipped business center with printing, scanning, and video conferencing capabilities."
+      id: 8,
+      name: "Business Center",
+      description: "Meeting rooms and business services available 24/7",
+      icon: <BookOpen className="h-8 w-8 mb-2 text-primary" />,
+      category: "services"
+    },
+    {
+      id: 9,
+      name: "Concierge Services",
+      description: "Local recommendations, reservations, and tour arrangements",
+      icon: <MapPin className="h-8 w-8 mb-2 text-primary" />,
+      category: "services"
     }
   ];
-
+  
+  const filteredFacilities = activeTab === 'all' 
+    ? facilities 
+    : facilities.filter(facility => facility.category === activeTab);
+  
   return (
-    <div className="min-h-screen pt-20 bg-slate-50">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <div className="relative h-[300px] md:h-[400px] bg-gradient-to-r from-blue-800 to-blue-600 overflow-hidden">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center items-center text-center">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Our Facilities</h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl">
-            Discover the exceptional amenities and services that make your stay with us truly memorable.
-          </p>
-        </div>
+    <div className="container mx-auto py-24 px-4">
+      <div className="text-center mb-12">
+        <h1 className="text-3xl font-bold mb-4">Our Facilities</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Discover our premium facilities designed to enhance your stay and provide unforgettable experiences.
+        </p>
       </div>
       
-      {/* Facilities Grid */}
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">World-Class Amenities</h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            We pride ourselves on offering the finest facilities and services to ensure your stay is as comfortable and enjoyable as possible.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {facilities.map((facility, index) => (
-            <FacilityCard 
-              key={index}
-              icon={facility.icon}
-              title={facility.title}
-              description={facility.description}
-            />
-          ))}
-        </div>
+      <div className="flex justify-center flex-wrap gap-2 mb-10">
+        <Button 
+          variant={activeTab === 'all' ? 'default' : 'outline'} 
+          onClick={() => setActiveTab('all')}
+          className="mb-2"
+        >
+          All Facilities
+        </Button>
+        <Button 
+          variant={activeTab === 'dining' ? 'default' : 'outline'} 
+          onClick={() => setActiveTab('dining')}
+          className="mb-2"
+        >
+          Dining
+        </Button>
+        <Button 
+          variant={activeTab === 'wellness' ? 'default' : 'outline'} 
+          onClick={() => setActiveTab('wellness')}
+          className="mb-2"
+        >
+          Wellness
+        </Button>
+        <Button 
+          variant={activeTab === 'services' ? 'default' : 'outline'} 
+          onClick={() => setActiveTab('services')}
+          className="mb-2"
+        >
+          Services
+        </Button>
       </div>
       
-      {/* Facilities Overview */}
-      <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">Experience Luxury at Every Turn</h2>
-              <p className="text-slate-600 mb-6">
-                Our hotel boasts a wide range of facilities designed to provide you with the ultimate luxury experience. From our exquisite dining options to recreational amenities, we ensure that every aspect of your stay exceeds expectations.
-              </p>
-              <p className="text-slate-600">
-                All facilities are maintained to the highest standards of cleanliness and service excellence, with our dedicated staff available 24/7 to assist with any requests you may have.
-              </p>
-            </div>
-            <div className="rounded-lg overflow-hidden shadow-lg">
-              <img 
-                src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80"
-                alt="Hotel facilities" 
-                className="w-full h-[400px] object-cover"
-              />
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredFacilities.map((facility) => (
+          <Card key={facility.id} className="transition-all hover:shadow-md">
+            <CardHeader className="text-center">
+              <div className="flex justify-center">
+                {facility.icon}
+              </div>
+              <CardTitle>{facility.name}</CardTitle>
+              <CardDescription>{facility.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center pb-6">
+              <Button variant="outline">Learn More</Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-      
-      <Footer />
     </div>
   );
 };
