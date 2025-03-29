@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Utensils, Coffee, DumbbellIcon, Waves, Spa, Wifi, BookOpen, MapPin, Wine } from "lucide-react";
+import { Utensils, Coffee, DumbbellIcon, Waves, Leaf, Wifi, BookOpen, MapPin, Wine } from "lucide-react";
 
 const Facilities = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -47,7 +47,7 @@ const Facilities = () => {
       id: 6,
       name: "Spa & Wellness",
       description: "Rejuvenating treatments and massages for ultimate relaxation",
-      icon: <Spa className="h-8 w-8 mb-2 text-primary" />,
+      icon: <Leaf className="h-8 w-8 mb-2 text-primary" />,
       category: "wellness"
     },
     {
