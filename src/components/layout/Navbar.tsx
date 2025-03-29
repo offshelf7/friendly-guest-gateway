@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Menu, X, User, LogOut, Home, Shield } from 'lucide-react';
+import { Menu, X, User, LogOut, Home, Shield, Hotel, Calendar, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -69,18 +69,24 @@ const Navbar = () => {
             <Home className="h-4 w-4" />
             Home
           </Link>
-          <a href="/#facilities" className={cn(
-            "transition-colors",
+          <Link to="/facilities" className={cn(
+            "flex items-center gap-2 transition-colors",
             isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
-          )}>Facilities</a>
+          )}>
+            <Hotel className="h-4 w-4" />
+            Facilities
+          </Link>
           <Link to="/rooms" className={cn(
             "transition-colors",
             isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
           )}>Rooms</Link>
-          <a href="/#contact" className={cn(
-            "transition-colors",
+          <Link to="/contact" className={cn(
+            "flex items-center gap-2 transition-colors",
             isScrolled ? "text-slate-700 hover:text-slate-900" : "text-white hover:text-white/80"
-          )}>Contact Us</a>
+          )}>
+            <Phone className="h-4 w-4" />
+            Contact Us
+          </Link>
           
           {isAdmin && (
             <Link to="/admin" className={cn(
@@ -114,7 +120,10 @@ const Navbar = () => {
                   <Link to="/profile" className="cursor-pointer">My Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/bookings" className="cursor-pointer">My Bookings</Link>
+                  <Link to="/my-bookings" className="cursor-pointer flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    My Bookings
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600">
@@ -165,13 +174,14 @@ const Navbar = () => {
             <Home className="h-5 w-5" />
             Home
           </Link>
-          <a 
-            href="/#facilities" 
-            className="text-xl font-medium text-slate-900 py-2"
+          <Link 
+            to="/facilities" 
+            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
             onClick={toggleMenu}
           >
+            <Hotel className="h-5 w-5" />
             Facilities
-          </a>
+          </Link>
           <Link 
             to="/rooms" 
             className="text-xl font-medium text-slate-900 py-2"
@@ -179,13 +189,14 @@ const Navbar = () => {
           >
             Rooms
           </Link>
-          <a 
-            href="/#contact" 
-            className="text-xl font-medium text-slate-900 py-2"
+          <Link 
+            to="/contact" 
+            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
             onClick={toggleMenu}
           >
+            <Phone className="h-5 w-5" />
             Contact Us
-          </a>
+          </Link>
           
           {isAdmin && (
             <Link
@@ -211,10 +222,11 @@ const Navbar = () => {
                 My Profile
               </Link>
               <Link
-                to="/bookings"
-                className="text-xl font-medium text-slate-900 py-2"
+                to="/my-bookings"
+                className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
                 onClick={toggleMenu}
               >
+                <Calendar className="h-5 w-5" />
                 My Bookings
               </Link>
               <button

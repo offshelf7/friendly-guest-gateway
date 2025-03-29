@@ -12,6 +12,9 @@ import RoomBooking from "./pages/RoomBooking";
 import BookingSuccess from "./pages/BookingSuccess";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import Facilities from "./pages/Facilities";
+import MyBookings from "./pages/MyBookings";
+import Contact from "./pages/Contact";
 
 // Import Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -35,6 +38,9 @@ const App = () => (
             <Route path="/booking/:roomId" element={<RoomBooking />} />
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/contact" element={<Contact />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />}>
