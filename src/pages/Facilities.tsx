@@ -107,9 +107,19 @@ const Facilities = () => {
     queryFn: fetchFacilities
   });
   
+  // Type the data properly to avoid the filter error
+  type Facility = {
+    id: number;
+    name: string;
+    description: string;
+    icon: string;
+    category: string;
+  }
+  
+  // Now filter the facilities with proper typing
   const filteredFacilities = activeTab === 'all' 
-    ? facilities 
-    : facilities.filter((facility: any) => facility.category === activeTab);
+    ? facilities as Facility[]
+    : (facilities as Facility[]).filter((facility) => facility.category === activeTab);
   
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
@@ -160,7 +170,7 @@ const Facilities = () => {
           <div className="text-center py-10 text-red-500">Error loading facilities. Please try again later.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFacilities.map((facility: any) => (
+            {filteredFacilities.map((facility) => (
               <Card key={facility.id} className="transition-all hover:shadow-md">
                 <CardHeader className="text-center">
                   <div className="flex justify-center">

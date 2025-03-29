@@ -9,7 +9,8 @@ import {
   CreditCard, 
   FileText, 
   Settings, 
-  UserCircle 
+  UserCircle,
+  BarChart3
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,7 @@ const menuItems = [
   { path: "/admin/reservations", label: "Reservations", icon: Calendar },
   { path: "/admin/rooms", label: "Rooms", icon: Bed },
   { path: "/admin/services", label: "Services", icon: Users },
+  { path: "/admin/reports", label: "Reports", icon: BarChart3 },
   { path: "/admin/messages", label: "Messages", icon: MessageSquare },
   { path: "/admin/billing", label: "Billing", icon: CreditCard },
   { path: "/admin/invoice", label: "Invoice", icon: FileText },
