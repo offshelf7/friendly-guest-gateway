@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +12,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import Navbar from "@/components/layout/Navbar";
 
 // Form validation schema
 const checkoutSchema = z.object({
@@ -72,7 +72,8 @@ const Checkout = () => {
             customerPhone: data.phone,
             customerAddress: data.address,
             metadata: {
-              type: 'food_order'
+              type: 'room_booking',
+              booking_id: location.state?.booking?.id
             }
           }
         });
@@ -90,7 +91,11 @@ const Checkout = () => {
             email: data.email,
             name: data.name,
             phone: data.phone,
-            address: data.address
+            address: data.address,
+            metadata: {
+              type: 'room_booking',
+              booking_id: location.state?.booking?.id
+            }
           }
         });
         
@@ -117,6 +122,7 @@ const Checkout = () => {
   
   return (
     <div className="container mx-auto py-24 px-4">
+      <Navbar />
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">Checkout</h1>
         
@@ -215,10 +221,10 @@ const Checkout = () => {
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>
-                      {item.name} x {item.quantity}
+                      {item.name}
                     </span>
                     <span className="font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${(item.price).toFixed(2)}
                     </span>
                   </div>
                 ))}

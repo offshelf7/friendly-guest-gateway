@@ -53,7 +53,7 @@ const RoomBooking = () => {
     return room.price_per_night * calculateNights();
   };
   
-  const handleBookRoom = async () => {
+  const handleBookRoom = async (paymentMethod: 'stripe' | 'chapa') => {
     if (!user || !room) return;
     
     try {
@@ -94,7 +94,7 @@ const RoomBooking = () => {
         return;
       }
       
-      // Create the booking
+      // Create a pending booking
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
         .insert([
@@ -105,7 +105,7 @@ const RoomBooking = () => {
             check_out_date: format(checkOutDate, 'yyyy-MM-dd'),
             guests_count: guestsCount,
             total_price: totalPrice,
-            status: 'confirmed',
+            status: 'pending', // Changed from 'confirmed' to 'pending'
             special_requests: specialRequests
           }
         ])
@@ -114,16 +114,22 @@ const RoomBooking = () => {
       
       if (bookingError) throw bookingError;
       
-      toast({
-        title: "Booking confirmed!",
-        description: `Your booking for ${room.name} has been confirmed.`,
-      });
+      // Prepare checkout item
+      const bookingItem = {
+        id: room.id,
+        name: `${room.name} - ${nights} night${nights !== 1 ? 's' : ''}`,
+        description: `Check-in: ${format(checkInDate, 'MMM d, yyyy')} - Check-out: ${format(checkOutDate, 'MMM d, yyyy')}`,
+        price: totalPrice,
+        quantity: 1
+      };
       
-      // Redirect to a booking confirmation page
-      navigate('/booking-success', { 
-        state: { 
-          booking: bookingData,
-          room: room 
+      // Redirect to checkout page with booking information
+      navigate('/checkout', {
+        state: {
+          items: [bookingItem],
+          totalPrice: totalPrice,
+          paymentMethod: paymentMethod,
+          booking: bookingData
         }
       });
       
