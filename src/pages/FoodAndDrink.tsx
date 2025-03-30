@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Coffee, Utensils, ShoppingCart } from "lucide-react";
 import { useCart } from '@/contexts/CartContext';
 import { MenuItem } from '@/types/menuTypes';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/home/Footer';
 
 // Sample menu data (would normally come from an API/Supabase)
 const menuItems: MenuItem[] = [
@@ -143,123 +145,129 @@ const FoodAndDrink = () => {
   const filteredItems = filterItems(menuItems);
 
   return (
-    <div className="container mx-auto py-24 px-4">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Food & Drink Menu</h1>
-          <p className="text-muted-foreground">Explore our delicious food and refreshing drinks</p>
-        </div>
-        
-        <div className="flex items-center mt-4 md:mt-0">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="relative mr-2"
-            onClick={() => navigate('/cart')}
-          >
-            <ShoppingCart />
-            {totalItems > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
-                {totalItems}
-              </Badge>
-            )}
-          </Button>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
+      <div className="container mx-auto py-24 px-4 flex-grow">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Food & Drink Menu</h1>
+            <p className="text-muted-foreground">Explore our delicious food and refreshing drinks</p>
+          </div>
           
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search menu..."
-              className="pl-8 w-[200px] md:w-[300px]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="flex items-center mt-4 md:mt-0">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="relative mr-2"
+              onClick={() => navigate('/cart')}
+            >
+              <ShoppingCart />
+              {totalItems > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
+                  {totalItems}
+                </Badge>
+              )}
+            </Button>
+            
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search menu..."
+                className="pl-8 w-[200px] md:w-[300px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
         </div>
+        
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-8 flex justify-start overflow-x-auto">
+            <TabsTrigger value="all">All Items</TabsTrigger>
+            <TabsTrigger value="food" className="flex items-center gap-1">
+              <Utensils className="w-4 h-4" />
+              Food
+            </TabsTrigger>
+            <TabsTrigger value="drink" className="flex items-center gap-1">
+              <Coffee className="w-4 h-4" />
+              Drinks
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-6">
+            {/* All Menu Items */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="food" className="space-y-6">
+            {/* Food Category Filters */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button 
+                variant={foodCategory === 'all' ? 'default' : 'outline'} 
+                size="sm"
+                onClick={() => setFoodCategory('all')}
+              >
+                All
+              </Button>
+              {foodTypes.map(type => (
+                <Button 
+                  key={type} 
+                  variant={foodCategory === type ? 'default' : 'outline'} 
+                  size="sm"
+                  onClick={() => setFoodCategory(type)}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Button>
+              ))}
+            </div>
+            
+            {/* Food Items */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="drink" className="space-y-6">
+            {/* Drink Category Filters */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button 
+                variant={drinkCategory === 'all' ? 'default' : 'outline'} 
+                size="sm"
+                onClick={() => setDrinkCategory('all')}
+              >
+                All
+              </Button>
+              {drinkTypes.map(type => (
+                <Button 
+                  key={type} 
+                  variant={drinkCategory === type ? 'default' : 'outline'} 
+                  size="sm"
+                  onClick={() => setDrinkCategory(type)}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Button>
+              ))}
+            </div>
+            
+            {/* Drink Items */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
       
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 flex justify-start overflow-x-auto">
-          <TabsTrigger value="all">All Items</TabsTrigger>
-          <TabsTrigger value="food" className="flex items-center gap-1">
-            <Utensils className="w-4 h-4" />
-            Food
-          </TabsTrigger>
-          <TabsTrigger value="drink" className="flex items-center gap-1">
-            <Coffee className="w-4 h-4" />
-            Drinks
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="space-y-6">
-          {/* All Menu Items */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="food" className="space-y-6">
-          {/* Food Category Filters */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Button 
-              variant={foodCategory === 'all' ? 'default' : 'outline'} 
-              size="sm"
-              onClick={() => setFoodCategory('all')}
-            >
-              All
-            </Button>
-            {foodTypes.map(type => (
-              <Button 
-                key={type} 
-                variant={foodCategory === type ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setFoodCategory(type)}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Button>
-            ))}
-          </div>
-          
-          {/* Food Items */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="drink" className="space-y-6">
-          {/* Drink Category Filters */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Button 
-              variant={drinkCategory === 'all' ? 'default' : 'outline'} 
-              size="sm"
-              onClick={() => setDrinkCategory('all')}
-            >
-              All
-            </Button>
-            {drinkTypes.map(type => (
-              <Button 
-                key={type} 
-                variant={drinkCategory === type ? 'default' : 'outline'} 
-                size="sm"
-                onClick={() => setDrinkCategory(type)}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Button>
-            ))}
-          </div>
-          
-          {/* Drink Items */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+      <Footer />
     </div>
   );
 };

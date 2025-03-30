@@ -29,12 +29,7 @@ const NavbarUserMenu = ({ isScrolled, toggleMenu }: NavbarUserMenuProps) => {
   if (!user) {
     return (
       <Link to="/login">
-        <Button variant="outline" className={cn(
-          "border-2",
-          isScrolled 
-            ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white" 
-            : "border-white text-white hover:bg-white/10"
-        )}>
+        <Button variant="outline" className="border-2 border-amber-300 text-amber-300 hover:bg-amber-300/10 hover:text-amber-200">
           Sign In
         </Button>
       </Link>
@@ -44,12 +39,7 @@ const NavbarUserMenu = ({ isScrolled, toggleMenu }: NavbarUserMenuProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={cn(
-          "border-2",
-          isScrolled 
-            ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white" 
-            : "border-white text-white hover:bg-white/10"
-        )}>
+        <Button variant="outline" className="border-2 border-amber-300 text-amber-300 hover:bg-amber-300/10 hover:text-amber-200">
           <User className="h-4 w-4 mr-2" />
           Account
         </Button>

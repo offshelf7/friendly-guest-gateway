@@ -41,7 +41,7 @@ const Navbar = () => {
     <nav 
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out px-6 md:px-10 py-4",
-        isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+        isScrolled ? "bg-slate-800/95 backdrop-blur-md shadow-sm" : "bg-slate-800"
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -58,10 +58,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className={cn(
-            "md:hidden focus:outline-none",
-            isScrolled ? "text-slate-900" : "text-white"
-          )}
+          className="md:hidden focus:outline-none text-white"
           onClick={toggleMenu}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
