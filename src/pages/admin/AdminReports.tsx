@@ -1,529 +1,541 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Download, 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Calendar,
-  BarChart,
-  PieChart,
-  LineChart
-} from "lucide-react";
-import { 
-  CartesianGrid, 
-  Legend, 
-  Line, 
-  LineChart as RechartsLineChart, 
-  Pie, 
-  PieChart as RechartsPieChart, 
-  Sector,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  XAxis, 
-  YAxis,
-  BarChart as RechartsBarChart,
-  Bar
-} from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from '@/integrations/supabase/client';
+import { ArrowDownToLine, BarChart3, Calendar, DollarSign, TrendingUp, Users } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart as RechartsBarChart,
+  Bar,
+  PieChart,
+  Pie,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell
+} from 'recharts';
 
-// Mock data fetching function for revenue data
-const fetchRevenueData = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { month: 'Jan', revenue: 8400, costs: 5600, profit: 2800 },
-        { month: 'Feb', revenue: 9200, costs: 6100, profit: 3100 },
-        { month: 'Mar', revenue: 8900, costs: 5900, profit: 3000 },
-        { month: 'Apr', revenue: 9600, costs: 6300, profit: 3300 },
-        { month: 'May', revenue: 10200, costs: 6800, profit: 3400 },
-        { month: 'Jun', revenue: 11500, costs: 7200, profit: 4300 },
-        { month: 'Jul', revenue: 12800, costs: 7900, profit: 4900 },
-        { month: 'Aug', revenue: 14200, costs: 8400, profit: 5800 },
-        { month: 'Sep', revenue: 13100, costs: 8100, profit: 5000 },
-        { month: 'Oct', revenue: 12400, costs: 7600, profit: 4800 },
-        { month: 'Nov', revenue: 11800, costs: 7400, profit: 4400 },
-        { month: 'Dec', revenue: 13500, costs: 8200, profit: 5300 }
-      ]);
-    }, 500);
-  });
-};
-
-// Mock data fetching function for guest data
-const fetchGuestData = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { month: 'Jan', guests: 124 },
-        { month: 'Feb', guests: 142 },
-        { month: 'Mar', guests: 156 },
-        { month: 'Apr', guests: 168 },
-        { month: 'May', guests: 182 },
-        { month: 'Jun', guests: 214 },
-        { month: 'Jul', guests: 246 },
-        { month: 'Aug', guests: 268 },
-        { month: 'Sep', guests: 232 },
-        { month: 'Oct', guests: 198 },
-        { month: 'Nov', guests: 186 },
-        { month: 'Dec', guests: 220 }
-      ]);
-    }, 500);
-  });
-};
-
-// Mock data fetching function for occupancy data
-const fetchOccupancyData = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { name: 'Standard', value: 40 },
-        { name: 'Deluxe', value: 30 },
-        { name: 'Suite', value: 20 },
-        { name: 'Presidential', value: 10 }
-      ]);
-    }, 500);
-  });
-};
-
-// Mock data fetching function for revenue by service
-const fetchRevenueByServiceData = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { name: 'Rooms', value: 65 },
-        { name: 'Restaurant', value: 15 },
-        { name: 'Spa', value: 10 },
-        { name: 'Events', value: 5 },
-        { name: 'Other', value: 5 }
-      ]);
-    }, 500);
-  });
-};
-
-const COLORS = ['#8B5CF6', '#0EA5E9', '#10B981', '#F59E0B', '#6366F1'];
-
-// Function to download chart data as CSV
-const downloadCSV = (data: any[], filename: string) => {
-  // Get the headers from the first object
-  const headers = Object.keys(data[0]);
+// Mock data service for reports
+const fetchReportData = async (reportType: string, period: string) => {
+  console.log(`Fetching ${reportType} report data for period: ${period}`);
   
-  // Create CSV string with headers
-  let csvContent = headers.join(',') + '\n';
+  // In a real app, this would fetch from Supabase
+  // You could use: await supabase.from('analytics').select('*').eq('type', reportType)
   
-  // Add rows
-  data.forEach(item => {
-    const row = headers.map(header => {
-      // Handle values that might need quotes
-      const value = item[header];
-      const valueStr = typeof value === 'string' ? `"${value}"` : value;
-      return valueStr;
-    }).join(',');
-    csvContent += row + '\n';
+  // For demo purposes, return mock data based on report type
+  await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
+  
+  switch(reportType) {
+    case 'revenue':
+      return generateRevenueData(period);
+    case 'guests':
+      return generateGuestData(period);
+    case 'occupancy':
+      return generateOccupancyData(period);
+    case 'services':
+      return generateServiceRevenueData(period);
+    default:
+      return [];
+  }
+};
+
+// Mock data generators
+const generateRevenueData = (period: string) => {
+  const data = [];
+  let days = period === 'year' ? 12 : period === 'month' ? 30 : 7;
+  let labels = period === 'year' ? 
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : 
+    Array.from({ length: days }, (_, i) => i + 1);
+  
+  for (let i = 0; i < days; i++) {
+    data.push({
+      name: period === 'year' ? labels[i] : `Day ${labels[i]}`,
+      roomRevenue: Math.floor(Math.random() * 10000) + 5000,
+      foodRevenue: Math.floor(Math.random() * 3000) + 1000,
+      spaRevenue: Math.floor(Math.random() * 2000) + 500,
+    });
+  }
+  return data;
+};
+
+const generateGuestData = (period: string) => {
+  const data = [];
+  let days = period === 'year' ? 12 : period === 'month' ? 30 : 7;
+  let labels = period === 'year' ? 
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : 
+    Array.from({ length: days }, (_, i) => i + 1);
+  
+  for (let i = 0; i < days; i++) {
+    data.push({
+      name: period === 'year' ? labels[i] : `Day ${labels[i]}`,
+      newGuests: Math.floor(Math.random() * 50) + 10,
+      returningGuests: Math.floor(Math.random() * 30) + 20,
+    });
+  }
+  return data;
+};
+
+const generateOccupancyData = (period: string) => {
+  const data = [];
+  let days = period === 'year' ? 12 : period === 'month' ? 30 : 7;
+  let labels = period === 'year' ? 
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : 
+    Array.from({ length: days }, (_, i) => i + 1);
+  
+  for (let i = 0; i < days; i++) {
+    const occupancyRate = Math.floor(Math.random() * 40) + 60; // 60-100%
+    data.push({
+      name: period === 'year' ? labels[i] : `Day ${labels[i]}`,
+      occupancyRate,
+      revenue: occupancyRate * 100,
+    });
+  }
+  return data;
+};
+
+const generateServiceRevenueData = (period: string) => {
+  const services = [
+    { name: 'Room Service', value: Math.floor(Math.random() * 5000) + 3000 },
+    { name: 'Spa & Wellness', value: Math.floor(Math.random() * 4000) + 2000 },
+    { name: 'Restaurant', value: Math.floor(Math.random() * 6000) + 4000 },
+    { name: 'Bar & Lounge', value: Math.floor(Math.random() * 3000) + 2000 },
+    { name: 'Conference', value: Math.floor(Math.random() * 2000) + 1000 },
+  ];
+  return services;
+};
+
+// COLORS for charts
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+const ReportSection = ({ title, value, percentage, icon: Icon, trend = "up" }: { 
+  title: string, 
+  value: string, 
+  percentage: string, 
+  icon: React.ElementType, 
+  trend?: "up" | "down" 
+}) => {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">
+          {title}
+        </CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className={`text-xs ${trend === "up" ? "text-green-500" : "text-red-500"} flex items-center`}>
+          <TrendingUp className="mr-1 h-3 w-3" />
+          {percentage}
+        </p>
+      </CardContent>
+    </Card>
+  );
+};
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0 
+  }).format(value);
+};
+
+const exportToCSV = (data: any[], filename: string) => {
+  if (!data || !data.length) return;
+  
+  const headers = Object.keys(data[0]).join(',');
+  const csvRows = data.map(row => {
+    return Object.values(row).join(',');
   });
   
-  // Create a download link
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}.csv`);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const csvContent = [headers, ...csvRows].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.setAttribute('hidden', '');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `${filename}.csv`);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 };
 
 const AdminReports = () => {
-  const [timeRange, setTimeRange] = useState('yearly');
+  const [activeTab, setActiveTab] = useState("revenue");
+  const [periodFilter, setPeriodFilter] = useState("month");
   
-  // Fetch revenue data
-  const { data: revenueData = [], isLoading: isLoadingRevenue } = useQuery({
-    queryKey: ['revenueData', timeRange],
-    queryFn: fetchRevenueData
+  // Use TanStack Query to fetch report data
+  const { data: reportData = [], isLoading, error } = useQuery({
+    queryKey: ['reports', activeTab, periodFilter],
+    queryFn: () => fetchReportData(activeTab, periodFilter)
   });
   
-  // Fetch guest data
-  const { data: guestData = [], isLoading: isLoadingGuests } = useQuery({
-    queryKey: ['guestData', timeRange],
-    queryFn: fetchGuestData
-  });
+  // Calculate summary metrics for the revenue tab
+  const totalRevenue = Array.isArray(reportData) ? reportData.reduce((sum, item) => {
+    const roomRev = item.roomRevenue || 0;
+    const foodRev = item.foodRevenue || 0;
+    const spaRev = item.spaRevenue || 0;
+    return sum + roomRev + foodRev + spaRev;
+  }, 0) : 0;
   
-  // Fetch occupancy data
-  const { data: occupancyData = [], isLoading: isLoadingOccupancy } = useQuery({
-    queryKey: ['occupancyData'],
-    queryFn: fetchOccupancyData
-  });
-  
-  // Fetch revenue by service data
-  const { data: revenueByServiceData = [], isLoading: isLoadingRevenueByService } = useQuery({
-    queryKey: ['revenueByServiceData'],
-    queryFn: fetchRevenueByServiceData
-  });
-
-  // Calculate total values for summary cards
-  const totalRevenue = revenueData.reduce((sum: number, item: any) => sum + item.revenue, 0);
-  const totalProfit = revenueData.reduce((sum: number, item: any) => sum + item.profit, 0);
-  const totalGuests = guestData.reduce((sum: number, item: any) => sum + item.guests, 0);
-  
-  // Render active shape for interactive pie chart
-  const renderActiveShape = (props: any) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
-    const sin = Math.sin(-midAngle * Math.PI / 180);
-    const cos = Math.cos(-midAngle * Math.PI / 180);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? 'start' : 'end';
-  
-    return (
-      <g>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name}: ${value}`}</text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-          {`(${(percent * 100).toFixed(2)}%)`}
-        </text>
-      </g>
-    );
-  };
-  
-  // State for active pie slice
-  const [activeIndex, setActiveIndex] = useState(0);
-  const onPieEnter = (_: any, index: number) => {
-    setActiveIndex(index);
-  };
+  const roomRevenue = Array.isArray(reportData) ? reportData.reduce((sum, item) => sum + (item.roomRevenue || 0), 0) : 0;
+  const foodRevenue = Array.isArray(reportData) ? reportData.reduce((sum, item) => sum + (item.foodRevenue || 0), 0) : 0;
+  const spaRevenue = Array.isArray(reportData) ? reportData.reduce((sum, item) => sum + (item.spaRevenue || 0), 0) : 0;
   
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Financial Reports</h1>
-        
-        <div className="flex items-center space-x-4">
-          <Select defaultValue={timeRange} onValueChange={setTimeRange}>
+    <div className="flex-1 space-y-4 p-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Reports & Analytics</h2>
+          <p className="text-muted-foreground">
+            View insights and analytics about your hotel performance
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => exportToCSV(reportData as any[], `${activeTab}-report-${periodFilter}`)}
+            disabled={isLoading || !Array.isArray(reportData) || reportData.length === 0}
+          >
+            <ArrowDownToLine className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Select value={periodFilter} onValueChange={setPeriodFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select time range" />
+              <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="monthly">Monthly</SelectItem>
-              <SelectItem value="quarterly">Quarterly</SelectItem>
-              <SelectItem value="yearly">Yearly</SelectItem>
+              <SelectItem value="week">Last 7 days</SelectItem>
+              <SelectItem value="month">Last 30 days</SelectItem>
+              <SelectItem value="year">Last 12 months</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">for the current year</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Profit</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalProfit.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+{((totalProfit/totalRevenue)*100).toFixed(1)}% margin</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Guests</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalGuests.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">for the current year</p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="revenue" className="w-full">
+      <Tabs defaultValue="revenue" value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="revenue">Revenue & Costs</TabsTrigger>
+          <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="guests">Guest Trends</TabsTrigger>
           <TabsTrigger value="occupancy">Occupancy</TabsTrigger>
-          <TabsTrigger value="services">Revenue by Service</TabsTrigger>
+          <TabsTrigger value="services">Service Revenue</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="revenue">
-          <Card>
+        {/* Revenue Tab */}
+        <TabsContent value="revenue" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <ReportSection 
+              title="Total Revenue" 
+              value={formatCurrency(totalRevenue)}
+              percentage="+20.1% from last month"
+              icon={DollarSign}
+            />
+            <ReportSection 
+              title="Room Revenue" 
+              value={formatCurrency(roomRevenue)}
+              percentage="+12.5% from last month"
+              icon={DollarSign}
+            />
+            <ReportSection 
+              title="Food Revenue" 
+              value={formatCurrency(foodRevenue)}
+              percentage="+18.2% from last month"
+              icon={DollarSign}
+            />
+            <ReportSection 
+              title="Spa Revenue" 
+              value={formatCurrency(spaRevenue)}
+              percentage="+8.4% from last month"
+              icon={DollarSign}
+            />
+          </div>
+          
+          <Card className="col-span-4">
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Revenue & Costs</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => downloadCSV(revenueData, 'revenue-costs-data')}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-              <CardDescription>Monthly breakdown of revenue, costs, and profit</CardDescription>
+              <CardTitle>Revenue Breakdown</CardTitle>
             </CardHeader>
-            <CardContent>
-              {isLoadingRevenue ? (
-                <div className="flex justify-center items-center h-[400px]">Loading...</div>
+            <CardContent className="pl-2">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-80">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : error ? (
+                <div className="flex justify-center items-center h-80 text-red-500">
+                  Error loading revenue data
+                </div>
               ) : (
-                <ChartContainer
-                  className="h-[400px]"
-                  config={{
-                    revenue: {
-                      label: 'Revenue',
-                      theme: {
-                        light: '#8B5CF6',
-                        dark: '#8B5CF6',
-                      },
-                    },
-                    costs: {
-                      label: 'Costs',
-                      theme: {
-                        light: '#0EA5E9',
-                        dark: '#0EA5E9',
-                      },
-                    },
-                    profit: {
-                      label: 'Profit',
-                      theme: {
-                        light: '#10B981',
-                        dark: '#10B981',
-                      },
-                    },
-                  }}
-                >
-                  <RechartsBarChart data={revenueData}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <AreaChart
+                    data={reportData as any[]}
+                    margin={{
+                      top: 10,
+                      right: 30,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="name" />
                     <YAxis />
-                    <RechartsTooltip 
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="rounded-lg border bg-background p-2 shadow-sm">
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="font-medium">{payload[0].payload.month}</div>
-                                <div className="text-right font-medium"></div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="text-muted-foreground">Revenue</div>
-                                <div className="text-right font-medium">${payload[0].value}</div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="text-muted-foreground">Costs</div>
-                                <div className="text-right font-medium">${payload[1].value}</div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="text-muted-foreground">Profit</div>
-                                <div className="text-right font-medium">${payload[2].value}</div>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
+                    <Tooltip />
                     <Legend />
-                    <Bar dataKey="revenue" fill="var(--color-revenue)" name="Revenue" />
-                    <Bar dataKey="costs" fill="var(--color-costs)" name="Costs" />
-                    <Bar dataKey="profit" fill="var(--color-profit)" name="Profit" />
-                  </RechartsBarChart>
-                </ChartContainer>
+                    <Area type="monotone" dataKey="roomRevenue" stackId="1" stroke="#8884d8" fill="#8884d8" name="Room Revenue" />
+                    <Area type="monotone" dataKey="foodRevenue" stackId="1" stroke="#82ca9d" fill="#82ca9d" name="Food Revenue" />
+                    <Area type="monotone" dataKey="spaRevenue" stackId="1" stroke="#ffc658" fill="#ffc658" name="Spa Revenue" />
+                  </AreaChart>
+                </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="guests">
-          <Card>
+        {/* Guest Trends Tab */}
+        <TabsContent value="guests" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <ReportSection 
+              title="Total Guests" 
+              value={Array.isArray(reportData) ? reportData.reduce((sum, item) => 
+                sum + (item.newGuests || 0) + (item.returningGuests || 0), 0).toString() : "0"}
+              percentage="+15.3% from last month"
+              icon={Users}
+            />
+            <ReportSection 
+              title="New Guests" 
+              value={Array.isArray(reportData) ? reportData.reduce((sum, item) => 
+                sum + (item.newGuests || 0), 0).toString() : "0"}
+              percentage="+18.7% from last month"
+              icon={Users}
+            />
+            <ReportSection 
+              title="Returning Guests" 
+              value={Array.isArray(reportData) ? reportData.reduce((sum, item) => 
+                sum + (item.returningGuests || 0), 0).toString() : "0"}
+              percentage="+10.4% from last month"
+              icon={Users}
+            />
+            <ReportSection 
+              title="Average Stay" 
+              value="3.2 days"
+              percentage="+0.5 days from last month"
+              icon={Calendar}
+            />
+          </div>
+          
+          <Card className="col-span-4">
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Guest Trends</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => downloadCSV(guestData, 'guest-trends-data')}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-              <CardDescription>Monthly guest count</CardDescription>
+              <CardTitle>Guest Trends</CardTitle>
             </CardHeader>
-            <CardContent>
-              {isLoadingGuests ? (
-                <div className="flex justify-center items-center h-[400px]">Loading...</div>
+            <CardContent className="pl-2">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-80">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : error ? (
+                <div className="flex justify-center items-center h-80 text-red-500">
+                  Error loading guest data
+                </div>
               ) : (
-                <ChartContainer
-                  className="h-[400px]"
-                  config={{
-                    guests: {
-                      label: 'Guests',
-                      theme: {
-                        light: '#0EA5E9',
-                        dark: '#0EA5E9',
-                      },
-                    },
-                  }}
-                >
-                  <RechartsLineChart data={guestData}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <RechartsBarChart
+                    data={reportData as any[]}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="name" />
                     <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="newGuests" fill="#8884d8" name="New Guests" />
+                    <Bar dataKey="returningGuests" fill="#82ca9d" name="Returning Guests" />
+                  </RechartsBarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Occupancy Tab */}
+        <TabsContent value="occupancy" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <ReportSection 
+              title="Average Occupancy" 
+              value={`${Array.isArray(reportData) ? Math.round(
+                reportData.reduce((sum, item) => sum + (item.occupancyRate || 0), 0) / 
+                (reportData.length || 1)
+              ) : 0}%`}
+              percentage="+5.2% from last month"
+              icon={BarChart3}
+            />
+            <ReportSection 
+              title="Revenue Per Room" 
+              value={formatCurrency(Array.isArray(reportData) ? 
+                reportData.reduce((sum, item) => sum + (item.revenue || 0), 0) / 
+                (reportData.length || 1) : 0)}
+              percentage="+8.7% from last month"
+              icon={DollarSign}
+            />
+            <ReportSection 
+              title="Peak Occupancy" 
+              value={`${Array.isArray(reportData) ? Math.max(
+                ...reportData.map(item => item.occupancyRate || 0)
+              ) : 0}%`}
+              percentage="+3.1% from last month"
+              icon={TrendingUp}
+            />
+            <ReportSection 
+              title="Lowest Occupancy" 
+              value={`${Array.isArray(reportData) ? Math.min(
+                ...reportData.map(item => item.occupancyRate || 0)
+              ) : 0}%`}
+              percentage="+2.4% from last month"
+              icon={TrendingUp}
+              trend="down"
+            />
+          </div>
+          
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle>Occupancy Rate</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-80">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : error ? (
+                <div className="flex justify-center items-center h-80 text-red-500">
+                  Error loading occupancy data
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart
+                    data={reportData as any[]}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip />
                     <Legend />
                     <Line 
+                      yAxisId="left"
                       type="monotone" 
-                      dataKey="guests" 
-                      stroke="var(--color-guests)" 
-                      strokeWidth={2} 
-                      dot={{ r: 4 }} 
-                      activeDot={{ r: 6 }} 
+                      dataKey="occupancyRate" 
+                      stroke="#8884d8" 
+                      activeDot={{ r: 8 }}
+                      name="Occupancy Rate (%)"
                     />
-                  </RechartsLineChart>
-                </ChartContainer>
+                    <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#82ca9d" name="Revenue per Room ($)" />
+                  </LineChart>
+                </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="occupancy">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Room Occupancy</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => downloadCSV(occupancyData, 'occupancy-data')}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-              <CardDescription>Occupancy by room type (%)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingOccupancy ? (
-                <div className="flex justify-center items-center h-[400px]">Loading...</div>
-              ) : (
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
+        {/* Services Tab */}
+        <TabsContent value="services" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Service Revenue Distribution</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-80">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : error ? (
+                  <div className="flex justify-center items-center h-80 text-red-500">
+                    Error loading service data
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <PieChart>
                       <Pie
-                        activeIndex={activeIndex}
-                        activeShape={renderActiveShape}
-                        data={occupancyData}
+                        data={reportData as any[]}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
+                        labelLine={true}
+                        outerRadius={150}
+                        fill="#8884d8"
                         dataKey="value"
-                        onMouseEnter={onPieEnter}
-                      >
-                        {occupancyData.map((entry: any, index: number) => (
-                          <Sector
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Legend />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="services">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Revenue by Service Type</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => downloadCSV(revenueByServiceData, 'revenue-by-service-data')}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </div>
-              <CardDescription>Percentage of revenue by service type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingRevenueByService ? (
-                <div className="flex justify-center items-center h-[400px]">Loading...</div>
-              ) : (
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                      <Pie
-                        data={revenueByServiceData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={100}
-                        dataKey="value"
+                        nameKey="name"
                         label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                       >
-                        {revenueByServiceData.map((entry: any, index: number) => (
-                          <Sector
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
+                        {Array.isArray(reportData) && reportData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Legend />
-                    </RechartsPieChart>
+                      <Tooltip formatter={(value) => formatCurrency(value as number)} />
+                    </PieChart>
                   </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Service Revenue Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-80">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : error ? (
+                  <div className="flex justify-center items-center h-80 text-red-500">
+                    Error loading service data
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {Array.isArray(reportData) && reportData.map((service, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{service.name}</span>
+                          <span>{formatCurrency(service.value)}</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2.5">
+                          <div 
+                            className="h-2.5 rounded-full" 
+                            style={{ 
+                              width: `${(service.value / (reportData.reduce((max, s) => Math.max(max, s.value), 0) || 1)) * 100}%`,
+                              backgroundColor: COLORS[index % COLORS.length] 
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

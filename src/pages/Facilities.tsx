@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Utensils, Coffee, DumbbellIcon, Waves, Leaf, Wifi, BookOpen, MapPin, Wine } from "lucide-react";
 import Navbar from '../components/layout/Navbar';
+import Footer from '../components/home/Footer';
 
 // Mock API function to fetch facilities data
 const fetchFacilities = async () => {
@@ -165,7 +166,10 @@ const Facilities = () => {
         </div>
         
         {isLoading ? (
-          <div className="text-center py-10">Loading facilities...</div>
+          <div className="text-center py-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p>Loading facilities...</p>
+          </div>
         ) : error ? (
           <div className="text-center py-10 text-red-500">Error loading facilities. Please try again later.</div>
         ) : (
@@ -187,6 +191,8 @@ const Facilities = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };
