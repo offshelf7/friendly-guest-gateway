@@ -10,7 +10,8 @@ import {
   FileText, 
   Settings, 
   UserCircle,
-  BarChart3
+  BarChart3,
+  Coffee
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,8 @@ const menuItems = [
   { path: "/admin/guests", label: "Guests", icon: Users },
   { path: "/admin/reservations", label: "Reservations", icon: Calendar },
   { path: "/admin/rooms", label: "Rooms", icon: Bed },
+  { path: "/admin/room-types", label: "Room Types", icon: Bed },
+  { path: "/admin/food-and-drink", label: "Food & Drink", icon: Coffee },
   { path: "/admin/services", label: "Services", icon: Users },
   { path: "/admin/reports", label: "Reports", icon: BarChart3 },
   { path: "/admin/messages", label: "Messages", icon: MessageSquare },

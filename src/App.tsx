@@ -24,6 +24,8 @@ import Checkout from "./pages/Checkout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminRooms from "./pages/admin/AdminRooms";
+import AdminRoomTypes from "./pages/admin/AdminRoomTypes";
+import AdminFoodAndDrink from "./pages/admin/AdminFoodAndDrink";
 import AdminGuests from "./pages/admin/AdminGuests";
 import GuestProfile from "./pages/admin/GuestProfile";
 import AdminServices from "./pages/admin/AdminServices";
@@ -55,6 +57,8 @@ const App = () => (
               <Route path="/admin" element={<AdminDashboard />}>
                 <Route index element={<AdminHome />} />
                 <Route path="rooms" element={<AdminRooms />} />
+                <Route path="room-types" element={<AdminRoomTypes />} />
+                <Route path="food-and-drink" element={<AdminFoodAndDrink />} />
                 <Route path="guests" element={<AdminGuests />} />
                 <Route path="guests/:id" element={<GuestProfile />} />
                 <Route path="services" element={<AdminServices />} />

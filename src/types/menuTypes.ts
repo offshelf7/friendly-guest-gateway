@@ -19,3 +19,12 @@ export interface PaymentMethod {
   processor: 'stripe' | 'chapa';
   icon: string;
 }
+
+export interface RoomType {
+  id: string;
+  name: string;
+  basePrice: number;
+  maxOccupancy: number;
+  amenities: string[];
+  description: string;
+}
