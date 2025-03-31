@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { RoleBasedRoute } from "@/components/auth/RoleBasedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Rooms from "./pages/Rooms";
@@ -31,6 +32,14 @@ import GuestProfile from "./pages/admin/GuestProfile";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminReports from "./pages/admin/AdminReports";
 
+// Import role-specific dashboard pages
+import GeneralManagerDashboard from "./pages/admin/GeneralManagerDashboard";
+import OperationalManagerDashboard from "./pages/admin/OperationalManagerDashboard";
+import ServiceManagerDashboard from "./pages/admin/ServiceManagerDashboard";
+import MaintenanceManagerDashboard from "./pages/admin/MaintenanceManagerDashboard";
+import MarketingManagerDashboard from "./pages/admin/MarketingManagerDashboard";
+import HRManagerDashboard from "./pages/admin/HRManagerDashboard";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -53,23 +62,35 @@ const App = () => (
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               
-              {/* Admin routes */}
-              <Route path="/admin" element={<AdminDashboard />}>
-                <Route index element={<AdminHome />} />
-                <Route path="rooms" element={<AdminRooms />} />
-                <Route path="room-types" element={<AdminRoomTypes />} />
-                <Route path="food-and-drink" element={<AdminFoodAndDrink />} />
-                <Route path="guests" element={<AdminGuests />} />
-                <Route path="guests/:id" element={<GuestProfile />} />
-                <Route path="services" element={<AdminServices />} />
-                <Route path="reports" element={<AdminReports />} />
-                <Route path="staff" element={<AdminHome />} />
-                <Route path="reservations" element={<AdminHome />} />
-                <Route path="messages" element={<AdminHome />} />
-                <Route path="billing" element={<AdminHome />} />
-                <Route path="invoice" element={<AdminHome />} />
-                <Route path="settings" element={<AdminHome />} />
-                <Route path="profile" element={<AdminHome />} />
+              {/* Admin routes with role-based access control */}
+              <Route element={<RoleBasedRoute allowedRoles={['admin', 'staff', 'general_manager', 'operational_manager', 'service_manager', 'maintenance_manager', 'marketing_manager', 'human_resources_manager']} />}>
+                <Route path="/admin" element={<AdminDashboard />}>
+                  <Route index element={<AdminHome />} />
+                  
+                  {/* Common admin routes accessible by all admin roles */}
+                  <Route path="rooms" element={<AdminRooms />} />
+                  <Route path="room-types" element={<AdminRoomTypes />} />
+                  <Route path="food-and-drink" element={<AdminFoodAndDrink />} />
+                  <Route path="guests" element={<AdminGuests />} />
+                  <Route path="guests/:id" element={<GuestProfile />} />
+                  <Route path="services" element={<AdminServices />} />
+                  <Route path="reports" element={<AdminReports />} />
+                  <Route path="staff" element={<AdminHome />} />
+                  <Route path="reservations" element={<AdminHome />} />
+                  <Route path="messages" element={<AdminHome />} />
+                  <Route path="billing" element={<AdminHome />} />
+                  <Route path="invoice" element={<AdminHome />} />
+                  <Route path="settings" element={<AdminHome />} />
+                  <Route path="profile" element={<AdminHome />} />
+                  
+                  {/* Role-specific dashboard pages */}
+                  <Route path="general-manager" element={<GeneralManagerDashboard />} />
+                  <Route path="operational-manager" element={<OperationalManagerDashboard />} />
+                  <Route path="service-manager" element={<ServiceManagerDashboard />} />
+                  <Route path="maintenance-manager" element={<MaintenanceManagerDashboard />} />
+                  <Route path="marketing-manager" element={<MarketingManagerDashboard />} />
+                  <Route path="hr-manager" element={<HRManagerDashboard />} />
+                </Route>
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
