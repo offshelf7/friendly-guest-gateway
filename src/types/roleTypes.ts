@@ -36,3 +36,24 @@ export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
   marketing_manager: 'Marketing Manager',
   human_resources_manager: 'HR Manager'
 };
+
+// Function to check if a user has a specific role
+export const hasRole = (userRoles: UserRole[] | UserRole | null, role: UserRole | UserRole[]): boolean => {
+  // If no user roles, return false
+  if (!userRoles) return false;
+  
+  // Convert single roles to arrays for easier comparison
+  const userRolesArray = Array.isArray(userRoles) ? userRoles : [userRoles];
+  const checkRolesArray = Array.isArray(role) ? role : [role];
+  
+  // Check if any of the user's roles match any of the required roles
+  return userRolesArray.some(userRole => checkRolesArray.includes(userRole));
+};
+
+// Function to check if a user has access to dashboard based on roles
+export const hasDashboardAccess = (userRoles: UserRole[] | UserRole | null): boolean => {
+  if (!userRoles) return false;
+  
+  const userRolesArray = Array.isArray(userRoles) ? userRoles : [userRoles];
+  return userRolesArray.some(role => DASHBOARD_ACCESS[role]);
+};

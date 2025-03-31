@@ -1,6 +1,7 @@
+
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { DASHBOARD_ACCESS } from '@/types/roleTypes';
+import { hasRole, hasDashboardAccess } from '@/types/roleTypes';
 
 type RoleBasedRouteProps = {
   allowedRoles?: string[];
@@ -11,7 +12,7 @@ export const RoleBasedRoute = ({
   allowedRoles = [],
   redirectPath = '/login',
 }: RoleBasedRouteProps) => {
-  const { user, userRole, loading } = useAuth();
+  const { user, userRoles, loading } = useAuth();
   
   // Show loading state if auth is still being checked
   if (loading) {
@@ -23,16 +24,16 @@ export const RoleBasedRoute = ({
     return <Navigate to={redirectPath} replace />;
   }
   
-  // If no specific roles are required, or user's role is allowed, render the route
+  // If no specific roles are required, or user has at least one of the allowed roles, render the route
   if (
     allowedRoles.length === 0 ||
-    (userRole && allowedRoles.includes(userRole))
+    hasRole(userRoles, allowedRoles as any[])
   ) {
     return <Outlet />;
   }
   
   // If user has dashboard access but not to this specific area, redirect to main dashboard
-  if (userRole && DASHBOARD_ACCESS[userRole]) {
+  if (hasDashboardAccess(userRoles)) {
     return <Navigate to="/admin" replace />;
   }
   

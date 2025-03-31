@@ -29,7 +29,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { ROLE_DISPLAY_NAMES, UserRole } from "@/types/roleTypes";
+import { ROLE_DISPLAY_NAMES, UserRole, hasRole } from "@/types/roleTypes";
 
 // Common menu items for all dashboard users
 const commonMenuItems = [
@@ -73,23 +73,26 @@ const roleMenuItems = [
 ];
 
 export function AdminSidebar() {
-  const { user, userRole } = useAuth();
+  const { user, userRoles } = useAuth();
   
   // Combine all menu items
   const allMenuItems = [...commonMenuItems, ...roleMenuItems];
   
-  // Filter menu items based on user role
+  // Display all user's roles as a comma-separated list
+  const userRoleDisplay = userRoles && userRoles.length > 0 
+    ? userRoles.map(role => ROLE_DISPLAY_NAMES[role as UserRole]).join(', ')
+    : 'Guest';
+  
+  // Filter menu items based on user roles
   const filteredMenuItems = allMenuItems.filter(item => 
-    item.roles.includes(userRole as string)
+    hasRole(userRoles, item.roles as UserRole[])
   );
 
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
         <h2 className="text-xl font-bold">Hotel Admin</h2>
-        {userRole && (
-          <p className="text-sm text-muted-foreground">{ROLE_DISPLAY_NAMES[userRole as UserRole]}</p>
-        )}
+        <p className="text-sm text-muted-foreground">{userRoleDisplay}</p>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>

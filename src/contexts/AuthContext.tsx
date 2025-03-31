@@ -3,12 +3,12 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
-import { UserRole } from '@/types/roomTypes';
+import { UserRole } from '@/types/roleTypes';
 
 type AuthContextType = {
   session: Session | null;
   user: User | null;
-  userRole: UserRole | null;
+  userRoles: UserRole[] | null;
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: any | null }>;
   signIn: (email: string, password: string) => Promise<{ error: any | null }>;
@@ -20,11 +20,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[] | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchUserRole = async (userId: string) => {
+  const fetchUserRoles = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('users')
@@ -33,15 +33,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
       
       if (error) {
-        console.error('Error fetching user role:', error);
+        console.error('Error fetching user roles:', error);
         return;
       }
       
+      // If the role is stored as a string, convert it to an array
       if (data?.role) {
-        setUserRole(data.role as UserRole);
+        // Check if role is already an array
+        if (Array.isArray(data.role)) {
+          setUserRoles(data.role as UserRole[]);
+        } else {
+          // If it's a single role, wrap it in an array
+          setUserRoles([data.role as UserRole]);
+        }
+      } else {
+        // Default to guest if no role is found
+        setUserRoles(['guest']);
       }
     } catch (error) {
-      console.error('Error in fetchUserRole:', error);
+      console.error('Error in fetchUserRoles:', error);
     }
   };
 
@@ -53,9 +63,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserRole(session.user.id);
+          fetchUserRoles(session.user.id);
         } else {
-          setUserRole(null);
+          setUserRoles(null);
         }
         
         if (event === 'SIGNED_IN') {
@@ -80,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRole(session.user.id);
+        fetchUserRoles(session.user.id);
       }
       
       setLoading(false);
@@ -153,7 +163,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider value={{ 
       session, 
       user, 
-      userRole,
+      userRoles,
       loading, 
       signUp, 
       signIn, 
