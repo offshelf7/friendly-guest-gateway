@@ -7,6 +7,8 @@ export interface MenuItem {
   image_url?: string;
   category: 'food' | 'drink';
   type: string; // subcategory like 'main', 'dessert', 'appetizer', 'cocktail', 'wine', etc.
+  // New drink subcategory for better classification
+  drinkType?: 'soft' | 'beer' | 'wine' | 'cocktail' | 'coffee' | 'tea' | 'other';
 }
 
 export interface CartItem extends MenuItem {
