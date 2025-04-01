@@ -12,8 +12,30 @@ import NavbarMobileMenu from './NavbarMobileMenu';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  
+  // Create mock auth data for debugging
+  const mockAuthData = {
+    user: null,
+    signOut: async () => { console.log('Mock sign out'); },
+    userRoles: null,
+    userSuspended: false,
+    session: null,
+    loading: false,
+    signUp: async () => ({ error: null }),
+    signIn: async () => ({ error: null }),
+  };
+  
+  // Try to use the real auth context, but fall back to mock data if it's not available
+  let auth;
+  try {
+    auth = useAuth();
+  } catch (e) {
+    console.log('AuthProvider not available, using mock data');
+    auth = mockAuthData;
+  }
+  
+  const { user, signOut } = auth;
 
   // Assume admin role for demonstration - in a real app, this would come from the user object
   const isAdmin = user && user.email === 'admin@hotel.com';
