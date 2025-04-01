@@ -10,6 +10,13 @@ import {
   Instagram, Facebook, Twitter, Mail, Globe, Award, DollarSign, Target
 } from "lucide-react";
 import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const MarketingManagerDashboard = () => {
   const [selectedDateRange, setSelectedDateRange] = useState("month");
@@ -967,9 +974,9 @@ const MarketingManagerDashboard = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Campaigns</SelectItem>
-                      <SelectItem value="high">High ROI (>200%)</SelectItem>
+                      <SelectItem value="high">High ROI (&gt;200%)</SelectItem>
                       <SelectItem value="medium">Medium ROI (100-200%)</SelectItem>
-                      <SelectItem value="low">Low ROI (<100%)</SelectItem>
+                      <SelectItem value="low">Low ROI (&lt;100%)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
