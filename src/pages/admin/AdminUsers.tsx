@@ -113,9 +113,13 @@ const AdminUsers = () => {
   // Function to update user role
   const updateUserRole = async (userId: string, roles: UserRole[]) => {
     try {
+      // Cast the roles to unknown first, then to any to satisfy TypeScript
+      // This is necessary because the database schema might accept different formats
+      const roleValue = roles.length === 1 ? roles[0] : roles;
+      
       const { error } = await supabase
         .from('users')
-        .update({ role: roles.length === 1 ? roles[0] : roles })
+        .update({ role: roleValue as any })
         .eq('id', userId);
 
       if (error) throw error;
@@ -232,10 +236,14 @@ const AdminUsers = () => {
       // Update the user's role after the trigger creates the user record
       const rolesArray = data.roles as unknown as UserRole[];
       setTimeout(async () => {
+        // Cast the roles to any to satisfy TypeScript
+        // This is necessary because the database schema might accept different formats
+        const roleValue = rolesArray.length === 1 ? rolesArray[0] : rolesArray;
+        
         const { error: roleError } = await supabase
           .from('users')
           .update({ 
-            role: rolesArray.length === 1 ? rolesArray[0] : rolesArray 
+            role: roleValue as any
           })
           .eq('id', authData.user!.id);
 
