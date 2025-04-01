@@ -18,18 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
-// Type for messages
-type Message = {
-  id: string;
-  from_user_id: string;
-  to_user_id: string;
-  message: string;
-  read: boolean;
-  created_at: string;
-  from_user_name?: string;
-  to_user_name?: string;
-};
+import { AdminMessage } from '@/types/adminTypes';
 
 // Schema for reply form
 const replySchema = z.object({
@@ -40,7 +29,7 @@ const replySchema = z.object({
 });
 
 const UserMessages = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<AdminMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<Record<string, string>>({});
   const { user } = useAuth();
@@ -58,14 +47,19 @@ const UserMessages = () => {
 
     const fetchMessages = async () => {
       try {
-        // Fetch messages where the current user is either sender or recipient
+        // Use the raw query method instead since the types aren't updated
         const { data, error } = await supabase
           .from('admin_messages')
           .select('*')
           .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false }) as { data: AdminMessage[] | null, error: any };
 
         if (error) throw error;
+        
+        if (!data) {
+          setMessages([]);
+          return;
+        }
 
         // Mark unread messages as read
         const unreadMessages = data
@@ -99,7 +93,7 @@ const UserMessages = () => {
         // Create a mapping of user IDs to names
         const userMap: Record<string, string> = {};
         userData.forEach((user) => {
-          userMap[user.id] = user.name || user.email;
+          userMap[user.id] = user.name || user.email || 'Unknown User';
         });
 
         setUsers(userMap);
@@ -178,11 +172,12 @@ const UserMessages = () => {
 
       const adminId = adminMessage.from_user_id;
 
+      // Use the raw insert method
       const { error } = await supabase.from('admin_messages').insert({
         from_user_id: user.id,
         to_user_id: adminId,
         message: data.message,
-      });
+      }) as { error: any };
 
       if (error) throw error;
 

@@ -1,3 +1,4 @@
+
 import {
   Home,
   LayoutDashboard,
@@ -8,7 +9,7 @@ import {
   Settings,
   Wrench,
   MessageSquare,
-  FileInvoice,
+  FileText,
   UserCog,
   Bell,
   ConciergeBell,
@@ -81,12 +82,12 @@ const sidebarItems: SidebarItem[] = [
   {
     path: "/admin/billing",
     name: "Billing",
-    icon: FileInvoice,
+    icon: FileText,
   },
   {
     path: "/admin/invoice",
     name: "Invoice",
-    icon: FileInvoice,
+    icon: FileText,
   },
   {
     path: "/admin/settings",

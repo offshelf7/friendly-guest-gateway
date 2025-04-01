@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
+import { UserData } from '@/types/adminTypes';
 
 import {
   Shield,
@@ -65,16 +66,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-// Type definition for user data
-type UserData = {
-  id: string;
-  email: string;
-  name: string | null;
-  role: UserRole | UserRole[] | null;
-  created_at: string;
-  suspended: boolean;
-};
-
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,7 +89,7 @@ const AdminUsers = () => {
           id: user.id,
           email: user.email || '',
           name: user.name,
-          role: user.role,
+          role: user.role as UserRole | UserRole[] | null,
           created_at: user.created_at,
           suspended: user.suspended || false
         }));
@@ -239,7 +230,7 @@ const AdminUsers = () => {
       }
 
       // Update the user's role after the trigger creates the user record
-      const rolesArray = data.roles as UserRole[];
+      const rolesArray = data.roles as unknown as UserRole[];
       setTimeout(async () => {
         const { error: roleError } = await supabase
           .from('users')
@@ -267,7 +258,7 @@ const AdminUsers = () => {
             id: user.id,
             email: user.email || '',
             name: user.name,
-            role: user.role,
+            role: user.role as UserRole | UserRole[] | null,
             created_at: user.created_at,
             suspended: user.suspended || false
           }));
@@ -297,11 +288,12 @@ const AdminUsers = () => {
     if (!selectedUser || !currentUser) return;
 
     try {
+      // Use the raw query method
       const { error } = await supabase.from('admin_messages').insert({
         from_user_id: currentUser.id,
         to_user_id: selectedUser.id,
         message: data.message,
-      });
+      }) as { error: any };
 
       if (error) throw error;
 
