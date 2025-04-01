@@ -115,7 +115,7 @@ const AdminUsers = () => {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ role: roles })
+        .update({ role: roles.length === 1 ? roles[0] : roles })
         .eq('id', userId);
 
       if (error) throw error;
@@ -234,7 +234,9 @@ const AdminUsers = () => {
       setTimeout(async () => {
         const { error: roleError } = await supabase
           .from('users')
-          .update({ role: rolesArray })
+          .update({ 
+            role: rolesArray.length === 1 ? rolesArray[0] : rolesArray 
+          })
           .eq('id', authData.user!.id);
 
         if (roleError) {
