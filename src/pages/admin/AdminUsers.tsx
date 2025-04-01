@@ -93,7 +93,17 @@ const AdminUsers = () => {
 
         if (error) throw error;
 
-        setUsers(data || []);
+        // Convert to the correct UserData format
+        const formattedUsers: UserData[] = (data || []).map(user => ({
+          id: user.id,
+          email: user.email || '',
+          name: user.name,
+          role: user.role,
+          created_at: user.created_at,
+          suspended: user.suspended || false
+        }));
+
+        setUsers(formattedUsers);
       } catch (error: any) {
         console.error('Error fetching users:', error);
         toast({
@@ -251,8 +261,18 @@ const AdminUsers = () => {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!fetchError) {
-          setUsers(updatedUsers || []);
+        if (!fetchError && updatedUsers) {
+          // Convert to the correct UserData format
+          const formattedUsers: UserData[] = updatedUsers.map(user => ({
+            id: user.id,
+            email: user.email || '',
+            name: user.name,
+            role: user.role,
+            created_at: user.created_at,
+            suspended: user.suspended || false
+          }));
+          
+          setUsers(formattedUsers);
         }
       }, 1000); // Give the trigger a second to create the user record
 
@@ -488,7 +508,7 @@ const AdminUsers = () => {
                     {user.suspended ? (
                       <Badge variant="destructive">Suspended</Badge>
                     ) : (
-                      <Badge variant="success">Active</Badge>
+                      <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
