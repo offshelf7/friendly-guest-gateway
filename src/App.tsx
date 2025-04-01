@@ -31,6 +31,8 @@ import AdminGuests from "./pages/admin/AdminGuests";
 import GuestProfile from "./pages/admin/GuestProfile";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminUsers from "./pages/admin/AdminUsers";
+import SuspendedUserDashboard from "./pages/admin/SuspendedUserDashboard";
 
 // Import role-specific dashboard pages
 import GeneralManagerDashboard from "./pages/admin/GeneralManagerDashboard";
@@ -83,6 +85,9 @@ const App = () => (
                   <Route path="settings" element={<AdminHome />} />
                   <Route path="profile" element={<AdminHome />} />
                   
+                  {/* User management - admin only */}
+                  <Route path="users" element={<AdminUsers />} />
+                  
                   {/* Role-specific dashboard pages */}
                   <Route path="general-manager" element={<GeneralManagerDashboard />} />
                   <Route path="operational-manager" element={<OperationalManagerDashboard />} />
@@ -91,6 +96,11 @@ const App = () => (
                   <Route path="marketing-manager" element={<MarketingManagerDashboard />} />
                   <Route path="hr-manager" element={<HRManagerDashboard />} />
                 </Route>
+              </Route>
+              
+              {/* Suspended user dashboard - accessible only by suspended users */}
+              <Route path="/admin/suspended" element={<RoleBasedRoute checkSuspension={false} />}>
+                <Route index element={<SuspendedUserDashboard />} />
               </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

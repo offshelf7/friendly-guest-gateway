@@ -9,6 +9,7 @@ type AuthContextType = {
   session: Session | null;
   user: User | null;
   userRoles: UserRole[] | null;
+  userSuspended: boolean;
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: any | null }>;
   signIn: (email: string, password: string) => Promise<{ error: any | null }>;
@@ -21,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userRoles, setUserRoles] = useState<UserRole[] | null>(null);
+  const [userSuspended, setUserSuspended] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -28,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('role')
+        .select('role, suspended')
         .eq('id', userId)
         .single();
       
@@ -50,6 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Default to guest if no role is found
         setUserRoles(['guest']);
       }
+
+      // Set the user's suspended status
+      setUserSuspended(data?.suspended || false);
     } catch (error) {
       console.error('Error in fetchUserRoles:', error);
     }
@@ -66,6 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           fetchUserRoles(session.user.id);
         } else {
           setUserRoles(null);
+          setUserSuspended(false);
         }
         
         if (event === 'SIGNED_IN') {
@@ -164,6 +170,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       session, 
       user, 
       userRoles,
+      userSuspended,
       loading, 
       signUp, 
       signIn, 

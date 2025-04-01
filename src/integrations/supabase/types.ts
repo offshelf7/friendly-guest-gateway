@@ -563,12 +563,12 @@ export type Database = {
           id: string
           image: string | null
           name: string | null
-          role: Database["public"]["Enums"]["user_role"] | null
+          role: string | null
           subscription: string | null
           token_identifier: string
           updated_at: string | null
           user_id: string | null
-          user_role: string | null
+          user_role: string[] | null
         }
         Insert: {
           avatar_url?: string | null
@@ -579,12 +579,12 @@ export type Database = {
           id: string
           image?: string | null
           name?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
+          role?: string | null
           subscription?: string | null
           token_identifier: string
           updated_at?: string | null
           user_id?: string | null
-          user_role?: string | null
+          user_role?: string[] | null
         }
         Update: {
           avatar_url?: string | null
@@ -595,12 +595,12 @@ export type Database = {
           id?: string
           image?: string | null
           name?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
+          role?: string | null
           subscription?: string | null
           token_identifier?: string
           updated_at?: string | null
           user_id?: string | null
-          user_role?: string | null
+          user_role?: string[] | null
         }
         Relationships: []
       }

@@ -6,13 +6,15 @@ import { hasRole, hasDashboardAccess } from '@/types/roleTypes';
 type RoleBasedRouteProps = {
   allowedRoles?: string[];
   redirectPath?: string;
+  checkSuspension?: boolean;
 };
 
 export const RoleBasedRoute = ({
   allowedRoles = [],
   redirectPath = '/login',
+  checkSuspension = true,
 }: RoleBasedRouteProps) => {
-  const { user, userRoles, loading } = useAuth();
+  const { user, userRoles, loading, userSuspended } = useAuth();
   
   // Show loading state if auth is still being checked
   if (loading) {
@@ -22,6 +24,21 @@ export const RoleBasedRoute = ({
   // If user isn't logged in, redirect to login
   if (!user) {
     return <Navigate to={redirectPath} replace />;
+  }
+  
+  // If user is suspended and this route should check suspension,
+  // redirect to suspended dashboard
+  if (checkSuspension && userSuspended) {
+    // Only allow access to the suspended dashboard
+    if (window.location.pathname !== '/admin/suspended') {
+      return <Navigate to="/admin/suspended" replace />;
+    }
+    return <Outlet />;
+  }
+  
+  // Special case for the suspended dashboard - only suspended users should access it
+  if (window.location.pathname === '/admin/suspended' && !userSuspended) {
+    return <Navigate to="/admin" replace />;
   }
   
   // If no specific roles are required, or user has at least one of the allowed roles, render the route
