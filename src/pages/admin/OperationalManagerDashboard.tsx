@@ -1,16 +1,32 @@
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Calendar, CheckCircle, Clock, AlertTriangle, BarChart, Users,
-  Briefcase, Clipboard, FileText, Settings, Printer, ArrowUpDown
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { BarChart3, ChevronUp, Clock, Clipboard, Hotel, Luggage, CalendarDays, Users, DollarSign, AlertTriangle, CheckCircle, ClipboardCheck, ShoppingCart, Utensils, Bed, Search, Filter, ArrowDownToLine } from "lucide-react";
 import { useState } from "react";
+
+const LineChartIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M3 3v18h18" />
+      <path d="m19 9-5 5-4-4-3 3" />
+    </svg>
+  );
+};
 
 const OperationalManagerDashboard = () => {
   const [selectedDateRange, setSelectedDateRange] = useState("today");
@@ -61,7 +77,7 @@ const OperationalManagerDashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">42</div>
@@ -285,7 +301,7 @@ const OperationalManagerDashboard = () => {
                 <CardContent>
                   <div className="h-40 flex items-center justify-center border-2 border-dashed rounded-lg mb-4">
                     <div className="text-center">
-                      <BarChart className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                      <BarChart3 className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">Task Chart Placeholder</p>
                     </div>
                   </div>
@@ -376,7 +392,7 @@ const OperationalManagerDashboard = () => {
                     <CardTitle>Staff Schedule</CardTitle>
                     <div className="flex gap-2">
                       <Button variant="outline">
-                        <Calendar className="h-4 w-4 mr-2" />
+                        <CalendarDays className="h-4 w-4 mr-2" />
                         Full Calendar
                       </Button>
                       <Button>
@@ -396,11 +412,11 @@ const OperationalManagerDashboard = () => {
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <ChevronLeft className="h-4 w-4" />
+                          <ChevronUp className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm">August 10, 2023</Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <ChevronRight className="h-4 w-4" />
+                          <ChevronDownToLine className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -672,7 +688,7 @@ const OperationalManagerDashboard = () => {
                         <TableHead>
                           <Button variant="ghost" className="flex items-center gap-1 p-0 h-auto font-semibold">
                             Item Name
-                            <ArrowUpDown className="h-3 w-3" />
+                            <ArrowDownToLine className="h-3 w-3" />
                           </Button>
                         </TableHead>
                         <TableHead>Category</TableHead>
@@ -774,7 +790,7 @@ const OperationalManagerDashboard = () => {
                 <CardContent>
                   <div className="h-40 flex items-center justify-center border-2 border-dashed rounded-lg mb-4">
                     <div className="text-center">
-                      <BarChart className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                      <BarChart3 className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">Inventory Status Chart</p>
                     </div>
                   </div>
@@ -955,7 +971,7 @@ const OperationalManagerDashboard = () => {
                   
                   <div className="h-60 flex items-center justify-center border-2 border-dashed rounded-lg mb-6">
                     <div className="text-center">
-                      <BarChart className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                      <BarChart3 className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">Monthly Performance Metrics Chart</p>
                     </div>
                   </div>
@@ -1102,7 +1118,7 @@ const OperationalManagerDashboard = () => {
                 <CardContent>
                   <div className="h-60 flex items-center justify-center border-2 border-dashed rounded-lg mb-6">
                     <div className="text-center">
-                      <LineChart className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                      <LineChartIcon className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
                       <p className="text-sm text-muted-foreground">Efficiency Trends Chart</p>
                     </div>
                   </div>
@@ -1359,19 +1375,21 @@ const OperationalManagerDashboard = () => {
   );
 };
 
-// Missing components used in layout
-const ChevronLeft = ({ className }) => {
+const ChevronUp = ({ className }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M15 18l-6-6 6-6" />
+      <path d="M12 5v14" />
+      <path d="M19 12h-6" />
     </svg>
   );
 };
 
-const ChevronRight = ({ className }) => {
+const ChevronDownToLine = ({ className }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M9 18l6-6-6-6" />
+      <path d="M12 5v14" />
+      <path d="M19 12h-6" />
+      <path d="M12 19v-6" />
     </svg>
   );
 };
