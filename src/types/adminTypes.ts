@@ -1,3 +1,4 @@
+
 // Add AdminMessage type
 export interface AdminMessage {
   id: string;
@@ -15,6 +16,16 @@ export interface AdminMessage {
     name: string;
     email: string;
   };
+}
+
+// Add UserData interface
+export interface UserData {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string | string[] | null;
+  created_at?: string;
+  suspended?: boolean;
 }
 
 // Add Invoice type

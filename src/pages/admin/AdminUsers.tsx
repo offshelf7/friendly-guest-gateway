@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -65,7 +64,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-// Define user interface matching with supabase User type
 interface MockUser {
   id: string;
   email: string;
@@ -77,7 +75,6 @@ const AdminUsers = () => {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const { toast } = useToast();
   
-  // Create mock auth data for debugging
   const mockAuthData = {
     user: { id: 'mock-admin-id', email: 'admin@example.com' } as MockUser,
     signOut: async () => { console.log('Mock sign out'); },
@@ -89,14 +86,11 @@ const AdminUsers = () => {
     signIn: async () => ({ error: null }),
   };
   
-  // State for currentUser, initialized with mock data
   const [currentUser, setCurrentUser] = useState<MockUser>(mockAuthData.user);
   
-  // Try to use the real auth context, but fall back to mock data if it's not available
   useEffect(() => {
     const fetchAuthUser = async () => {
       try {
-        // Dynamic import to avoid the error when AuthProvider is not available
         const { useAuth } = await import('@/contexts/AuthContext');
         try {
           const auth = useAuth();
@@ -105,18 +99,15 @@ const AdminUsers = () => {
           }
         } catch (e) {
           console.log('AuthProvider not available, using mock data');
-          // Mock user already set as default state
         }
       } catch (e) {
         console.log('Failed to import AuthContext, using mock data');
-        // Mock user already set as default state
       }
     };
     
     fetchAuthUser();
   }, []);
 
-  // Load users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -127,7 +118,6 @@ const AdminUsers = () => {
 
         if (error) throw error;
 
-        // Convert to the correct UserData format
         const formattedUsers: UserData[] = (data || []).map(user => ({
           id: user.id,
           email: user.email || '',
@@ -153,11 +143,8 @@ const AdminUsers = () => {
     fetchUsers();
   }, [toast]);
 
-  // Function to update user role
   const updateUserRole = async (userId: string, roles: UserRole[]) => {
     try {
-      // Cast the roles to unknown first, then to any to satisfy TypeScript
-      // This is necessary because the database schema might accept different formats
       const roleValue = roles.length === 1 ? roles[0] : roles;
       
       const { error } = await supabase
@@ -187,7 +174,6 @@ const AdminUsers = () => {
     }
   };
 
-  // Function to toggle user suspension
   const toggleSuspension = async (userId: string, suspend: boolean) => {
     try {
       const { error } = await supabase
@@ -219,7 +205,6 @@ const AdminUsers = () => {
     }
   };
 
-  // Schema for new user form
   const newUserSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email address' }),
     password: z
@@ -229,7 +214,6 @@ const AdminUsers = () => {
     roles: z.array(z.string()).min(1, { message: 'Select at least one role' }),
   });
 
-  // Schema for message form
   const messageSchema = z.object({
     message: z
       .string()
@@ -237,7 +221,6 @@ const AdminUsers = () => {
       .max(500, { message: 'Message must be less than 500 characters' }),
   });
 
-  // Form for creating a new user
   const newUserForm = useForm<z.infer<typeof newUserSchema>>({
     resolver: zodResolver(newUserSchema),
     defaultValues: {
@@ -248,7 +231,6 @@ const AdminUsers = () => {
     },
   });
 
-  // Form for sending a message
   const messageForm = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
     defaultValues: {
@@ -256,10 +238,8 @@ const AdminUsers = () => {
     },
   });
 
-  // Function to create a new user
   const createUser = async (data: z.infer<typeof newUserSchema>) => {
     try {
-      // Register user in auth system
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -276,11 +256,8 @@ const AdminUsers = () => {
         throw new Error('User creation failed');
       }
 
-      // Update the user's role after the trigger creates the user record
       const rolesArray = data.roles as unknown as UserRole[];
       setTimeout(async () => {
-        // Cast the roles to any to satisfy TypeScript
-        // This is necessary because the database schema might accept different formats
         const roleValue = rolesArray.length === 1 ? rolesArray[0] : rolesArray;
         
         const { error: roleError } = await supabase
@@ -299,14 +276,12 @@ const AdminUsers = () => {
           });
         }
 
-        // Refresh the user list
         const { data: updatedUsers, error: fetchError } = await supabase
           .from('users')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (!fetchError && updatedUsers) {
-          // Convert to the correct UserData format
           const formattedUsers: UserData[] = updatedUsers.map(user => ({
             id: user.id,
             email: user.email || '',
@@ -318,7 +293,7 @@ const AdminUsers = () => {
           
           setUsers(formattedUsers);
         }
-      }, 1000); // Give the trigger a second to create the user record
+      }, 1000);
 
       toast({
         title: 'User created',
@@ -336,12 +311,10 @@ const AdminUsers = () => {
     }
   };
 
-  // Function to send a message to a user
   const sendMessage = async (data: z.infer<typeof messageSchema>) => {
     if (!selectedUser || !currentUser) return;
 
     try {
-      // Use the raw query method
       const { error } = await supabase.from('admin_messages').insert({
         from_user_id: currentUser.id,
         to_user_id: selectedUser.id,
@@ -366,7 +339,6 @@ const AdminUsers = () => {
     }
   };
 
-  // Get available roles for display
   const availableRoles = Object.keys(ROLE_DISPLAY_NAMES) as UserRole[];
 
   return (
@@ -558,7 +530,6 @@ const AdminUsers = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      {/* Edit Roles Button */}
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
@@ -652,7 +623,6 @@ const AdminUsers = () => {
                         </DialogContent>
                       </Dialog>
 
-                      {/* Message User Button */}
                       <Sheet>
                         <SheetTrigger asChild>
                           <Button
@@ -702,7 +672,6 @@ const AdminUsers = () => {
                         </SheetContent>
                       </Sheet>
 
-                      {/* Suspend/Unsuspend User Button */}
                       <Button
                         size="sm"
                         variant={user.suspended ? 'outline' : 'destructive'}

@@ -68,29 +68,56 @@ const AdminMessages = () => {
   const fetchMessages = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      // First, get all admin_messages
+      const { data: messageData, error: messageError } = await supabase
         .from("admin_messages")
-        .select(`
-          *,
-          from_user:from_user_id(name,email),
-          to_user:to_user_id(name,email)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-
-      // Cast the data to the correct type
-      const formattedMessages = (data || []).map(msg => ({
+      if (messageError) throw messageError;
+      
+      if (!messageData || messageData.length === 0) {
+        setMessages([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Get unique user IDs from messages
+      const userIds = Array.from(
+        new Set(
+          messageData.flatMap((msg) => [msg.from_user_id, msg.to_user_id])
+        )
+      );
+      
+      // Fetch user data for these IDs
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("id, name, email")
+        .in("id", userIds);
+        
+      if (userError) throw userError;
+      
+      // Create a map of user IDs to user data
+      const userMap: Record<string, { name: string, email: string }> = {};
+      userData?.forEach((user) => {
+        userMap[user.id] = {
+          name: user.name || 'Unknown User',
+          email: user.email || 'unknown@example.com'
+        };
+      });
+      
+      // Combine message data with user data
+      const formattedMessages: AdminMessage[] = messageData.map((msg) => ({
         ...msg,
         from_user: {
-          name: msg.from_user?.name || 'Unknown',
-          email: msg.from_user?.email || 'unknown@example.com'
+          name: userMap[msg.from_user_id]?.name || 'Unknown User',
+          email: userMap[msg.from_user_id]?.email || 'unknown@example.com'
         },
         to_user: {
-          name: msg.to_user?.name || 'Unknown',
-          email: msg.to_user?.email || 'unknown@example.com'
+          name: userMap[msg.to_user_id]?.name || 'Unknown User',
+          email: userMap[msg.to_user_id]?.email || 'unknown@example.com'
         }
-      })) as AdminMessage[];
+      }));
 
       setMessages(formattedMessages);
     } catch (error: any) {
