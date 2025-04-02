@@ -256,7 +256,7 @@ const AdminUsers = () => {
         throw new Error('User creation failed');
       }
 
-      const rolesArray = data.roles as unknown as UserRole[];
+      const rolesArray = data.roles.map(role => role as UserRole);
       setTimeout(async () => {
         const roleValue = rolesArray.length === 1 ? rolesArray[0] : rolesArray;
         

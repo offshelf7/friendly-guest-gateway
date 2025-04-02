@@ -5,7 +5,10 @@ CREATE TYPE public.user_role AS ENUM (
   'staff', 
   'admin', 
   'general_manager', 
-  'operational_manager'
+  'operational_manager',
+  'front_office_manager',
+  'finance_manager',
+  'purchasing_manager'
 );
 
 -- Add role column to existing users table
@@ -81,15 +84,15 @@ ON public.service_categories FOR SELECT USING (true);
 
 CREATE POLICY "Staff and above can insert service categories" 
 ON public.service_categories FOR INSERT 
-WITH CHECK (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+WITH CHECK (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 CREATE POLICY "Staff and above can update service categories" 
 ON public.service_categories FOR UPDATE 
-USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 CREATE POLICY "Staff and above can delete service categories" 
 ON public.service_categories FOR DELETE 
-USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 -- RLS Policies for services
 CREATE POLICY "Anyone can view services" 
@@ -97,15 +100,15 @@ ON public.services FOR SELECT USING (true);
 
 CREATE POLICY "Staff and above can insert services" 
 ON public.services FOR INSERT 
-WITH CHECK (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+WITH CHECK (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 CREATE POLICY "Staff and above can update services" 
 ON public.services FOR UPDATE 
-USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 CREATE POLICY "Staff and above can delete services" 
 ON public.services FOR DELETE 
-USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager'));
+USING (auth.jwt() ->> 'role' IN ('staff', 'admin', 'general_manager', 'operational_manager', 'front_office_manager', 'finance_manager', 'purchasing_manager'));
 
 -- Create function to set user role
 CREATE OR REPLACE FUNCTION public.set_user_role(user_id_param UUID, role_param user_role)
