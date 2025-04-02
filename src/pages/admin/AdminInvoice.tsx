@@ -1,33 +1,19 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  FilePlus, 
-  Printer, 
-  Send, 
-  Download, 
-  Search, 
-  Pencil, 
-  Trash2,
-  Eye,
-  FileText
+import { format } from "date-fns";
+import {
+  CalendarIcon,
+  Download,
+  Edit,
+  FileText,
+  Plus,
+  Printer,
+  Search,
+  Trash,
+  User,
+  X,
 } from "lucide-react";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 import {
   Dialog,
@@ -40,827 +26,753 @@ import {
 } from "@/components/ui/dialog";
 
 import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Invoice, InvoiceItem, InvoiceStatus } from "@/types/adminTypes";
+
+import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-interface InvoiceItem {
-  id: string;
-  description: string;
-  quantity: number;
-  price: number;
-}
+// Form schema for the invoice
+const invoiceFormSchema = z.object({
+  invoiceNumber: z.string().min(1, "Invoice number is required"),
+  customerName: z.string().min(1, "Customer name is required"),
+  customerEmail: z.string().email("Invalid email address"),
+  customerAddress: z.string().min(1, "Address is required"),
+  date: z.string().min(1, "Date is required"),
+  dueDate: z.string().min(1, "Due date is required"),
+  status: z.enum(["draft", "sent", "paid", "overdue"]),
+  notes: z.string().optional(),
+});
 
-interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  customer: {
-    name: string;
-    email: string;
-    address: string;
-  };
-  date: string;
-  dueDate: string;
-  items: InvoiceItem[];
-  status: 'draft' | 'sent' | 'paid' | 'overdue';
-  notes?: string;
-}
-
-// Mock data for demonstration
-const mockInvoices: Invoice[] = [
-  {
-    id: '1',
-    invoiceNumber: 'INV-2023-001',
-    customer: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      address: '123 Main St, Anytown, CA 12345'
-    },
-    date: '2023-11-01',
-    dueDate: '2023-11-15',
-    items: [
-      {
-        id: '1-1',
-        description: 'Deluxe Room - 3 nights',
-        quantity: 3,
-        price: 250
-      },
-      {
-        id: '1-2',
-        description: 'Room Service',
-        quantity: 2,
-        price: 75
-      }
-    ],
-    status: 'paid'
-  },
-  {
-    id: '2',
-    invoiceNumber: 'INV-2023-002',
-    customer: {
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      address: '456 Oak St, Othertown, NY 54321'
-    },
-    date: '2023-11-05',
-    dueDate: '2023-11-20',
-    items: [
-      {
-        id: '2-1',
-        description: 'Suite Room - 2 nights',
-        quantity: 2,
-        price: 350
-      },
-      {
-        id: '2-2',
-        description: 'Spa Treatment',
-        quantity: 1,
-        price: 120
-      }
-    ],
-    status: 'sent'
-  },
-  {
-    id: '3',
-    invoiceNumber: 'INV-2023-003',
-    customer: {
-      name: 'Robert Johnson',
-      email: 'robert@example.com',
-      address: '789 Pine St, Somewhere, TX 67890'
-    },
-    date: '2023-11-10',
-    dueDate: '2023-11-25',
-    items: [
-      {
-        id: '3-1',
-        description: 'Standard Room - 5 nights',
-        quantity: 5,
-        price: 150
-      }
-    ],
-    status: 'draft',
-    notes: 'Pending confirmation from customer'
-  }
-];
+// Form schema for invoice items
+const invoiceItemSchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
+  unitPrice: z.coerce.number().min(0.01, "Price must be greater than 0"),
+});
 
 const AdminInvoice = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [isAddingItem, setIsAddingItem] = useState(false);
+  const [isEditingItem, setIsEditingItem] = useState<string | null>(null);
+  
   const { toast } = useToast();
-
-  // Schema for invoice form
-  const invoiceSchema = z.object({
-    invoiceNumber: z.string().min(1, { message: "Invoice number is required" }),
-    customerName: z.string().min(1, { message: "Customer name is required" }),
-    customerEmail: z.string().email({ message: "Valid email is required" }),
-    customerAddress: z.string().min(1, { message: "Address is required" }),
-    date: z.string().min(1, { message: "Date is required" }),
-    dueDate: z.string().min(1, { message: "Due date is required" }),
-    status: z.enum(['draft', 'sent', 'paid', 'overdue']),
-    notes: z.string().optional()
-  });
-
-  // Schema for invoice item
-  const invoiceItemSchema = z.object({
-    description: z.string().min(1, { message: "Description is required" }),
-    quantity: z.coerce.number().positive({ message: "Quantity must be positive" }),
-    price: z.coerce.number().positive({ message: "Price must be positive" })
-  });
-
-  // Form for invoice
-  const form = useForm<z.infer<typeof invoiceSchema>>({
-    resolver: zodResolver(invoiceSchema),
+  
+  // Form for invoice details
+  const invoiceForm = useForm<z.infer<typeof invoiceFormSchema>>({
+    resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
-      invoiceNumber: '',
-      customerName: '',
-      customerEmail: '',
-      customerAddress: '',
-      date: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-      status: 'draft',
-      notes: ''
-    }
+      invoiceNumber: "",
+      customerName: "",
+      customerEmail: "",
+      customerAddress: "",
+      date: new Date().toISOString().split("T")[0],
+      dueDate: "",
+      status: "draft",
+      notes: "",
+    },
   });
-
-  // Form for invoice item
+  
+  // Form for invoice items
   const itemForm = useForm<z.infer<typeof invoiceItemSchema>>({
     resolver: zodResolver(invoiceItemSchema),
     defaultValues: {
-      description: '',
+      description: "",
       quantity: 1,
-      price: 0
-    }
+      unitPrice: 0,
+    },
   });
 
-  // Filter invoices by search term
-  const filteredInvoices = invoices.filter(invoice => 
-    invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+  // Load mock invoices
+  useEffect(() => {
+    setIsLoading(true);
+    
+    // Mock data - in a real app, this would be an API call
+    setTimeout(() => {
+      const mockInvoices: Invoice[] = Array.from({ length: 8 }, (_, i) => ({
+        id: `inv-${i + 1000}`,
+        invoiceNumber: `INV-${2023 + i}-${1000 + i}`,
+        customer: {
+          name: `Customer ${i + 1}`,
+          email: `customer${i + 1}@example.com`,
+          address: `${123 + i} Main St, City ${i + 1}, State, Zip`,
+        },
+        date: new Date(Date.now() - (Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+        dueDate: new Date(Date.now() + (Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
+        items: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, (_, j) => ({
+          id: `item-${i}-${j}`,
+          description: ["Room booking", "Room service", "Restaurant charges", "Spa services"][Math.floor(Math.random() * 4)],
+          quantity: Math.floor(Math.random() * 5) + 1,
+          unitPrice: Math.floor(Math.random() * 100) + 50,
+        })),
+        status: ["draft", "sent", "paid", "overdue"][Math.floor(Math.random() * 4)] as InvoiceStatus,
+        notes: Math.random() > 0.5 ? "Thank you for your business." : undefined,
+      }));
+      
+      setInvoices(mockInvoices);
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  // Reset form when editing an invoice
+  useEffect(() => {
+    if (selectedInvoice) {
+      invoiceForm.reset({
+        invoiceNumber: selectedInvoice.invoiceNumber,
+        customerName: selectedInvoice.customer.name,
+        customerEmail: selectedInvoice.customer.email,
+        customerAddress: selectedInvoice.customer.address,
+        date: new Date(selectedInvoice.date).toISOString().split("T")[0],
+        dueDate: new Date(selectedInvoice.dueDate).toISOString().split("T")[0],
+        status: selectedInvoice.status,
+        notes: selectedInvoice.notes || "",
+      });
+      
+      setInvoiceItems([...selectedInvoice.items]);
+    } else {
+      // For new invoices, generate a new invoice number
+      const newInvoiceNumber = `INV-${new Date().getFullYear()}-${1000 + invoices.length}`;
+      invoiceForm.reset({
+        invoiceNumber: newInvoiceNumber,
+        customerName: "",
+        customerEmail: "",
+        customerAddress: "",
+        date: new Date().toISOString().split("T")[0],
+        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        status: "draft",
+        notes: "",
+      });
+      
+      setInvoiceItems([]);
+    }
+  }, [selectedInvoice, invoiceForm, invoices.length]);
+
+  // Filter invoices based on search term
+  const filteredInvoices = invoices.filter(
+    (invoice) =>
+      invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  // Calculate total for an invoice
+  // Calculate totals for an invoice
   const calculateTotal = (items: InvoiceItem[]) => {
-    return items.reduce((total, item) => total + (item.quantity * item.price), 0);
+    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   };
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-  };
-
-  // Get status badge class
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
-      case 'sent':
-        return 'bg-blue-100 text-blue-800';
-      case 'paid':
-        return 'bg-green-100 text-green-800';
-      case 'overdue':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  // Handle saving the invoice
+  const handleSaveInvoice = (data: z.infer<typeof invoiceFormSchema>) => {
+    if (invoiceItems.length === 0) {
+      toast({
+        title: "Cannot save invoice",
+        description: "Please add at least one item to the invoice",
+        variant: "destructive",
+      });
+      return;
     }
-  };
-
-  // Add new invoice
-  const addInvoice = (data: z.infer<typeof invoiceSchema>) => {
-    const newInvoice: Invoice = {
-      id: `${Date.now()}`,
+    
+    const invoiceData: Invoice = {
+      id: selectedInvoice ? selectedInvoice.id : `inv-${Date.now()}`,
       invoiceNumber: data.invoiceNumber,
       customer: {
         name: data.customerName,
         email: data.customerEmail,
-        address: data.customerAddress
+        address: data.customerAddress,
       },
-      date: data.date,
-      dueDate: data.dueDate,
-      items: [],
-      status: data.status,
-      notes: data.notes
+      date: new Date(data.date).toISOString(),
+      dueDate: new Date(data.dueDate).toISOString(),
+      items: invoiceItems,
+      status: data.status as InvoiceStatus,
+      notes: data.notes,
     };
-
-    setInvoices([newInvoice, ...invoices]);
-    toast({
-      title: 'Success',
-      description: 'Invoice created successfully',
-    });
-    form.reset();
-  };
-
-  // Update existing invoice
-  const updateInvoice = (data: z.infer<typeof invoiceSchema>) => {
-    if (!selectedInvoice) return;
-
-    const updatedInvoices = invoices.map(invoice => 
-      invoice.id === selectedInvoice.id ? {
-        ...invoice,
-        invoiceNumber: data.invoiceNumber,
-        customer: {
-          name: data.customerName,
-          email: data.customerEmail,
-          address: data.customerAddress
-        },
-        date: data.date,
-        dueDate: data.dueDate,
-        status: data.status,
-        notes: data.notes
-      } : invoice
-    );
-
-    setInvoices(updatedInvoices);
-    toast({
-      title: 'Success',
-      description: 'Invoice updated successfully',
-    });
-    setIsEditing(false);
+    
+    if (selectedInvoice) {
+      // Update existing invoice
+      setInvoices(
+        invoices.map((inv) => (inv.id === invoiceData.id ? invoiceData : inv))
+      );
+      toast({
+        title: "Invoice updated",
+        description: `Invoice ${data.invoiceNumber} has been updated successfully.`,
+      });
+    } else {
+      // Create new invoice
+      setInvoices([invoiceData, ...invoices]);
+      toast({
+        title: "Invoice created",
+        description: `Invoice ${data.invoiceNumber} has been created successfully.`,
+      });
+    }
+    
+    setIsFormDialogOpen(false);
     setSelectedInvoice(null);
   };
 
-  // Delete invoice
-  const deleteInvoice = (id: string) => {
-    setInvoices(invoices.filter(invoice => invoice.id !== id));
+  // Add or update an invoice item
+  const handleSaveItem = (data: z.infer<typeof invoiceItemSchema>) => {
+    const newItem: InvoiceItem = {
+      id: isEditingItem || `item-${Date.now()}`,
+      description: data.description,
+      quantity: data.quantity,
+      unitPrice: data.unitPrice,
+    };
+    
+    if (isEditingItem) {
+      // Update existing item
+      setInvoiceItems(
+        invoiceItems.map((item) =>
+          item.id === isEditingItem ? newItem : item
+        )
+      );
+    } else {
+      // Add new item
+      setInvoiceItems([...invoiceItems, newItem]);
+    }
+    
+    itemForm.reset({
+      description: "",
+      quantity: 1,
+      unitPrice: 0,
+    });
+    
+    setIsAddingItem(false);
+    setIsEditingItem(null);
+  };
+
+  // Delete an invoice item
+  const handleDeleteItem = (id: string) => {
+    setInvoiceItems(invoiceItems.filter((item) => item.id !== id));
+  };
+
+  // Delete an invoice
+  const handleDeleteInvoice = (id: string) => {
+    setInvoices(invoices.filter((invoice) => invoice.id !== id));
     toast({
-      title: 'Success',
-      description: 'Invoice deleted successfully',
+      title: "Invoice deleted",
+      description: "The invoice has been deleted successfully.",
     });
   };
 
+  // Edit an invoice item
+  const handleEditItem = (item: InvoiceItem) => {
+    itemForm.reset({
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    });
+    
+    setIsEditingItem(item.id);
+    setIsAddingItem(true);
+  };
+
+  // Get status badge based on invoice status
+  const getStatusBadge = (status: InvoiceStatus) => {
+    switch (status) {
+      case "paid":
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Paid</Badge>;
+      case "sent":
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-200">Sent</Badge>;
+      case "draft":
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-200">Draft</Badge>;
+      case "overdue":
+        return <Badge variant="destructive">Overdue</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Invoice Management</h1>
-          <p className="text-muted-foreground">Create and manage customer invoices</p>
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button onClick={() => {
-              setIsEditing(false);
-              form.reset({
-                invoiceNumber: `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-                customerName: '',
-                customerEmail: '',
-                customerAddress: '',
-                date: new Date().toISOString().split('T')[0],
-                dueDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-                status: 'draft',
-                notes: ''
-              });
-            }}>
-              <FilePlus className="h-4 w-4 mr-2" />
-              Create Invoice
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>{isEditing ? 'Edit Invoice' : 'Create New Invoice'}</DialogTitle>
-              <DialogDescription>
-                {isEditing 
-                  ? 'Update the invoice details below'
-                  : 'Fill in the invoice details below'
-                }
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(isEditing ? updateInvoice : addInvoice)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="invoiceNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="INV-2023-001" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="draft">Draft</SelectItem>
-                            <SelectItem value="sent">Sent</SelectItem>
-                            <SelectItem value="paid">Paid</SelectItem>
-                            <SelectItem value="overdue">Overdue</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Due Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Customer Information</h3>
-                  <FormField
-                    control={form.control}
-                    name="customerName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Customer name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="customerEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="customer@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="customerAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Customer address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Any additional notes" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <DialogFooter>
-                  <Button type="submit">
-                    {isEditing ? 'Update Invoice' : 'Create Invoice'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="mb-6">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search invoices..."
-            className="pl-8 w-[300px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
+    <div className="container mx-auto py-8">
       <Card>
         <CardHeader>
-          <CardTitle>All Invoices</CardTitle>
-          <CardDescription>View and manage all customer invoices</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell className="font-medium">
-                    {invoice.invoiceNumber}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{invoice.customer.name}</div>
-                      <div className="text-sm text-muted-foreground">{invoice.customer.email}</div>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Invoice Management</CardTitle>
+              <CardDescription>
+                Create, view and manage customer invoices
+              </CardDescription>
+            </div>
+            <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={() => setSelectedInvoice(null)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Invoice
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedInvoice ? "Edit Invoice" : "Create New Invoice"}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {selectedInvoice
+                      ? "Update the invoice details"
+                      : "Enter invoice details to create a new invoice"}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <Form {...invoiceForm}>
+                  <form
+                    onSubmit={invoiceForm.handleSubmit(handleSaveInvoice)}
+                    className="space-y-4 mt-4"
+                  >
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={invoiceForm.control}
+                        name="invoiceNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Invoice Number</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={invoiceForm.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="sent">Sent</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                                <SelectItem value="overdue">Overdue</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </TableCell>
-                  <TableCell>{formatDate(invoice.date)}</TableCell>
-                  <TableCell>{formatDate(invoice.dueDate)}</TableCell>
-                  <TableCell>{formatCurrency(calculateTotal(invoice.items))}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(invoice.status)}`}>
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[700px]">
-                          <DialogHeader>
-                            <div className="flex justify-between">
-                              <DialogTitle>Invoice {invoice.invoiceNumber}</DialogTitle>
-                              <div className="flex space-x-2">
-                                <Button variant="outline" size="sm">
-                                  <Printer className="h-4 w-4 mr-2" />
-                                  Print
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Download
-                                </Button>
-                                {invoice.status !== 'sent' && invoice.status !== 'paid' && (
-                                  <Button size="sm">
-                                    <Send className="h-4 w-4 mr-2" />
-                                    Send
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          </DialogHeader>
-                          <div className="py-4">
-                            <div className="flex justify-between mb-8">
-                              <div>
-                                <h3 className="text-lg font-bold mb-1">Invoice To:</h3>
-                                <p className="font-medium">{invoice.customer.name}</p>
-                                <p className="text-sm text-muted-foreground">{invoice.customer.email}</p>
-                                <p className="text-sm text-muted-foreground whitespace-pre-line">{invoice.customer.address}</p>
-                              </div>
-                              <div className="text-right">
-                                <h3 className="text-lg font-bold mb-1">Invoice Details:</h3>
-                                <p><span className="text-muted-foreground">Invoice Number:</span> {invoice.invoiceNumber}</p>
-                                <p><span className="text-muted-foreground">Date:</span> {formatDate(invoice.date)}</p>
-                                <p><span className="text-muted-foreground">Due Date:</span> {formatDate(invoice.dueDate)}</p>
-                                <p>
-                                  <span className="text-muted-foreground">Status:</span> 
-                                  <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(invoice.status)}`}>
-                                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead className="w-[50%]">Description</TableHead>
-                                  <TableHead>Qty</TableHead>
-                                  <TableHead>Price</TableHead>
-                                  <TableHead className="text-right">Total</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {invoice.items.map((item) => (
-                                  <TableRow key={item.id}>
-                                    <TableCell>{item.description}</TableCell>
-                                    <TableCell>{item.quantity}</TableCell>
-                                    <TableCell>{formatCurrency(item.price)}</TableCell>
-                                    <TableCell className="text-right">{formatCurrency(item.quantity * item.price)}</TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                            
-                            <div className="mt-4 flex justify-end">
-                              <div className="w-1/3">
-                                <div className="flex justify-between py-2 font-medium">
-                                  <span>Subtotal:</span>
-                                  <span>{formatCurrency(calculateTotal(invoice.items))}</span>
-                                </div>
-                                <div className="flex justify-between py-2 font-medium border-t border-b">
-                                  <span>Total:</span>
-                                  <span className="text-lg">{formatCurrency(calculateTotal(invoice.items))}</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {invoice.notes && (
-                              <div className="mt-8">
-                                <h3 className="font-medium mb-2">Notes:</h3>
-                                <p className="text-sm text-muted-foreground">{invoice.notes}</p>
-                              </div>
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                      
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setIsEditing(true);
-                              setSelectedInvoice(invoice);
-                              form.reset({
-                                invoiceNumber: invoice.invoiceNumber,
-                                customerName: invoice.customer.name,
-                                customerEmail: invoice.customer.email,
-                                customerAddress: invoice.customer.address,
-                                date: invoice.date,
-                                dueDate: invoice.dueDate,
-                                status: invoice.status,
-                                notes: invoice.notes || ''
-                              });
-                            }}
-                          >
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Invoice</DialogTitle>
-                            <DialogDescription>
-                              Update the invoice details below
-                            </DialogDescription>
-                          </DialogHeader>
-                          <Form {...form}>
-                            <form onSubmit={form.handleSubmit(updateInvoice)} className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <FormField
-                                  control={form.control}
-                                  name="invoiceNumber"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Invoice Number</FormLabel>
-                                      <FormControl>
-                                        <Input placeholder="INV-2023-001" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={invoiceForm.control}
+                        name="date"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Invoice Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={invoiceForm.control}
+                        name="dueDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Due Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="border p-4 rounded-md bg-muted/30">
+                      <h3 className="font-medium mb-2">Customer Information</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={invoiceForm.control}
+                          name="customerName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Customer name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={invoiceForm.control}
+                          name="customerEmail"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Email address" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <FormField
+                          control={invoiceForm.control}
+                          name="customerAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="Customer address"
+                                  rows={2}
+                                  {...field}
                                 />
-                                <FormField
-                                  control={form.control}
-                                  name="status"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Status</FormLabel>
-                                      <Select 
-                                        onValueChange={field.onChange} 
-                                        defaultValue={field.value}
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="border p-4 rounded-md bg-muted/30">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="font-medium">Invoice Items</h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            itemForm.reset({
+                              description: "",
+                              quantity: 1,
+                              unitPrice: 0,
+                            });
+                            setIsEditingItem(null);
+                            setIsAddingItem(true);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Item
+                        </Button>
+                      </div>
+
+                      {invoiceItems.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">
+                          No items added yet
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="text-right">Quantity</TableHead>
+                                <TableHead className="text-right">Unit Price</TableHead>
+                                <TableHead className="text-right">Total</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {invoiceItems.map((item) => (
+                                <TableRow key={item.id}>
+                                  <TableCell>{item.description}</TableCell>
+                                  <TableCell className="text-right">{item.quantity}</TableCell>
+                                  <TableCell className="text-right">
+                                    ${item.unitPrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="text-right font-medium">
+                                    ${(item.quantity * item.unitPrice).toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditItem(item)}
                                       >
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          <SelectItem value="draft">Draft</SelectItem>
-                                          <SelectItem value="sent">Sent</SelectItem>
-                                          <SelectItem value="paid">Paid</SelectItem>
-                                          <SelectItem value="overdue">Overdue</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDeleteItem(item.id)}
+                                      >
+                                        <Trash className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                          <div className="flex justify-end mt-4">
+                            <div className="text-right">
+                              <div className="font-medium text-lg">
+                                Total: ${calculateTotal(invoiceItems).toFixed(2)}
                               </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-                              <div className="grid grid-cols-2 gap-4">
-                                <FormField
-                                  control={form.control}
-                                  name="date"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Invoice Date</FormLabel>
-                                      <FormControl>
-                                        <Input type="date" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name="dueDate"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Due Date</FormLabel>
-                                      <FormControl>
-                                        <Input type="date" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-
-                              <div className="space-y-4">
-                                <h3 className="text-lg font-medium">Customer Information</h3>
-                                <FormField
-                                  control={form.control}
-                                  name="customerName"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Name</FormLabel>
-                                      <FormControl>
-                                        <Input placeholder="Customer name" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name="customerEmail"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Email</FormLabel>
-                                      <FormControl>
-                                        <Input placeholder="customer@example.com" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name="customerAddress"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Address</FormLabel>
-                                      <FormControl>
-                                        <Textarea placeholder="Customer address" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-
+                      {isAddingItem && (
+                        <div className="mt-4 border p-3 rounded-md bg-background">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="text-sm font-medium">
+                              {isEditingItem ? "Edit Item" : "Add New Item"}
+                            </h4>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setIsAddingItem(false);
+                                setIsEditingItem(null);
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <Form {...itemForm}>
+                            <form
+                              onSubmit={itemForm.handleSubmit(handleSaveItem)}
+                              className="space-y-3"
+                            >
                               <FormField
-                                control={form.control}
-                                name="notes"
+                                control={itemForm.control}
+                                name="description"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Notes</FormLabel>
+                                    <FormLabel>Description</FormLabel>
                                     <FormControl>
-                                      <Textarea placeholder="Any additional notes" {...field} />
+                                      <Input
+                                        placeholder="Item description"
+                                        {...field}
+                                      />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
                                 )}
                               />
-
-                              <DialogFooter>
-                                <Button type="submit">
-                                  Update Invoice
+                              <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                  control={itemForm.control}
+                                  name="quantity"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Quantity</FormLabel>
+                                      <FormControl>
+                                        <Input type="number" min={1} {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={itemForm.control}
+                                  name="unitPrice"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Unit Price</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0.01}
+                                          step={0.01}
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                              <div className="flex justify-end">
+                                <Button type="submit" size="sm">
+                                  {isEditingItem ? "Update Item" : "Add Item"}
                                 </Button>
-                              </DialogFooter>
+                              </div>
                             </form>
                           </Form>
-                        </DialogContent>
-                      </Dialog>
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteInvoice(invoice.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
-                      
-                      {invoice.status === 'draft' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const updatedInvoices = invoices.map(inv => 
-                              inv.id === invoice.id ? { ...inv, status: 'sent' } : inv
-                            );
-                            setInvoices(updatedInvoices);
-                            toast({
-                              title: 'Success',
-                              description: 'Invoice sent successfully',
-                            });
-                          }}
-                        >
-                          <Send className="h-4 w-4" />
-                          <span className="sr-only">Send</span>
-                        </Button>
+                        </div>
                       )}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                      >
-                        <Download className="h-4 w-4" />
-                        <span className="sr-only">Download</span>
-                      </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredInvoices.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24">
-                    No invoices found. 
-                    {searchTerm && (
-                      <span className="text-muted-foreground ml-1">
-                        Try clearing your search or create a new invoice.
-                      </span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+
+                    <FormField
+                      control={invoiceForm.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Notes</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Additional notes for the invoice"
+                              rows={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <DialogFooter>
+                      <Button type="submit">
+                        {selectedInvoice ? "Update Invoice" : "Create Invoice"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="relative mb-6">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by invoice number or customer details..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <p>Loading invoices...</p>
+            </div>
+          ) : filteredInvoices.length === 0 ? (
+            <div className="text-center py-10">
+              <FileText className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium">No invoices found</h3>
+              <p className="text-muted-foreground">
+                {searchTerm
+                  ? "Try changing your search criteria"
+                  : "Create a new invoice to get started"}
+              </p>
+            </div>
+          ) : (
+            <div className="border rounded-md overflow-hidden">
+              <Table>
+                <TableCaption>List of invoices</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">
+                        {invoice.invoiceNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          {invoice.customer.name}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {invoice.customer.email}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(invoice.date), "PP")}
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(invoice.dueDate), "PP")}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        ${calculateTotal(invoice.items).toFixed(2)}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setSelectedInvoice(invoice);
+                              setIsFormDialogOpen(true);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost">
+                            <Printer className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteInvoice(invoice.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

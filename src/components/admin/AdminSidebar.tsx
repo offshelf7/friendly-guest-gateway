@@ -1,4 +1,3 @@
-
 import {
   Home,
   LayoutDashboard,
@@ -14,7 +13,6 @@ import {
   Bell,
   ConciergeBell,
   ShoppingCart,
-  FileInvoice,
   Receipt,
   CreditCard
 } from "lucide-react";
@@ -91,7 +89,7 @@ const sidebarItems: SidebarItem[] = [
   {
     path: "/admin/invoice",
     name: "Invoice",
-    icon: FileInvoice,
+    icon: Receipt,
   },
   {
     path: "/admin/settings",

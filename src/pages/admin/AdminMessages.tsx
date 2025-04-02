@@ -2,24 +2,21 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  MessageSquare, 
-  Trash2, 
-  RefreshCw,
-  Send
-} from "lucide-react";
-
+import { AdminMessage } from "@/types/adminTypes";
+import { format } from "date-fns";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Check,
+  MessageSquare,
+  RefreshCcw,
+  Search,
+  Trash,
+  X,
+} from "lucide-react";
 
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -28,387 +25,357 @@ import {
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
-interface AdminMessage {
-  id: string;
-  message: string;
-  from_user_id: string;
-  to_user_id: string;
-  created_at: string;
-  read: boolean;
-  from_user?: {
-    name: string;
-    email: string;
-  };
-  to_user?: {
-    name: string;
-    email: string;
-  };
-}
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AdminMessages = () => {
   const [messages, setMessages] = useState<AdminMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<AdminMessage | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "read" | "unread">("all");
+  
   const { toast } = useToast();
 
-  // Create a form schema for new messages
-  const messageSchema = z.object({
-    to_user_id: z.string().uuid({
-      message: "Please select a valid recipient"
-    }),
-    message: z.string().min(1, {
-      message: "Message cannot be empty"
-    })
-  });
-
-  // Create a form for the new message
-  const form = useForm<z.infer<typeof messageSchema>>({
-    resolver: zodResolver(messageSchema),
-    defaultValues: {
-      to_user_id: "",
-      message: ""
-    }
-  });
-
-  // Fetch messages
+  // Load messages from the database
   const fetchMessages = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('admin_messages')
+        .from("admin_messages")
         .select(`
           *,
-          from_user:from_user_id(name, email),
-          to_user:to_user_id(name, email)
+          from_user:from_user_id(name,email),
+          to_user:to_user_id(name,email)
         `)
-        .order('created_at', { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      setMessages(data as AdminMessage[]);
+      // Cast the data to the correct type
+      const formattedMessages = (data || []).map(msg => ({
+        ...msg,
+        from_user: {
+          name: msg.from_user?.name || 'Unknown',
+          email: msg.from_user?.email || 'unknown@example.com'
+        },
+        to_user: {
+          name: msg.to_user?.name || 'Unknown',
+          email: msg.to_user?.email || 'unknown@example.com'
+        }
+      })) as AdminMessage[];
+
+      setMessages(formattedMessages);
     } catch (error: any) {
-      console.error('Error fetching messages:', error);
+      console.error("Error fetching messages:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to load messages',
-        variant: 'destructive',
+        title: "Error fetching messages",
+        description: error.message,
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete a message
-  const deleteMessage = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('admin_messages')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setMessages(messages.filter(message => message.id !== id));
-      toast({
-        title: 'Success',
-        description: 'Message deleted successfully',
-      });
-    } catch (error: any) {
-      console.error('Error deleting message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete message',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Mark a message as read
-  const markAsRead = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('admin_messages')
-        .update({ read: true })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setMessages(messages.map(message => 
-        message.id === id ? { ...message, read: true } : message
-      ));
-    } catch (error: any) {
-      console.error('Error marking message as read:', error);
-    }
-  };
-
-  // Send a new message
-  const sendMessage = async (data: z.infer<typeof messageSchema>) => {
-    try {
-      // Get current user
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) throw userError;
-      if (!userData.user) {
-        toast({
-          title: 'Error',
-          description: 'You must be logged in to send messages',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('admin_messages')
-        .insert({
-          from_user_id: userData.user.id,
-          to_user_id: data.to_user_id,
-          message: data.message,
-          read: false
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Success',
-        description: 'Message sent successfully',
-      });
-      form.reset();
-      fetchMessages();
-    } catch (error: any) {
-      console.error('Error sending message:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to send message',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Load messages when component mounts
   useEffect(() => {
     fetchMessages();
   }, []);
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
+  // Mark message as read
+  const markAsRead = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("admin_messages")
+        .update({ read: true })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setMessages(messages.map(msg => 
+        msg.id === id ? { ...msg, read: true } : msg
+      ));
+
+      toast({
+        title: "Message marked as read",
+        description: "The message has been marked as read successfully.",
+      });
+    } catch (error: any) {
+      console.error("Error marking message as read:", error);
+      toast({
+        title: "Error updating message",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Admin Messages</h1>
-          <p className="text-muted-foreground">Manage internal communications</p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={fetchMessages} variant="outline">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <MessageSquare className="h-4 w-4 mr-2" />
-                New Message
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Send Message</DialogTitle>
-                <DialogDescription>
-                  Send a message to another staff member
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(sendMessage)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="to_user_id"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Recipient</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="User ID"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Type your message here..."
-                            className="min-h-[100px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="submit">
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Message
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+  // Delete message
+  const deleteMessage = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("admin_messages")
+        .delete()
+        .eq("id", id);
 
-      <Card>
+      if (error) throw error;
+
+      setMessages(messages.filter(msg => msg.id !== id));
+      setSelectedMessage(null);
+
+      toast({
+        title: "Message deleted",
+        description: "The message has been deleted successfully.",
+      });
+    } catch (error: any) {
+      console.error("Error deleting message:", error);
+      toast({
+        title: "Error deleting message",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Send reply
+  const sendReply = async () => {
+    if (!selectedMessage || !replyText.trim()) return;
+
+    try {
+      const { error } = await supabase.from("admin_messages").insert({
+        from_user_id: selectedMessage.to_user_id, // Sending as the recipient (admin)
+        to_user_id: selectedMessage.from_user_id, // Sending to the original sender
+        message: replyText,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Reply sent",
+        description: "Your reply has been sent successfully.",
+      });
+
+      setReplyText("");
+      fetchMessages(); // Refresh messages to include the new reply
+    } catch (error: any) {
+      console.error("Error sending reply:", error);
+      toast({
+        title: "Error sending reply",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Filter messages based on search term and filter status
+  const filteredMessages = messages.filter(msg => {
+    const matchesSearch = 
+      msg.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.from_user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.from_user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (filterStatus === "all") return matchesSearch;
+    if (filterStatus === "read") return matchesSearch && msg.read;
+    if (filterStatus === "unread") return matchesSearch && !msg.read;
+    
+    return matchesSearch;
+  });
+
+  return (
+    <div className="container mx-auto py-8">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Messages</CardTitle>
-          <CardDescription>View all admin communications</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Message Management</CardTitle>
+              <CardDescription>
+                View and respond to messages from users
+              </CardDescription>
+            </div>
+            <Button onClick={fetchMessages} variant="outline" size="sm">
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search messages..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select
+              value={filterStatus}
+              onValueChange={(value) => setFilterStatus(value as "all" | "read" | "unread")}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Messages</SelectItem>
+                <SelectItem value="read">Read</SelectItem>
+                <SelectItem value="unread">Unread</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <p>Loading messages...</p>
             </div>
+          ) : filteredMessages.length === 0 ? (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-muted-foreground">No messages found</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>From</TableHead>
-                  <TableHead>To</TableHead>
-                  <TableHead>Message</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {messages.length > 0 ? (
-                  messages.map((message) => (
-                    <TableRow 
-                      key={message.id}
-                      className={`${!message.read ? 'bg-muted/50' : ''}`}
-                      onClick={() => {
-                        setSelectedMessage(message);
-                        if (!message.read) markAsRead(message.id);
-                      }}
-                    >
+            <div className="border rounded-md">
+              <Table>
+                <TableCaption>List of user messages</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>From</TableHead>
+                    <TableHead>Message</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMessages.map((message) => (
+                    <TableRow key={message.id} className={!message.read ? "bg-muted/20" : ""}>
                       <TableCell>
-                        {message.from_user?.name || message.from_user?.email || message.from_user_id}
+                        <div className="font-medium">{message.from_user.name}</div>
+                        <div className="text-sm text-muted-foreground">{message.from_user.email}</div>
                       </TableCell>
                       <TableCell>
-                        {message.to_user?.name || message.to_user?.email || message.to_user_id}
+                        <div className="max-w-xs truncate">
+                          {message.message.substring(0, 100)}
+                          {message.message.length > 100 && "..."}
+                        </div>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-xs truncate">{message.message}</div>
+                        {message.created_at ? format(new Date(message.created_at), "PPp") : "N/A"}
                       </TableCell>
-                      <TableCell>{formatDate(message.created_at)}</TableCell>
                       <TableCell>
                         {message.read ? (
-                          <Badge variant="outline">Read</Badge>
+                          <Badge variant="outline" className="bg-green-100 text-green-800">Read</Badge>
                         ) : (
-                          <Badge>New</Badge>
+                          <Badge variant="secondary">Unread</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteMessage(message.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setSelectedMessage(message);
+                              if (!message.read) {
+                                markAsRead(message.id);
+                              }
+                            }}
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                          {!message.read && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => markAsRead(message.id)}
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteMessage(message.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center h-24">
-                      No messages found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Message Detail Dialog */}
+      {/* Message Dialog */}
       {selectedMessage && (
-        <Dialog open={!!selectedMessage} onOpenChange={(open) => !open && setSelectedMessage(null)}>
-          <DialogContent>
+        <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
+          <DialogContent className="sm:max-w-[625px]">
             <DialogHeader>
               <DialogTitle>Message Details</DialogTitle>
+              <DialogDescription>
+                From: {selectedMessage.from_user.name} ({selectedMessage.from_user.email})
+              </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium">From:</p>
-                <p>{selectedMessage.from_user?.name || selectedMessage.from_user?.email || selectedMessage.from_user_id}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">To:</p>
-                <p>{selectedMessage.to_user?.name || selectedMessage.to_user?.email || selectedMessage.to_user_id}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Date:</p>
-                <p>{formatDate(selectedMessage.created_at)}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Message:</p>
-                <div className="p-3 bg-muted rounded-md mt-1">
-                  {selectedMessage.message}
-                </div>
+            
+            <div className="border rounded-md p-4 bg-muted/50 my-4">
+              <p className="whitespace-pre-wrap">{selectedMessage.message}</p>
+              <div className="text-sm text-muted-foreground mt-2">
+                {selectedMessage.created_at
+                  ? format(new Date(selectedMessage.created_at), "PPp")
+                  : "N/A"}
               </div>
             </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Reply</h4>
+              <Textarea 
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Type your reply here..."
+                className="min-h-[100px]"
+              />
+            </div>
+            
             <DialogFooter>
-              <Button 
-                variant="destructive" 
-                onClick={() => {
-                  deleteMessage(selectedMessage.id);
-                  setSelectedMessage(null);
-                }}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+              <DialogClose asChild>
+                <Button variant="outline" className="mr-2">
+                  <X className="w-4 h-4 mr-2" />
+                  Close
+                </Button>
+              </DialogClose>
+              <Button onClick={sendReply} disabled={!replyText.trim()}>
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Send Reply
               </Button>
             </DialogFooter>
           </DialogContent>
