@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
@@ -83,17 +82,34 @@ const AdminUsers = () => {
     signIn: async () => ({ error: null }),
   };
   
-  // Try to use the real auth context, but fall back to mock data if it's not available
-  let currentUser;
-  try {
-    // Dynamic import to avoid the error when AuthProvider is not available
-    const { useAuth } = await import('@/contexts/AuthContext');
-    const auth = useAuth();
-    currentUser = auth.user;
-  } catch (e) {
-    console.log('AuthProvider not available, using mock data');
-    currentUser = mockAuthData.user;
-  }
+  // Use a safer approach without await at component level
+  const [currentUser, setCurrentUser] = useState(mockAuthData.user);
+
+  // Try to get the real auth context when component mounts
+  useEffect(() => {
+    // This is inside a useEffect, so we can use async/await
+    const getAuthUser = async () => {
+      try {
+        // Import AuthContext dynamically
+        const authModule = await import('@/contexts/AuthContext');
+        try {
+          // Try to use the hook in a safe way
+          const auth = authModule.useAuth();
+          if (auth && auth.user) {
+            setCurrentUser(auth.user);
+          }
+        } catch (hookError) {
+          console.log('AuthProvider not available, using mock data');
+          // Keep using mock data (already set as default)
+        }
+      } catch (importError) {
+        console.log('Failed to import AuthContext, using mock data');
+        // Keep using mock data (already set as default)
+      }
+    };
+
+    getAuthUser();
+  }, []);
 
   // Load users
   useEffect(() => {
