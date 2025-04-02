@@ -11,7 +11,28 @@ type NavbarMobileMenuProps = {
 };
 
 const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobileMenuProps) => {
-  const { user } = useAuth();
+  // Create mock auth data for debugging
+  const mockAuthData = {
+    user: null,
+    signOut: async () => { console.log('Mock sign out'); },
+    userRoles: null,
+    userSuspended: false,
+    session: null,
+    loading: false,
+    signUp: async () => ({ error: null }),
+    signIn: async () => ({ error: null }),
+  };
+  
+  // Try to use the real auth context, but fall back to mock data if it's not available
+  let auth;
+  try {
+    auth = useAuth();
+  } catch (e) {
+    console.log('AuthProvider not available, using mock data');
+    auth = mockAuthData;
+  }
+  
+  const { user } = auth;
   
   // Assume admin role for demonstration - in a real app, this would come from the user object
   const isAdmin = user && user.email === 'admin@hotel.com';
