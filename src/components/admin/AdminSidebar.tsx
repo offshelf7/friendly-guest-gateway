@@ -13,6 +13,10 @@ import {
   UserCog,
   Bell,
   ConciergeBell,
+  ShoppingCart,
+  FileInvoice,
+  Receipt,
+  CreditCard
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -42,7 +46,7 @@ const sidebarItems: SidebarItem[] = [
   {
     path: "/admin/food-and-drink",
     name: "Food & Drink",
-    icon: Calendar,
+    icon: ShoppingCart,
   },
   {
     path: "/admin/guests",
@@ -82,12 +86,12 @@ const sidebarItems: SidebarItem[] = [
   {
     path: "/admin/billing",
     name: "Billing",
-    icon: FileText,
+    icon: CreditCard,
   },
   {
     path: "/admin/invoice",
     name: "Invoice",
-    icon: FileText,
+    icon: FileInvoice,
   },
   {
     path: "/admin/settings",

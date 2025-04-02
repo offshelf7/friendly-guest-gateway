@@ -32,6 +32,10 @@ import GuestProfile from "./pages/admin/GuestProfile";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminMessages from "./pages/admin/AdminMessages";
+import AdminBilling from "./pages/admin/AdminBilling";
+import AdminInvoice from "./pages/admin/AdminInvoice";
+import AdminSettings from "./pages/admin/AdminSettings";
 import SuspendedUserDashboard from "./pages/admin/SuspendedUserDashboard";
 
 // Import role-specific dashboard pages
@@ -78,10 +82,10 @@ const App = () => (
                 <Route path="reports" element={<AdminReports />} />
                 <Route path="staff" element={<AdminHome />} />
                 <Route path="reservations" element={<AdminHome />} />
-                <Route path="messages" element={<AdminHome />} />
-                <Route path="billing" element={<AdminHome />} />
-                <Route path="invoice" element={<AdminHome />} />
-                <Route path="settings" element={<AdminHome />} />
+                <Route path="messages" element={<AdminMessages />} />
+                <Route path="billing" element={<AdminBilling />} />
+                <Route path="invoice" element={<AdminInvoice />} />
+                <Route path="settings" element={<AdminSettings />} />
                 <Route path="profile" element={<AdminHome />} />
                 
                 {/* User management - admin only */}

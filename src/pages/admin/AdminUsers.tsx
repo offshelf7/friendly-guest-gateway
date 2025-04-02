@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
@@ -64,6 +65,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+// Define user interface matching with supabase User type
+interface MockUser {
+  id: string;
+  email: string;
+}
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +79,7 @@ const AdminUsers = () => {
   
   // Create mock auth data for debugging
   const mockAuthData = {
-    user: { id: 'mock-admin-id', email: 'admin@example.com' },
+    user: { id: 'mock-admin-id', email: 'admin@example.com' } as MockUser,
     signOut: async () => { console.log('Mock sign out'); },
     userRoles: ['admin'],
     userSuspended: false,
@@ -82,33 +89,31 @@ const AdminUsers = () => {
     signIn: async () => ({ error: null }),
   };
   
-  // Use a safer approach without await at component level
-  const [currentUser, setCurrentUser] = useState(mockAuthData.user);
-
-  // Try to get the real auth context when component mounts
+  // State for currentUser, initialized with mock data
+  const [currentUser, setCurrentUser] = useState<MockUser>(mockAuthData.user);
+  
+  // Try to use the real auth context, but fall back to mock data if it's not available
   useEffect(() => {
-    // This is inside a useEffect, so we can use async/await
-    const getAuthUser = async () => {
+    const fetchAuthUser = async () => {
       try {
-        // Import AuthContext dynamically
-        const authModule = await import('@/contexts/AuthContext');
+        // Dynamic import to avoid the error when AuthProvider is not available
+        const { useAuth } = await import('@/contexts/AuthContext');
         try {
-          // Try to use the hook in a safe way
-          const auth = authModule.useAuth();
-          if (auth && auth.user) {
-            setCurrentUser(auth.user);
+          const auth = useAuth();
+          if (auth.user) {
+            setCurrentUser(auth.user as MockUser);
           }
-        } catch (hookError) {
+        } catch (e) {
           console.log('AuthProvider not available, using mock data');
-          // Keep using mock data (already set as default)
+          // Mock user already set as default state
         }
-      } catch (importError) {
+      } catch (e) {
         console.log('Failed to import AuthContext, using mock data');
-        // Keep using mock data (already set as default)
+        // Mock user already set as default state
       }
     };
-
-    getAuthUser();
+    
+    fetchAuthUser();
   }, []);
 
   // Load users

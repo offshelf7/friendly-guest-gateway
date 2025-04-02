@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -38,10 +39,19 @@ const mockAuthData = {
   signIn: async () => ({ error: null }),
 };
 
+// Define user type to match what we expect
+interface User {
+  email?: string;
+  user_metadata?: { 
+    name?: string;
+  };
+  created_at?: string;
+}
+
 const Profile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(mockAuthData.user);
+  const [user, setUser] = useState<User>(mockAuthData.user);
   
   useEffect(() => {
     // Try to get the real auth context when component mounts
