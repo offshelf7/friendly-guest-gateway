@@ -8,8 +8,10 @@ const AdminDashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <AdminSidebar />
-        <main className="flex-1 overflow-y-auto bg-slate-50">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto bg-slate-50 ml-64">
+          <div className="p-6">
+            <Outlet />
+          </div>
         </main>
       </div>
     </SidebarProvider>

@@ -108,23 +108,23 @@ const sidebarItems: SidebarItem[] = [
 
 const AdminSidebar = () => {
   return (
-    <div className="w-64 bg-gray-800 text-white h-screen fixed top-0 left-0 overflow-y-auto">
-      <div className="p-4">
+    <div className="w-64 bg-gray-800 text-white h-screen fixed top-0 left-0 overflow-y-auto z-10">
+      <div className="p-4 border-b border-gray-700">
         <h1 className="text-2xl font-bold">Admin Panel</h1>
       </div>
-      <nav>
+      <nav className="py-2">
         <ul>
           {sidebarItems.map((item) => (
             <li key={item.name} className="hover:bg-gray-700">
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center p-4 ${
+                  `flex items-center p-3 mx-2 rounded-md ${
                     isActive ? "bg-gray-700" : ""
                   }`
                 }
               >
-                <item.icon className="mr-2 h-4 w-4" />
+                <item.icon className="mr-3 h-5 w-5" />
                 {item.name}
               </NavLink>
             </li>
