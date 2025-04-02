@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { AuthProvider } from "@/contexts/AuthContext"; // Commented out for debugging
+import { AuthProvider } from "@/contexts/AuthContext"; // Uncommented for proper auth
 import { CartProvider } from "@/contexts/CartContext";
 // import { RoleBasedRoute } from "@/components/auth/RoleBasedRoute"; // Temporarily commented out
 import Index from "./pages/Index";
@@ -47,7 +47,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* AuthProvider removed for debugging */}
+      <AuthProvider>
         <CartProvider>
           <BrowserRouter>
             <Routes>
@@ -106,6 +106,7 @@ const App = () => (
           <Toaster />
           <Sonner />
         </CartProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
