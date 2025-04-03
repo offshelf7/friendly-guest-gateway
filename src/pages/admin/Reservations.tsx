@@ -96,7 +96,7 @@ const Reservations = () => {
             guests_count: booking.guests_count || 1,
             room: {
               name: room.name || 'Unknown Room',
-              room_number: room.room_number || room.id?.toString() || 'N/A',
+              room_number: room.room_number || (room.id ? room.id.toString() : 'N/A'),
               room_type: room.room_type || 'Standard'
             }
           };

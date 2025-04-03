@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -163,7 +164,7 @@ const FrontDesk = () => {
             profile: booking.profile || {},
             room: {
               name: room.name || 'Unknown Room',
-              room_number: room.room_number || room.id?.toString() || 'N/A',
+              room_number: room.room_number || (room.id ? room.id.toString() : 'N/A'),
               room_type: room.room_type || 'Standard'
             }
           };
@@ -278,12 +279,14 @@ const FrontDesk = () => {
 
   const updateRoomStatus = async (roomId: string, status: string) => {
     try {
+      const updateData: Partial<FrontDeskRoom> = { 
+        status: status as 'available' | 'occupied' | 'cleaning' | 'maintenance',
+        updated_at: new Date().toISOString()
+      };
+
       const { error } = await supabase
         .from('rooms')
-        .update({ 
-          status: status,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', roomId);
 
       if (error) throw error;
@@ -310,14 +313,16 @@ const FrontDesk = () => {
 
   const markRoomCleaned = async (roomId: string) => {
     try {
+      const updateData: Partial<FrontDeskRoom> = { 
+        is_clean: true,
+        last_cleaned: new Date().toISOString(),
+        status: 'available',
+        updated_at: new Date().toISOString()
+      };
+
       const { error } = await supabase
         .from('rooms')
-        .update({ 
-          is_clean: true,
-          last_cleaned: new Date().toISOString(),
-          status: 'available',
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', roomId);
 
       if (error) throw error;
@@ -367,13 +372,15 @@ const FrontDesk = () => {
     if (!selectedRoom) return;
 
     try {
+      const updateData: Partial<FrontDeskRoom> = { 
+        status: 'maintenance',
+        maintenance_notes: data.notes,
+        updated_at: new Date().toISOString()
+      };
+
       const { error } = await supabase
         .from('rooms')
-        .update({ 
-          status: 'maintenance',
-          maintenance_notes: data.notes,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', selectedRoom.id);
 
       if (error) throw error;
