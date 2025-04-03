@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -322,36 +323,6 @@ const renderBookingTable = (
       </TableBody>
     </Table>
   );
-};
-
-// Define the missing functions that we used the keep existing code comment for
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'confirmed':
-      return <Badge>Confirmed</Badge>;
-    case 'checked_in':
-      return <Badge variant="secondary">Checked In</Badge>;
-    case 'checked_out':
-      return <Badge variant="outline">Checked Out</Badge>;
-    case 'cancelled':
-      return <Badge variant="destructive">Cancelled</Badge>;
-    case 'completed':
-      return <Badge variant="outline">Completed</Badge>;
-    default:
-      return <Badge>{status}</Badge>;
-  }
-};
-
-const handleDateRangeChange = (range: DateRange | undefined) => {
-  if (range?.from) {
-    if (range.to) {
-      setDateRange({ from: range.from, to: range.to });
-    } else {
-      setDateRange({ from: range.from, to: range.from });
-    }
-  } else {
-    setDateRange(undefined);
-  }
 };
 
 export default Reservations;
