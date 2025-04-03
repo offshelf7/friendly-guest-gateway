@@ -1,3 +1,4 @@
+
 import {
   Bed,
   Briefcase,
@@ -150,12 +151,42 @@ export const adminSidebarItems: SidebarItem[] = [
     href: "/admin/services",
     icon: Briefcase,
     roles: ["admin", "staff", "general_manager", "operational_manager"],
+    children: [
+      {
+        name: "Dashboard",
+        href: "/admin/services",
+        icon: BarChart,
+        roles: ["admin", "staff", "general_manager", "operational_manager"],
+      },
+      {
+        name: "All Services",
+        href: "/admin/services/list",
+        icon: ClipboardCheck,
+        roles: ["admin", "staff", "general_manager", "operational_manager"],
+      },
+      {
+        name: "Food & Drink",
+        href: "/admin/food-and-drink",
+        icon: Utensils,
+        roles: ["admin", "staff", "general_manager", "operational_manager"],
+      },
+    ]
   },
+  
+  // Guests
   {
-    name: "Food & Drink",
-    href: "/admin/food-and-drink",
-    icon: Utensils,
-    roles: ["admin", "staff", "general_manager", "operational_manager"],
+    name: "Guests",
+    href: "/admin/guests",
+    icon: User,
+    roles: ["admin", "staff", "general_manager", "operational_manager", "front_office_manager"],
+  },
+  
+  // Reports
+  {
+    name: "Reports",
+    href: "/admin/reports",
+    icon: BarChart,
+    roles: ["admin", "general_manager", "operational_manager", "finance_manager"],
   },
   
   // Finance
@@ -165,6 +196,12 @@ export const adminSidebarItems: SidebarItem[] = [
     icon: DollarSign,
     roles: ["admin", "staff", "general_manager", "finance_manager"],
     children: [
+      {
+        name: "Dashboard",
+        href: "/admin/finance/dashboard",
+        icon: BarChart,
+        roles: ["admin", "general_manager", "finance_manager"],
+      },
       {
         name: "Billing",
         href: "/admin/finance/billing",
@@ -178,7 +215,7 @@ export const adminSidebarItems: SidebarItem[] = [
         roles: ["admin", "staff", "general_manager", "finance_manager"],
       },
       {
-        name: "Financial Reports",
+        name: "Reports",
         href: "/admin/finance/reports",
         icon: Calculator,
         roles: ["admin", "general_manager", "finance_manager"],
@@ -200,6 +237,12 @@ export const adminSidebarItems: SidebarItem[] = [
     roles: ["admin", "general_manager", "front_office_manager", "staff"],
     children: [
       {
+        name: "Dashboard",
+        href: "/admin/front-office/dashboard",
+        icon: BarChart,
+        roles: ["admin", "general_manager", "front_office_manager", "staff"],
+      },
+      {
         name: "Front Desk",
         href: "/admin/front-office/front-desk",
         icon: BookOpen,
@@ -214,22 +257,6 @@ export const adminSidebarItems: SidebarItem[] = [
     ],
   },
   
-  // Guests
-  {
-    name: "Guests",
-    href: "/admin/guests",
-    icon: User,
-    roles: ["admin", "staff", "general_manager", "operational_manager", "front_office_manager"],
-  },
-  
-  // Reports
-  {
-    name: "Reports",
-    href: "/admin/reports",
-    icon: BarChart,
-    roles: ["admin", "general_manager", "operational_manager", "finance_manager"],
-  },
-  
   // Inventory/Purchasing
   {
     name: "Inventory",
@@ -238,7 +265,13 @@ export const adminSidebarItems: SidebarItem[] = [
     roles: ["admin", "general_manager", "purchasing_manager"],
     children: [
       {
-        name: "Inventory Items",
+        name: "Dashboard",
+        href: "/admin/inventory/dashboard",
+        icon: BarChart,
+        roles: ["admin", "general_manager", "purchasing_manager"],
+      },
+      {
+        name: "Items",
         href: "/admin/inventory/items",
         icon: Package,
         roles: ["admin", "general_manager", "purchasing_manager"],

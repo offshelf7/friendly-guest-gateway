@@ -1,4 +1,3 @@
-
 import { Routes, Route } from "react-router-dom";
 import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
 import Index from "./pages/Index";
@@ -15,10 +14,8 @@ import Cart from "./pages/Cart";
 import Facilities from "./pages/Facilities";
 import FoodAndDrink from "./pages/FoodAndDrink";
 
-// Layout component
 import AdminHome from "./pages/admin/AdminHome";
 
-// Dashboard components 
 import Dashboard from "./pages/admin/Dashboard";
 import GeneralManagerDashboard from "./pages/admin/GeneralManagerDashboard";
 import OperationalManagerDashboard from "./pages/admin/OperationalManagerDashboard";
@@ -31,7 +28,6 @@ import FinanceDashboard from "./pages/admin/FinanceDashboard";
 import PurchasingDashboard from "./pages/admin/PurchasingDashboard";
 import SuspendedUserDashboard from "./pages/admin/SuspendedUserDashboard";
 
-// Admin features - Users, Messages, Rooms
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminRooms from "./pages/admin/AdminRooms";
@@ -39,36 +35,38 @@ import AdminRoomTypes from "./pages/admin/AdminRoomTypes";
 import AdminGuests from "./pages/admin/AdminGuests";
 import GuestProfile from "./pages/admin/GuestProfile";
 
-// Admin features - Services
 import AdminServices from "./pages/admin/AdminServices";
 import AdminFoodAndDrink from "./pages/admin/AdminFoodAndDrink";
 
-// Admin features - Reports
 import AdminReports from "./pages/admin/AdminReports";
 
-// Admin features - Finance
 import AdminBilling from "./pages/admin/AdminBilling";
 import AdminInvoice from "./pages/admin/AdminInvoice";
 import FinanceReports from "./pages/admin/FinanceReports";
 import Transactions from "./pages/admin/Transactions";
 
-// Admin features - Front Office
 import FrontDesk from "./pages/admin/FrontDesk";
 import Reservations from "./pages/admin/Reservations";
 
-// Admin features - Inventory/Purchasing
 import Inventory from "./pages/admin/Inventory";
 import Suppliers from "./pages/admin/Suppliers";
 
-// Admin features - Settings
 import AdminSettings from "./pages/admin/AdminSettings";
+
+import ServicesDashboard from "./pages/admin/ServicesDashboard";
+import ServicesList from "./pages/admin/ServicesList";
+import Billing from "./pages/admin/Billing";
+import Invoices from "./pages/admin/Invoices";
+import FinancialReports from "./pages/admin/FinancialReports";
+import InventoryDashboard from "./pages/admin/InventoryDashboard";
+import InventoryItems from "./pages/admin/InventoryItems";
+import SuppliersList from "./pages/admin/SuppliersList";
 
 import "./App.css";
 
 function App() {
   return (
     <Routes>
-      {/* Public routes */}
       <Route path="/" element={<Index />} />
       <Route path="/rooms" element={<Rooms />} />
       <Route path="/login" element={<Login />} />
@@ -76,7 +74,6 @@ function App() {
       <Route path="/facilities" element={<Facilities />} />
       <Route path="/food-and-drink" element={<FoodAndDrink />} />
       
-      {/* Protected customer routes */}
       <Route path="/profile" element={<Profile />} />
       <Route path="/rooms/:id" element={<RoomBooking />} />
       <Route path="/booking-success" element={<BookingSuccess />} />
@@ -84,7 +81,6 @@ function App() {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/cart" element={<Cart />} />
 
-      {/* Admin Routes with Role-Based Access */}
       <Route
         path="/admin"
         element={
@@ -96,10 +92,8 @@ function App() {
           </RoleBasedRoute>
         }
       >
-        {/* Main Dashboard - accessible to all admin roles */}
         <Route index element={<Dashboard />} />
 
-        {/* Manager Dashboards */}
         <Route path="dashboards">
           <Route path="general-manager" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager"]}>
@@ -133,7 +127,6 @@ function App() {
           } />
         </Route>
 
-        {/* Department Dashboards */}
         <Route path="departments">
           <Route path="front-office" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager", "front_office_manager", "staff"]}>
@@ -152,7 +145,6 @@ function App() {
           } />
         </Route>
 
-        {/* User Management */}
         <Route path="users" element={
           <RoleBasedRoute allowedRoles={["admin", "general_manager"]}>
             <AdminUsers />
@@ -160,14 +152,12 @@ function App() {
         } />
         <Route path="suspended" element={<SuspendedUserDashboard />} />
         
-        {/* Communication */}
         <Route path="messages" element={
           <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "operational_manager"]}>
             <AdminMessages />
           </RoleBasedRoute>
         } />
         
-        {/* Rooms and Facilities */}
         <Route path="rooms" element={
           <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "operational_manager", "front_office_manager"]}>
             <AdminRooms />
@@ -179,7 +169,6 @@ function App() {
           </RoleBasedRoute>
         } />
         
-        {/* Guest Management */}
         <Route path="guests" element={
           <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "operational_manager", "front_office_manager"]}>
             <AdminGuests />
@@ -191,10 +180,14 @@ function App() {
           </RoleBasedRoute>
         } />
         
-        {/* Services */}
         <Route path="services" element={
           <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "operational_manager"]}>
-            <AdminServices />
+            <ServicesDashboard />
+          </RoleBasedRoute>
+        } />
+        <Route path="services/list" element={
+          <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "operational_manager"]}>
+            <ServicesList />
           </RoleBasedRoute>
         } />
         <Route path="food-and-drink" element={
@@ -203,23 +196,21 @@ function App() {
           </RoleBasedRoute>
         } />
         
-        {/* Reports */}
         <Route path="reports" element={
           <RoleBasedRoute allowedRoles={["admin", "general_manager", "operational_manager", "finance_manager"]}>
             <AdminReports />
           </RoleBasedRoute>
         } />
         
-        {/* Finance */}
         <Route path="finance">
           <Route path="billing" element={
             <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "finance_manager"]}>
-              <AdminBilling />
+              <Billing />
             </RoleBasedRoute>
           } />
           <Route path="invoices" element={
             <RoleBasedRoute allowedRoles={["admin", "staff", "general_manager", "finance_manager"]}>
-              <AdminInvoice />
+              <Invoices />
             </RoleBasedRoute>
           } />
           <Route path="invoice/:id" element={
@@ -229,7 +220,7 @@ function App() {
           } />
           <Route path="reports" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager", "finance_manager"]}>
-              <FinanceReports />
+              <FinancialReports />
             </RoleBasedRoute>
           } />
           <Route path="transactions" element={
@@ -239,7 +230,6 @@ function App() {
           } />
         </Route>
         
-        {/* Front Office */}
         <Route path="front-office">
           <Route path="front-desk" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager", "front_office_manager", "staff"]}>
@@ -253,21 +243,24 @@ function App() {
           } />
         </Route>
         
-        {/* Inventory/Purchasing */}
         <Route path="inventory">
+          <Route path="dashboard" element={
+            <RoleBasedRoute allowedRoles={["admin", "general_manager", "purchasing_manager"]}>
+              <InventoryDashboard />
+            </RoleBasedRoute>
+          } />
           <Route path="items" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager", "purchasing_manager"]}>
-              <Inventory />
+              <InventoryItems />
             </RoleBasedRoute>
           } />
           <Route path="suppliers" element={
             <RoleBasedRoute allowedRoles={["admin", "general_manager", "purchasing_manager"]}>
-              <Suppliers />
+              <SuppliersList />
             </RoleBasedRoute>
           } />
         </Route>
         
-        {/* Settings */}
         <Route path="settings" element={
           <RoleBasedRoute allowedRoles={["admin", "general_manager"]}>
             <AdminSettings />
@@ -275,7 +268,6 @@ function App() {
         } />
       </Route>
 
-      {/* Catch all for 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
