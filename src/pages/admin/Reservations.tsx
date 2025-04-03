@@ -59,12 +59,14 @@ const Reservations = () => {
 
         // Map the data to match the Booking interface with explicit room properties
         const mappedBookings = data?.map(booking => {
-          const roomData = booking.room as Record<string, any> || {};
+          const bookingData = booking as Record<string, any>;
+          const roomData = bookingData.room as Record<string, any> || {};
+          
           return {
             ...booking,
             guest_id: booking.user_id, // Map user_id to guest_id
             profile: booking.profile || {},
-            payment_status: booking.payment_status || 'unpaid',
+            payment_status: bookingData.payment_status || 'unpaid',
             guests_count: booking.guests_count || 1,
             room: {
               name: roomData.name || 'Unknown Room',
@@ -320,6 +322,36 @@ const renderBookingTable = (
       </TableBody>
     </Table>
   );
+};
+
+// Define the missing functions that we used the keep existing code comment for
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'confirmed':
+      return <Badge>Confirmed</Badge>;
+    case 'checked_in':
+      return <Badge variant="secondary">Checked In</Badge>;
+    case 'checked_out':
+      return <Badge variant="outline">Checked Out</Badge>;
+    case 'cancelled':
+      return <Badge variant="destructive">Cancelled</Badge>;
+    case 'completed':
+      return <Badge variant="outline">Completed</Badge>;
+    default:
+      return <Badge>{status}</Badge>;
+  }
+};
+
+const handleDateRangeChange = (range: DateRange | undefined) => {
+  if (range?.from) {
+    if (range.to) {
+      setDateRange({ from: range.from, to: range.to });
+    } else {
+      setDateRange({ from: range.from, to: range.from });
+    }
+  } else {
+    setDateRange(undefined);
+  }
 };
 
 export default Reservations;
