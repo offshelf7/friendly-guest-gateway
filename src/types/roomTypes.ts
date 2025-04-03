@@ -1,4 +1,3 @@
-
 export interface Room {
   id: string;
   name: string;
@@ -13,9 +12,12 @@ export interface Room {
   created_at: string;
   updated_at: string;
   room_number?: string;
-  status?: 'available' | 'occupied';
+  status?: 'available' | 'occupied' | 'cleaning' | 'maintenance';
   bed_type?: string;
   amenities?: Amenity[];
+  is_clean?: boolean;
+  last_cleaned?: string;
+  maintenance_notes?: string;
 }
 
 export interface Booking {

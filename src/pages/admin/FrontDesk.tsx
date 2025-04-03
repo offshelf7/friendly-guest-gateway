@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/MockAuthContext';
-import { MockUser } from '@/types/adminTypes';
+import { MockUser, Room as AdminRoom } from '@/types/adminTypes';
+import { Room } from '@/types/roomTypes';
 
 import {
   Table,
@@ -98,7 +98,6 @@ interface Room {
   is_clean: boolean;
   last_cleaned: string;
   maintenance_notes?: string;
-  // Additional fields from database
   capacity?: number;
   description?: string;
   is_available?: boolean;
@@ -168,12 +167,20 @@ const FrontDesk = () => {
 
         if (error) throw error;
 
-        // Map the data to match the Booking interface
-        const mappedBookings = data?.map(booking => ({
-          ...booking,
-          guest_id: booking.user_id, // Map user_id to guest_id
-          profile: booking.profile || {}
-        })) as Booking[];
+        const mappedBookings = data?.map(booking => {
+          const room = booking.room || {};
+          return {
+            ...booking,
+            guest_id: booking.user_id,
+            profile: booking.profile || {},
+            room: {
+              ...room,
+              name: room.name || 'Unknown Room',
+              room_number: room.room_number || room.id?.toString() || 'N/A',
+              room_type: room.room_type || 'Standard'
+            }
+          };
+        }) as Booking[];
 
         setTodayBookings(mappedBookings || []);
       } catch (error: any) {
@@ -195,13 +202,12 @@ const FrontDesk = () => {
 
         if (error) throw error;
 
-        // Map the data to match the Room interface
         const mappedRooms = data?.map(room => ({
           ...room,
-          status: room.status || 'available', // Default status
-          room_number: room.room_number || room.id.toString(), // Default room number
-          is_clean: room.is_clean !== undefined ? room.is_clean : true, // Default clean status
-          last_cleaned: room.last_cleaned || new Date().toISOString() // Default last cleaned date
+          status: room.status || 'available',
+          room_number: room.room_number || room.id.toString(),
+          is_clean: room.is_clean !== undefined ? room.is_clean : true,
+          last_cleaned: room.last_cleaned || new Date().toISOString()
         })) as Room[];
 
         setRooms(mappedRooms || []);
@@ -287,7 +293,10 @@ const FrontDesk = () => {
     try {
       const { error } = await supabase
         .from('rooms')
-        .update({ status })
+        .update({ 
+          status: status,
+          updated_at: new Date().toISOString()
+        } as Partial<Room>)
         .eq('id', roomId);
 
       if (error) throw error;
@@ -319,8 +328,9 @@ const FrontDesk = () => {
         .update({ 
           is_clean: true,
           last_cleaned: new Date().toISOString(),
-          status: 'available'
-        })
+          status: 'available',
+          updated_at: new Date().toISOString()
+        } as Partial<Room>)
         .eq('id', roomId);
 
       if (error) throw error;
@@ -366,7 +376,7 @@ const FrontDesk = () => {
     },
   });
 
-  const submitMaintenanceRequest = async (data: z.infer<typeof maintenanceSchema>) => {
+  const submitMaintenanceRequest = async (data: any) => {
     if (!selectedRoom) return;
 
     try {
@@ -374,8 +384,9 @@ const FrontDesk = () => {
         .from('rooms')
         .update({ 
           status: 'maintenance',
-          maintenance_notes: data.notes
-        })
+          maintenance_notes: data.notes,
+          updated_at: new Date().toISOString()
+        } as Partial<Room>)
         .eq('id', selectedRoom.id);
 
       if (error) throw error;
