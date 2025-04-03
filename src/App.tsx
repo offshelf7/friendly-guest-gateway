@@ -1,6 +1,6 @@
 
 import { Routes, Route } from "react-router-dom";
-import RoleBasedRoute from "./components/auth/RoleBasedRoute";
+import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
 import Index from "./pages/Index";
 import Rooms from "./pages/Rooms";
 import Login from "./pages/Login";

@@ -1,18 +1,19 @@
-
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasRole, hasDashboardAccess } from '@/types/roleTypes';
+import { UserRole, hasRole, hasDashboardAccess } from '@/types/roleTypes';
 
 type RoleBasedRouteProps = {
-  allowedRoles?: string[];
+  allowedRoles?: UserRole[];
   redirectPath?: string;
   checkSuspension?: boolean;
+  children?: React.ReactNode;
 };
 
 export const RoleBasedRoute = ({
   allowedRoles = [],
   redirectPath = '/login',
   checkSuspension = true,
+  children,
 }: RoleBasedRouteProps) => {
   const { user, userRoles, loading, userSuspended } = useAuth();
   
@@ -33,7 +34,7 @@ export const RoleBasedRoute = ({
     if (window.location.pathname !== '/admin/suspended') {
       return <Navigate to="/admin/suspended" replace />;
     }
-    return <Outlet />;
+    return children ? <>{children}</> : <Outlet />;
   }
   
   // Special case for the suspended dashboard - only suspended users should access it
@@ -44,16 +45,18 @@ export const RoleBasedRoute = ({
   // If no specific roles are required, or user has at least one of the allowed roles, render the route
   if (
     allowedRoles.length === 0 ||
-    hasRole(userRoles, allowedRoles as any[])
+    hasRole(userRoles as UserRole | UserRole[] | null, allowedRoles as UserRole[])
   ) {
-    return <Outlet />;
+    return children ? <>{children}</> : <Outlet />;
   }
   
   // If user has dashboard access but not to this specific area, redirect to main dashboard
-  if (hasDashboardAccess(userRoles)) {
+  if (hasDashboardAccess(userRoles as UserRole | UserRole[] | null)) {
     return <Navigate to="/admin" replace />;
   }
   
   // Otherwise redirect to login
   return <Navigate to={redirectPath} replace />;
 };
+
+export default RoleBasedRoute;

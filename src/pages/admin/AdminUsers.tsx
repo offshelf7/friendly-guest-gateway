@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
-import { UserData } from '@/types/adminTypes';
+
+export interface UserData {
+  id: string;
+  email: string;
+  name?: string;
+  role: UserRole | UserRole[] | null;
+  created_at?: string;
+  suspended?: boolean;
+}
 
 import {
   Shield,
@@ -63,11 +71,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
-interface MockUser {
-  id: string;
-  email: string;
-}
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -211,7 +214,10 @@ const AdminUsers = () => {
       .string()
       .min(8, { message: 'Password must be at least 8 characters long' }),
     name: z.string().min(1, { message: 'Please enter a name' }),
-    roles: z.array(z.string()).min(1, { message: 'Select at least one role' }),
+    roles: z.array(z.string()).refine(
+      (roles) => roles.every(role => Object.keys(ROLE_DISPLAY_NAMES).includes(role)),
+      { message: 'Invalid role selected' }
+    ),
   });
 
   const messageSchema = z.object({
