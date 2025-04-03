@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,6 +135,12 @@ const Transactions = () => {
     }
   });
   
+  // Handle viewing transaction details - with type casting
+  const handleViewDetails = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setDetailsOpen(true);
+  };
+  
   // Filter transactions based on search term, type, and status
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = 
@@ -143,6 +148,7 @@ const Transactions = () => {
       transaction.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.reference.toLowerCase().includes(searchTerm.toLowerCase());
     
+    // Ensure proper type comparison by casting
     const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
     
@@ -163,12 +169,6 @@ const Transactions = () => {
   const pendingAmount = transactions
     .filter(t => t.status === 'pending')
     .reduce((sum, t) => sum + (t.type === 'income' ? t.amount : 0), 0);
-  
-  // Handle viewing transaction details
-  const handleViewDetails = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setDetailsOpen(true);
-  };
   
   // Handle creating a new transaction
   const handleCreateTransaction = () => {
@@ -331,7 +331,7 @@ const Transactions = () => {
                           transaction.status === 'completed'
                             ? 'default'
                             : transaction.status === 'pending'
-                            ? 'secondary'
+                            ? 'outline'
                             : 'destructive'
                         }
                       >
@@ -342,9 +342,12 @@ const Transactions = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleViewDetails(transaction)}
+                        onClick={() => handleViewDetails(transaction as Transaction)}
                       >
                         <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <FileText className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -428,7 +431,7 @@ const Transactions = () => {
                       selectedTransaction.status === 'completed'
                         ? 'default'
                         : selectedTransaction.status === 'pending'
-                        ? 'secondary'
+                        ? 'outline'
                         : 'destructive'
                     }
                   >

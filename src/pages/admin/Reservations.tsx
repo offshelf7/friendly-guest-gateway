@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -355,7 +354,7 @@ const Reservations = () => {
                             : booking.status === 'pending'
                             ? 'secondary'
                             : booking.status === 'checked_in'
-                            ? 'success'
+                            ? 'default'
                             : booking.status === 'completed'
                             ? 'default'
                             : 'destructive'
@@ -412,7 +411,6 @@ const Reservations = () => {
         </CardContent>
       </Card>
       
-      {/* New Reservation Dialog */}
       <Dialog open={newReservationOpen} onOpenChange={setNewReservationOpen}>
         <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>

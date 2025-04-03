@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       {/* AuthProvider temporarily disabled for debugging */}
-      <MockAuthContext.Provider value={MockAuthContext._context.Provider.value}>
+      <MockAuthContext.Provider value={MockAuthContext._defaultValue || mockAuthValues}>
         <App />
       </MockAuthContext.Provider>
     </BrowserRouter>

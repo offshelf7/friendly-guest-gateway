@@ -28,6 +28,16 @@ export interface UserData {
   suspended?: boolean;
 }
 
+// Add MockUser type for admin pages
+export interface MockUser {
+  id: string;
+  email: string;
+  user_metadata?: {
+    name?: string;
+  };
+  app_metadata?: any;
+}
+
 // Add Invoice type
 export type InvoiceStatus = "paid" | "draft" | "sent" | "overdue";
 

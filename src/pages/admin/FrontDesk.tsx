@@ -398,7 +398,6 @@ const FrontDesk = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Check-in Dialog */}
       <Dialog open={checkInDialogOpen} onOpenChange={setCheckInDialogOpen}>
         <DialogContent>
           <DialogHeader>

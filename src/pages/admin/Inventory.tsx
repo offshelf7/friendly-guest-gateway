@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -300,63 +299,63 @@ const Inventory = () => {
           <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="items" className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
-                    <TableHead>Supplier</TableHead>
-                    <TableHead className="text-right">Unit Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.category}</TableCell>
-                      <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell>{item.supplier}</TableCell>
-                      <TableCell className="text-right">${item.unit_price.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            item.status === 'in_stock'
-                              ? 'outline'
-                              : item.status === 'low_stock'
-                              ? 'secondary'
-                              : 'destructive'
-                          }
-                        >
-                          {item.status === 'in_stock'
-                            ? 'In Stock'
+      <TabsContent value="items" className="space-y-4">
+        <Card>
+          <CardContent className="pt-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Item Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead>Supplier</TableHead>
+                  <TableHead className="text-right">Unit Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell className="text-right">{item.quantity}</TableCell>
+                    <TableCell>{item.supplier}</TableCell>
+                    <TableCell className="text-right">${item.unit_price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          item.status === 'in_stock'
+                            ? 'outline'
                             : item.status === 'low_stock'
-                            ? 'Low Stock'
-                            : 'Out of Stock'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditItem(item)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteItem(item.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                            ? 'secondary'
+                            : 'destructive'
+                        }
+                      >
+                        {item.status === 'in_stock'
+                          ? 'In Stock'
+                          : item.status === 'low_stock'
+                          ? 'Low Stock'
+                          : 'Out of Stock'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditItem(item as InventoryItem)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteItem(item.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </TabsContent>
         
         <TabsContent value="orders" className="space-y-4">
           <Card>
