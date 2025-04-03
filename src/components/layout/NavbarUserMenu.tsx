@@ -2,7 +2,7 @@
 import { cn } from '@/lib/utils';
 import { User, LogOut, Calendar } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext'; // Changed from mock to real
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,29 +20,7 @@ type NavbarUserMenuProps = {
 
 const NavbarUserMenu = ({ isScrolled, toggleMenu }: NavbarUserMenuProps) => {
   const navigate = useNavigate();
-  
-  // Create mock auth data for debugging
-  const mockAuthData = {
-    user: null,
-    signOut: async () => { console.log('Mock sign out'); navigate('/'); },
-    userRoles: null,
-    userSuspended: false,
-    session: null,
-    loading: false,
-    signUp: async () => ({ error: null }),
-    signIn: async () => ({ error: null }),
-  };
-  
-  // Try to use the real auth context, but fall back to mock data if it's not available
-  let auth;
-  try {
-    auth = useAuth();
-  } catch (e) {
-    console.log('AuthProvider not available, using mock data');
-    auth = mockAuthData;
-  }
-  
-  const { user, signOut } = auth;
+  const { user, signOut } = useAuth();
   
   const handleSignOut = async () => {
     await signOut();

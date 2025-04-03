@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/MockAuthContext'; // Import from MockAuthContext
+import { useAuth } from '@/contexts/AuthContext';
 import NavbarLogo from './NavbarLogo';
 import NavbarDesktopLinks from './NavbarDesktopLinks';
 import NavbarUserMenu from './NavbarUserMenu';
@@ -13,32 +12,13 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  
-  // Create mock auth data for debugging
-  const mockAuthData = {
-    user: null,
-    signOut: async () => { console.log('Mock sign out'); },
-    userRoles: null,
-    userSuspended: false,
-    session: null,
-    loading: false,
-    signUp: async () => ({ error: null }),
-    signIn: async () => ({ error: null }),
-  };
-  
-  // Try to use the real auth context, but fall back to mock data if it's not available
-  let auth;
-  try {
-    auth = useAuth();
-  } catch (e) {
-    console.log('AuthProvider not available, using mock data');
-    auth = mockAuthData;
-  }
-  
-  const { user, signOut } = auth;
+  const { user, signOut } = useAuth();
 
-  // Assume admin role for demonstration - in a real app, this would come from the user object
-  const isAdmin = user && user.email === 'admin@hotel.com';
+  // Check if user has admin role
+  const isAdmin = user && (user.email === 'admin@hotel.com' || 
+                           (user.user_metadata && 
+                           (user.user_metadata.role === 'admin' || 
+                            user.user_metadata.role === 'staff')));
 
   useEffect(() => {
     const handleScroll = () => {

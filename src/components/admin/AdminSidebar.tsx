@@ -1,23 +1,42 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/MockAuthContext"; // Import from MockAuthContext
+import { useAuth } from "@/contexts/AuthContext"; // Use real AuthContext
 import { adminSidebarItems } from "./AdminSidebarItems";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, LogOut } from "lucide-react";
+import { ChevronDown, ChevronLeft, LogOut } from "lucide-react";
 import { hasRole, UserRole } from "@/types/roleTypes";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const AdminSidebar = () => {
   const location = useLocation();
   const { userRoles, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
-  // Filter items based on user roles - ensure userRoles is treated as UserRole[]
+  // Filter items based on user roles
   const filteredItems = adminSidebarItems.filter(
     (item) => !item.roles || hasRole(userRoles as UserRole[], item.roles as UserRole[])
   );
+
+  const toggleCategory = (href: string) => {
+    if (collapsed) return;
+    
+    setOpenCategories(prev => ({
+      ...prev,
+      [href]: !prev[href]
+    }));
+  };
+
+  const isItemActive = (href: string) => {
+    return location.pathname === href || location.pathname.startsWith(`${href}/`);
+  };
 
   return (
     <div
@@ -50,18 +69,68 @@ const AdminSidebar = () => {
         <div className="py-2">
           <nav className="grid gap-1 px-2">
             {filteredItems.map((item, index) => (
-              <Link
-                key={index}
-                to={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                  location.pathname === item.href
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent hover:text-accent-foreground"
-                } ${collapsed ? "justify-center" : ""}`}
-              >
-                <item.icon className="h-4 w-4" />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
+              item.children ? (
+                <Collapsible 
+                  key={index}
+                  open={openCategories[item.href] || isItemActive(item.href)}
+                  onOpenChange={() => {}}
+                  className={collapsed ? "hidden" : ""}
+                >
+                  <CollapsibleTrigger asChild onClick={(e) => {
+                    e.preventDefault();
+                    toggleCategory(item.href);
+                  }}>
+                    <div className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors cursor-pointer ${
+                      isItemActive(item.href)
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <item.icon className="h-4 w-4" />
+                        {!collapsed && <span>{item.name}</span>}
+                      </div>
+                      {!collapsed && (
+                        <ChevronDown className={`h-4 w-4 transition-transform ${
+                          openCategories[item.href] ? "rotate-180" : ""
+                        }`} />
+                      )}
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="pl-6 pt-1">
+                      {item.children.filter(
+                        child => !child.roles || hasRole(userRoles as UserRole[], child.roles as UserRole[])
+                      ).map((child, childIndex) => (
+                        <Link
+                          key={`${index}-${childIndex}`}
+                          to={child.href}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                            location.pathname === child.href
+                              ? "bg-accent text-accent-foreground"
+                              : "hover:bg-accent hover:text-accent-foreground"
+                          }`}
+                        >
+                          <child.icon className="h-4 w-4" />
+                          <span>{child.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <Link
+                  key={index}
+                  to={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    location.pathname === item.href
+                      ? "bg-accent text-accent-foreground"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  } ${collapsed ? "justify-center" : ""}`}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              )
             ))}
           </nav>
           <Separator className="my-2" />
