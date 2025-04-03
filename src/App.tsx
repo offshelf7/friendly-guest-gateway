@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
 import Index from "./pages/Index";
@@ -53,14 +54,15 @@ import Suppliers from "./pages/admin/Suppliers";
 
 import AdminSettings from "./pages/admin/AdminSettings";
 
-import ServicesDashboard from "./pages/admin/ServicesDashboard";
-import ServicesList from "./pages/admin/ServicesList";
-import Billing from "./pages/admin/Billing";
-import Invoices from "./pages/admin/Invoices";
-import FinancialReports from "./pages/admin/FinancialReports";
-import InventoryDashboard from "./pages/admin/InventoryDashboard";
-import InventoryItems from "./pages/admin/InventoryItems";
-import SuppliersList from "./pages/admin/SuppliersList";
+// Import components from their new locations
+import ServicesDashboard from "./pages/services/ServicesDashboard";
+import ServicesList from "./pages/services/ServicesList";
+import Billing from "./pages/finance/Billing";
+import Invoices from "./pages/finance/Invoices";
+import FinancialReports from "./pages/finance/FinancialReports";
+import InventoryDashboard from "./pages/inventory/InventoryDashboard";
+import InventoryItems from "./pages/inventory/InventoryItems";
+import SuppliersList from "./pages/inventory/SuppliersList";
 
 import "./App.css";
 
