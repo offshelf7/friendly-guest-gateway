@@ -18,18 +18,18 @@ import FoodAndDrink from "./pages/FoodAndDrink";
 import AdminHome from "./pages/admin/AdminHome";
 
 import Dashboard from "./pages/admin/Dashboard";
-import GeneralManagerDashboard from "./pages/admin/GeneralManagerDashboard";
+import GeneralManagerDashboard from "./pages/general-manager/GeneralManagerDashboard";
 import OperationalManagerDashboard from "./pages/admin/OperationalManagerDashboard";
-import ServiceManagerDashboard from "./pages/admin/ServiceManagerDashboard";
+import ServiceManagerDashboard from "./pages/service/ServiceManagerDashboard";
 import MaintenanceManagerDashboard from "./pages/admin/MaintenanceManagerDashboard";
 import MarketingManagerDashboard from "./pages/admin/MarketingManagerDashboard";
-import HRManagerDashboard from "./pages/admin/HRManagerDashboard";
+import HRManagerDashboard from "./pages/hr/HRManagerDashboard";
 import FrontOfficeDashboard from "./pages/admin/FrontOfficeDashboard";
 import FinanceDashboard from "./pages/admin/FinanceDashboard";
 import PurchasingDashboard from "./pages/admin/PurchasingDashboard";
-import SuspendedUserDashboard from "./pages/admin/SuspendedUserDashboard";
+import SuspendedUserDashboard from "./pages/users/SuspendedUserDashboard";
 
-import AdminUsers from "./pages/admin/AdminUsers";
+import AdminUsers from "./pages/users/AdminUsers";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminRooms from "./pages/admin/AdminRooms";
 import AdminRoomTypes from "./pages/admin/AdminRoomTypes";
@@ -46,8 +46,8 @@ import AdminInvoice from "./pages/admin/AdminInvoice";
 import FinanceReports from "./pages/admin/FinanceReports";
 import Transactions from "./pages/admin/Transactions";
 
-import FrontDesk from "./pages/admin/FrontDesk";
-import Reservations from "./pages/admin/Reservations";
+import FrontDesk from "./pages/frontoffice/FrontDesk";
+import Reservations from "./pages/frontoffice/Reservations";
 
 import Inventory from "./pages/admin/Inventory";
 import Suppliers from "./pages/admin/Suppliers";
