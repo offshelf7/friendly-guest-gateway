@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -97,6 +98,15 @@ interface Room {
   is_clean: boolean;
   last_cleaned: string;
   maintenance_notes?: string;
+  // Additional fields from database
+  capacity?: number;
+  description?: string;
+  is_available?: boolean;
+  image_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  has_wifi?: boolean;
+  has_breakfast?: boolean;
 }
 
 const FrontDesk = () => {
@@ -151,14 +161,21 @@ const FrontDesk = () => {
           .select(`
             *,
             room:room_id (*),
-            profile:guest_id (*)
+            profile:user_id (*)
           `)
           .eq('status', 'confirmed')
           .or(`check_in_date.eq.${today},check_out_date.eq.${today}`);
 
         if (error) throw error;
 
-        setTodayBookings(data || []);
+        // Map the data to match the Booking interface
+        const mappedBookings = data?.map(booking => ({
+          ...booking,
+          guest_id: booking.user_id, // Map user_id to guest_id
+          profile: booking.profile || {}
+        })) as Booking[];
+
+        setTodayBookings(mappedBookings || []);
       } catch (error: any) {
         console.error('Error fetching today bookings:', error);
         toast({
@@ -178,7 +195,16 @@ const FrontDesk = () => {
 
         if (error) throw error;
 
-        setRooms(data || []);
+        // Map the data to match the Room interface
+        const mappedRooms = data?.map(room => ({
+          ...room,
+          status: room.status || 'available', // Default status
+          room_number: room.room_number || room.id.toString(), // Default room number
+          is_clean: room.is_clean !== undefined ? room.is_clean : true, // Default clean status
+          last_cleaned: room.last_cleaned || new Date().toISOString() // Default last cleaned date
+        })) as Room[];
+
+        setRooms(mappedRooms || []);
       } catch (error: any) {
         console.error('Error fetching rooms:', error);
         toast({
