@@ -1,3 +1,4 @@
+
 export interface Room {
   id: string;
   name: string;
@@ -20,6 +21,12 @@ export interface Room {
   maintenance_notes?: string;
 }
 
+export interface RoomDetails {
+  name: string;
+  room_number: string;
+  room_type: string;
+}
+
 export interface Booking {
   id: string;
   user_id: string;
@@ -32,18 +39,16 @@ export interface Booking {
   special_requests?: string;
   created_at: string;
   updated_at: string;
+  payment_status?: string;
+  room: RoomDetails;
+  profile?: {
+    full_name?: string;
+    email?: string;
+    phone?: string;
+  };
 }
 
-export interface Amenity {
-  id: string;
-  room_id: string;
-  amenity_name: string;
-  amenity_description?: string;
-  icon?: string;
-  created_at: string;
-}
-
-export type UserRole = 'guest' | 'staff' | 'admin' | 'general_manager' | 'operational_manager';
+export type UserRole = 'guest' | 'staff' | 'admin' | 'general_manager' | 'operational_manager' | 'front_office_manager' | 'finance_manager' | 'purchasing_manager';
 
 export interface ServiceCategory {
   id: string;

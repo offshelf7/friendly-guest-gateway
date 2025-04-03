@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format, isToday, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { Booking } from '@/types/roomTypes';
 
 import {
   Table,
@@ -33,35 +34,6 @@ import { CalendarIcon, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
 
-interface RoomDetails {
-  name: string;
-  room_number: string;
-  room_type: string;
-}
-
-interface Profile {
-  full_name?: string;
-  email?: string;
-  phone?: string;
-}
-
-interface Booking {
-  id: string;
-  room_id: string;
-  guest_id: string;
-  user_id: string;
-  check_in_date: string;
-  check_out_date: string;
-  status: string;
-  total_price: number;
-  special_requests?: string;
-  created_at: string;
-  payment_status?: string;
-  guests_count: number;
-  room: RoomDetails;
-  profile?: Profile;
-}
-
 const Reservations = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
@@ -87,7 +59,7 @@ const Reservations = () => {
 
         // Map the data to match the Booking interface with explicit room properties
         const mappedBookings = data?.map(booking => {
-          const room = booking.room || {};
+          const room = booking.room as Record<string, any> || {};
           return {
             ...booking,
             guest_id: booking.user_id, // Map user_id to guest_id

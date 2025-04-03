@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +5,7 @@ import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/MockAuthContext';
 import { MockUser } from '@/types/adminTypes';
-import { Room } from '@/types/roomTypes';
+import { Room, Booking } from '@/types/roomTypes';
 
 import {
   Table,
@@ -66,28 +65,6 @@ import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
-interface Booking {
-  id: string;
-  room_id: string;
-  guest_id: string;
-  check_in_date: string;
-  check_out_date: string;
-  status: string;
-  total_price: number;
-  special_requests?: string;
-  created_at: string;
-  room: {
-    name: string;
-    room_number: string;
-    room_type: string;
-  };
-  profile?: {
-    full_name?: string;
-    email?: string;
-    phone?: string;
-  };
-}
 
 interface FrontDeskRoom extends Room {
   room_number: string;
@@ -157,7 +134,7 @@ const FrontDesk = () => {
         if (error) throw error;
 
         const mappedBookings = data?.map(booking => {
-          const room = booking.room || {};
+          const room = booking.room as Record<string, any> || {};
           return {
             ...booking,
             guest_id: booking.user_id,
@@ -192,7 +169,7 @@ const FrontDesk = () => {
 
         const mappedRooms = data?.map(room => ({
           ...room,
-          status: room.status || 'available',
+          status: (room.status as 'available' | 'occupied' | 'cleaning' | 'maintenance') || 'available',
           room_number: room.room_number || room.id.toString(),
           is_clean: room.is_clean !== undefined ? room.is_clean : true,
           last_cleaned: room.last_cleaned || new Date().toISOString()
