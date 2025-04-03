@@ -1,270 +1,327 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { format, isToday, parseISO } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { Booking } from '@/types/roomTypes';
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 import { Button } from '@/components/ui/button';
-import { 
-  Calendar, 
-  Filter, 
-  Plus, 
-  Search, 
-  ChevronLeft, 
-  ChevronRight,
-  Check,
-  X,
-  Clock,
-  Edit,
-  Trash2
-} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { DateRange } from 'react-day-picker';
 
 const Reservations = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState({ start: null, end: null });
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
   const { toast } = useToast();
-  
-  // Mock data - would normally come from API
-  const reservations = [
-    {
-      id: "RES-001",
-      guestName: "John Smith",
-      roomType: "Deluxe King",
-      roomNumber: "302",
-      checkInDate: "2023-09-28",
-      checkOutDate: "2023-10-02",
-      guestCount: 2,
-      status: "confirmed",
-      total: 799.00,
-      paymentStatus: "paid"
-    },
-    {
-      id: "RES-002",
-      guestName: "Maria Garcia",
-      roomType: "Junior Suite",
-      roomNumber: "401",
-      checkInDate: "2023-09-30",
-      checkOutDate: "2023-10-05",
-      guestCount: 3,
-      status: "pending",
-      total: 1299.00,
-      paymentStatus: "pending"
-    },
-    {
-      id: "RES-003",
-      guestName: "Robert Johnson",
-      roomType: "Standard Double",
-      roomNumber: "215",
-      checkInDate: "2023-09-25",
-      checkOutDate: "2023-09-28",
-      guestCount: 2,
-      status: "checked_in",
-      total: 450.00,
-      paymentStatus: "paid"
-    },
-    {
-      id: "RES-004",
-      guestName: "Emma Davis",
-      roomType: "Family Suite",
-      roomNumber: "505",
-      checkInDate: "2023-10-10",
-      checkOutDate: "2023-10-15",
-      guestCount: 4,
-      status: "confirmed",
-      total: 1750.00,
-      paymentStatus: "paid"
-    },
-    {
-      id: "RES-005",
-      guestName: "David Wilson",
-      roomType: "Deluxe Queen",
-      roomNumber: "318",
-      checkInDate: "2023-09-22",
-      checkOutDate: "2023-09-25",
-      guestCount: 1,
-      status: "checked_out",
-      total: 450.00,
-      paymentStatus: "paid"
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select(`
+            *,
+            room:room_id (*),
+            profile:user_id (*)
+          `)
+          .order('check_in_date', { ascending: false });
+
+        if (error) throw error;
+
+        // Map the data to match the Booking interface with explicit room properties
+        const mappedBookings = data?.map(booking => {
+          const bookingData = booking as Record<string, any>;
+          const roomData = bookingData.room as Record<string, any> || {};
+          
+          return {
+            ...booking,
+            guest_id: booking.user_id, // Map user_id to guest_id
+            profile: booking.profile || {},
+            payment_status: bookingData.payment_status || 'unpaid',
+            guests_count: booking.guests_count || 1,
+            room: {
+              name: roomData.name || 'Unknown Room',
+              room_number: roomData.room_number || (roomData.id ? roomData.id.toString() : 'N/A'),
+              room_type: roomData.room_type || 'Standard'
+            }
+          };
+        }) as Booking[];
+
+        setBookings(mappedBookings || []);
+        setFilteredBookings(mappedBookings || []);
+      } catch (error: any) {
+        console.error('Error fetching bookings:', error);
+        toast({
+          title: 'Error fetching reservations',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [toast]);
+
+  useEffect(() => {
+    // Apply filters
+    let filtered = [...bookings];
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(booking => 
+        (booking.profile?.full_name || '').toLowerCase().includes(query) ||
+        (booking.profile?.email || '').toLowerCase().includes(query) ||
+        booking.room.name.toLowerCase().includes(query) ||
+        booking.room.room_number.toLowerCase().includes(query) ||
+        booking.status.toLowerCase().includes(query)
+      );
     }
-  ];
-  
-  const filteredReservations = reservations.filter(res => {
-    // Filter by search term
-    const matchesSearch = 
-      res.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      res.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      res.roomNumber.includes(searchTerm);
-    
-    // Filter by status
-    const matchesStatus = statusFilter === 'all' || res.status === statusFilter;
-    
-    // Filter by date range (if active)
-    let matchesDateRange = true;
-    if (dateRange.start && dateRange.end) {
-      const checkIn = new Date(res.checkInDate);
-      const checkOut = new Date(res.checkOutDate);
-      const start = new Date(dateRange.start);
-      const end = new Date(dateRange.end);
+
+    // Date range filter
+    if (dateRange?.from) {
+      const fromDate = new Date(dateRange.from);
+      fromDate.setHours(0, 0, 0, 0);
       
-      matchesDateRange = 
-        (checkIn >= start && checkIn <= end) || 
-        (checkOut >= start && checkOut <= end) ||
-        (checkIn <= start && checkOut >= end);
+      filtered = filtered.filter(booking => {
+        const checkInDate = new Date(booking.check_in_date);
+        
+        if (dateRange.to) {
+          const toDate = new Date(dateRange.to);
+          toDate.setHours(23, 59, 59, 999);
+          
+          return checkInDate >= fromDate && checkInDate <= toDate;
+        }
+        
+        return checkInDate >= fromDate;
+      });
     }
-    
-    return matchesSearch && matchesStatus && matchesDateRange;
-  });
 
-  const handleDateRangeChange = (range) => {
-    setDateRange(range);
-  };
+    setFilteredBookings(filtered);
+  }, [bookings, searchQuery, dateRange]);
 
-  const handleNewReservation = () => {
-    toast({
-      title: "Coming Soon",
-      description: "New reservation form will be available soon.",
-    });
-  };
-  
-  // Helper function to get status badge
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <Badge className="bg-blue-100 text-blue-800">Confirmed</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-100 text-amber-800">Pending</Badge>;
+        return <Badge>Confirmed</Badge>;
       case 'checked_in':
-        return <Badge className="bg-green-100 text-green-800">Checked In</Badge>;
+        return <Badge variant="secondary">Checked In</Badge>;
       case 'checked_out':
-        return <Badge className="bg-slate-100 text-slate-800">Checked Out</Badge>;
+        return <Badge variant="outline">Checked Out</Badge>;
       case 'cancelled':
-        return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
+        return <Badge variant="destructive">Cancelled</Badge>;
+      case 'completed':
+        return <Badge variant="outline">Completed</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
   };
-  
+
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (range?.from) {
+      if (range.to) {
+        setDateRange({ from: range.from, to: range.to });
+      } else {
+        setDateRange({ from: range.from, to: range.from });
+      }
+    } else {
+      setDateRange(undefined);
+    }
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Reservations</h1>
-          <p className="text-muted-foreground">Manage hotel bookings and reservations</p>
-        </div>
-        <Button onClick={handleNewReservation}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Reservation
-        </Button>
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search reservations..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="confirmed">Confirmed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="checked_in">Checked In</SelectItem>
-            <SelectItem value="checked_out">Checked Out</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Button variant="outline" className="w-[180px]">
-          <Calendar className="mr-2 h-4 w-4" />
-          Date Range
-        </Button>
-      </div>
-      
-      <Card>
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">Reservations</h1>
+
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle>All Reservations</CardTitle>
+          <CardTitle>Reservations Filter</CardTitle>
+          <CardDescription>
+            Filter reservations by name, email, room, or date
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-md">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="py-3 px-4 text-left">Reservation</th>
-                  <th className="py-3 px-4 text-left">Guest</th>
-                  <th className="py-3 px-4 text-left">Room</th>
-                  <th className="py-3 px-4 text-left">Check-In</th>
-                  <th className="py-3 px-4 text-left">Check-Out</th>
-                  <th className="py-3 px-4 text-left">Status</th>
-                  <th className="py-3 px-4 text-left">Payment</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReservations.map((res) => (
-                  <tr key={res.id} className="border-t">
-                    <td className="py-3 px-4 font-medium">{res.id}</td>
-                    <td className="py-3 px-4">{res.guestName}</td>
-                    <td className="py-3 px-4">{res.roomNumber} ({res.roomType})</td>
-                    <td className="py-3 px-4">{res.checkInDate}</td>
-                    <td className="py-3 px-4">{res.checkOutDate}</td>
-                    <td className="py-3 px-4">{getStatusBadge(res.status)}</td>
-                    <td className="py-3 px-4">
-                      {res.paymentStatus === 'paid' ? (
-                        <span className="flex items-center text-green-600">
-                          <Check className="h-4 w-4 mr-1" />
-                          Paid
-                        </span>
-                      ) : (
-                        <span className="flex items-center text-amber-600">
-                          <Clock className="h-4 w-4 mr-1" />
-                          Pending
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        {res.status === 'pending' && (
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {filteredReservations.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="py-6 text-center text-muted-foreground">
-                      No reservations found matching your search criteria
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by guest, email, or room..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start text-left font-normal md:w-[240px]",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "LLL dd, y")} -{" "}
+                        {format(dateRange.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Filter by date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange as DateRange}
+                  onSelect={handleDateRangeChange}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {dateRange && (
+              <Button 
+                variant="ghost" 
+                onClick={() => setDateRange(undefined)}
+                className="md:w-auto w-full"
+              >
+                Clear Dates
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      <Tabs defaultValue="all" className="mb-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">All Reservations</TabsTrigger>
+          <TabsTrigger value="today">Today's Reservations</TabsTrigger>
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all">
+          {renderBookingTable(filteredBookings, getStatusBadge)}
+        </TabsContent>
+
+        <TabsContent value="today">
+          {renderBookingTable(
+            filteredBookings.filter(booking => 
+              isToday(parseISO(booking.check_in_date)) || isToday(parseISO(booking.check_out_date))
+            ),
+            getStatusBadge
+          )}
+        </TabsContent>
+
+        <TabsContent value="upcoming">
+          {renderBookingTable(
+            filteredBookings.filter(booking => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              return new Date(booking.check_in_date) > today && booking.status !== 'cancelled';
+            }),
+            getStatusBadge
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
+  );
+};
+
+const renderBookingTable = (
+  bookings: Booking[], 
+  getStatusBadge: (status: string) => JSX.Element
+) => {
+  if (bookings.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No reservations found</p>
+      </div>
+    );
+  }
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Guest</TableHead>
+          <TableHead>Room</TableHead>
+          <TableHead>Check-in</TableHead>
+          <TableHead>Check-out</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Price</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {bookings.map((booking) => (
+          <TableRow key={booking.id}>
+            <TableCell>
+              {booking.profile?.full_name || "Guest"}
+              <div className="text-xs text-muted-foreground mt-1">
+                {booking.profile?.email || "No email"}
+              </div>
+            </TableCell>
+            <TableCell>
+              {booking.room.name}
+              <div className="text-xs text-muted-foreground mt-1">
+                Room {booking.room.room_number}, {booking.room.room_type}
+              </div>
+            </TableCell>
+            <TableCell>
+              {format(new Date(booking.check_in_date), 'MMM d, yyyy')}
+            </TableCell>
+            <TableCell>
+              {format(new Date(booking.check_out_date), 'MMM d, yyyy')}
+            </TableCell>
+            <TableCell>
+              {getStatusBadge(booking.status)}
+            </TableCell>
+            <TableCell className="text-right">
+              ${booking.total_price.toFixed(2)}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 
