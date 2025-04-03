@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/MockAuthContext';
-import { MockUser, Room as AdminRoom } from '@/types/adminTypes';
+import { MockUser } from '@/types/adminTypes';
 import { Room } from '@/types/roomTypes';
 
 import {
@@ -88,32 +88,20 @@ interface Booking {
   };
 }
 
-interface Room {
-  id: string;
-  name: string;
+interface FrontDeskRoom extends Room {
   room_number: string;
-  room_type: string;
-  status: string;
-  price_per_night: number;
+  status: 'available' | 'occupied' | 'cleaning' | 'maintenance';
   is_clean: boolean;
   last_cleaned: string;
   maintenance_notes?: string;
-  capacity?: number;
-  description?: string;
-  is_available?: boolean;
-  image_url?: string;
-  created_at?: string;
-  updated_at?: string;
-  has_wifi?: boolean;
-  has_breakfast?: boolean;
 }
 
 const FrontDesk = () => {
   const [todayBookings, setTodayBookings] = useState<Booking[]>([]);
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<FrontDeskRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<FrontDeskRoom | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -174,7 +162,6 @@ const FrontDesk = () => {
             guest_id: booking.user_id,
             profile: booking.profile || {},
             room: {
-              ...room,
               name: room.name || 'Unknown Room',
               room_number: room.room_number || room.id?.toString() || 'N/A',
               room_type: room.room_type || 'Standard'
@@ -208,7 +195,7 @@ const FrontDesk = () => {
           room_number: room.room_number || room.id.toString(),
           is_clean: room.is_clean !== undefined ? room.is_clean : true,
           last_cleaned: room.last_cleaned || new Date().toISOString()
-        })) as Room[];
+        })) as FrontDeskRoom[];
 
         setRooms(mappedRooms || []);
       } catch (error: any) {
@@ -296,14 +283,14 @@ const FrontDesk = () => {
         .update({ 
           status: status,
           updated_at: new Date().toISOString()
-        } as Partial<Room>)
+        })
         .eq('id', roomId);
 
       if (error) throw error;
 
       setRooms(
         rooms.map((room) =>
-          room.id === roomId ? { ...room, status } : room
+          room.id === roomId ? { ...room, status: status as any } : room
         )
       );
 
@@ -330,7 +317,7 @@ const FrontDesk = () => {
           last_cleaned: new Date().toISOString(),
           status: 'available',
           updated_at: new Date().toISOString()
-        } as Partial<Room>)
+        })
         .eq('id', roomId);
 
       if (error) throw error;
@@ -386,7 +373,7 @@ const FrontDesk = () => {
           status: 'maintenance',
           maintenance_notes: data.notes,
           updated_at: new Date().toISOString()
-        } as Partial<Room>)
+        })
         .eq('id', selectedRoom.id);
 
       if (error) throw error;

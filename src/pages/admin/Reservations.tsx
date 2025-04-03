@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -34,10 +33,23 @@ import { CalendarIcon, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
 
+interface RoomDetails {
+  name: string;
+  room_number: string;
+  room_type: string;
+}
+
+interface Profile {
+  full_name?: string;
+  email?: string;
+  phone?: string;
+}
+
 interface Booking {
   id: string;
   room_id: string;
   guest_id: string;
+  user_id: string;
   check_in_date: string;
   check_out_date: string;
   status: string;
@@ -45,17 +57,9 @@ interface Booking {
   special_requests?: string;
   created_at: string;
   payment_status?: string;
-  num_guests?: number;
-  room: {
-    name: string;
-    room_number: string;
-    room_type: string;
-  };
-  profile?: {
-    full_name?: string;
-    email?: string;
-    phone?: string;
-  };
+  guests_count: number;
+  room: RoomDetails;
+  profile?: Profile;
 }
 
 const Reservations = () => {
@@ -89,9 +93,8 @@ const Reservations = () => {
             guest_id: booking.user_id, // Map user_id to guest_id
             profile: booking.profile || {},
             payment_status: booking.payment_status || 'unpaid',
-            num_guests: booking.guests_count || 1,
+            guests_count: booking.guests_count || 1,
             room: {
-              ...room,
               name: room.name || 'Unknown Room',
               room_number: room.room_number || room.id?.toString() || 'N/A',
               room_type: room.room_type || 'Standard'
@@ -289,7 +292,6 @@ const Reservations = () => {
   );
 };
 
-// Helper function to render the booking table
 const renderBookingTable = (
   bookings: Booking[], 
   getStatusBadge: (status: string) => JSX.Element
