@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/MockAuthContext'; // Import from MockAuthContext
 import NavbarLogo from './NavbarLogo';
 import NavbarDesktopLinks from './NavbarDesktopLinks';
 import NavbarUserMenu from './NavbarUserMenu';

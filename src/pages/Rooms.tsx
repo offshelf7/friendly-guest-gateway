@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/MockAuthContext'; // Import from MockAuthContext
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';

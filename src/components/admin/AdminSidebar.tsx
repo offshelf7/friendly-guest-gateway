@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/MockAuthContext";
+import { useAuth } from "@/contexts/MockAuthContext"; // Import from MockAuthContext
 import { adminSidebarItems } from "./AdminSidebarItems";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

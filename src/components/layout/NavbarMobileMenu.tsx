@@ -1,8 +1,7 @@
-
 import { cn } from '@/lib/utils';
 import { Home, Hotel, Phone, Calendar, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/MockAuthContext';
 
 type NavbarMobileMenuProps = {
   isMenuOpen: boolean;
