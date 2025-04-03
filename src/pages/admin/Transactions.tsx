@@ -22,16 +22,44 @@ const Transactions = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const { data, error } = await supabase
-          .from('transactions')
-          .select('*')
-          .order('date', { ascending: false });
-
-        if (error) throw error;
-
-        // Cast each transaction's type to the correct type
-        const typedTransactions = data?.map(transaction => castTransactionType(transaction)) || [];
-        setTransactions(typedTransactions);
+        // Since the transactions table might not exist yet, we'll use mock data for demonstration
+        const mockTransactionData = [
+          {
+            id: "1",
+            date: "2023-05-15",
+            description: "Room booking payment",
+            amount: 250.00,
+            type: "income" as TransactionType,
+            status: "completed",
+            payment_method: "credit_card",
+            guest_name: "John Smith",
+            reference: "BOOK-001"
+          },
+          {
+            id: "2",
+            date: "2023-05-16",
+            description: "Restaurant bill",
+            amount: 85.50,
+            type: "income" as TransactionType,
+            status: "completed",
+            payment_method: "room_charge",
+            guest_name: "Maria Garcia",
+            reference: "REST-045"
+          },
+          {
+            id: "3",
+            date: "2023-05-17",
+            description: "Utility payment",
+            amount: 320.75,
+            type: "expense" as TransactionType,
+            status: "completed",
+            payment_method: "bank_transfer",
+            guest_name: "N/A",
+            reference: "UTIL-MAY23"
+          }
+        ];
+        
+        setTransactions(mockTransactionData);
       } catch (error: any) {
         console.error('Error fetching transactions:', error);
         toast({
