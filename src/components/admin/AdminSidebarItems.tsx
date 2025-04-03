@@ -1,4 +1,3 @@
-
 import {
   Bed,
   Briefcase,
@@ -20,7 +19,7 @@ import {
   Calculator,
   Layout,
   Home,
-  BuildingHotel,
+  Building,
   Building2,
   PiggyBank,
   ShoppingCart,
@@ -53,7 +52,7 @@ export const adminSidebarItems: SidebarItem[] = [
       {
         name: "General Manager",
         href: "/admin/dashboards/general-manager",
-        icon: BuildingHotel,
+        icon: Building,
         roles: ["admin", "general_manager"],
       },
       {
@@ -71,13 +70,13 @@ export const adminSidebarItems: SidebarItem[] = [
       {
         name: "Maintenance Manager",
         href: "/admin/dashboards/maintenance-manager",
-        icon: BuildingHotel,
+        icon: Building,
         roles: ["admin", "operational_manager"],
       },
       {
         name: "Marketing Manager",
         href: "/admin/dashboards/marketing-manager",
-        icon: BuildingHotel,
+        icon: Building,
         roles: ["admin", "general_manager"],
       },
       {

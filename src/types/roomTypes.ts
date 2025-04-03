@@ -12,6 +12,7 @@ export interface Room {
   is_available: boolean;
   created_at: string;
   updated_at: string;
+  amenities?: Amenity[]; // Added amenities as optional property
 }
 
 export interface Amenity {
@@ -52,4 +53,28 @@ export interface Booking {
     email?: string;
     [key: string]: any;
   };
+}
+
+// Add the missing service-related types
+export interface Service {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category_id: string;
+  image_url?: string;
+  duration?: number;
+  is_available: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceCategory {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  created_at: string;
+  updated_at: string;
+  services?: Service[];
 }
