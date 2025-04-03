@@ -43,6 +43,14 @@ import FrontOfficeDashboard from "./pages/admin/FrontOfficeDashboard";
 import FinanceDashboard from "./pages/admin/FinanceDashboard";
 import PurchasingDashboard from "./pages/admin/PurchasingDashboard";
 
+// New department pages
+import FrontDesk from "./pages/admin/FrontDesk";
+import Reservations from "./pages/admin/Reservations";
+import FinanceReports from "./pages/admin/FinanceReports";
+import Transactions from "./pages/admin/Transactions";
+import Inventory from "./pages/admin/Inventory";
+import Suppliers from "./pages/admin/Suppliers";
+
 import "./App.css";
 
 function App() {
@@ -66,7 +74,7 @@ function App() {
         path="/admin"
         element={
           <RoleBasedRoute
-            allowedRoles={["admin", "staff", "general_manager", "operational_manager"]}
+            allowedRoles={["admin", "staff", "general_manager", "operational_manager", "front_office_manager", "finance_manager", "purchasing_manager"]}
             redirectTo="/"
           >
             <AdminHome />
@@ -97,10 +105,22 @@ function App() {
         <Route path="marketing-manager" element={<MarketingManagerDashboard />} />
         <Route path="hr-manager" element={<HRManagerDashboard />} />
         
-        {/* New Department Dashboards */}
+        {/* Department Dashboards */}
         <Route path="front-office" element={<FrontOfficeDashboard />} />
         <Route path="finance" element={<FinanceDashboard />} />
         <Route path="purchasing" element={<PurchasingDashboard />} />
+        
+        {/* Front Office Pages */}
+        <Route path="front-desk" element={<FrontDesk />} />
+        <Route path="reservations" element={<Reservations />} />
+        
+        {/* Finance Pages */}
+        <Route path="finance-reports" element={<FinanceReports />} />
+        <Route path="transactions" element={<Transactions />} />
+        
+        {/* Inventory/Purchasing Pages */}
+        <Route path="inventory" element={<Inventory />} />
+        <Route path="suppliers" element={<Suppliers />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
