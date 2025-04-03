@@ -25,7 +25,7 @@ const mockAuthValues = {
 };
 
 // Create context with mock values
-const MockAuthContext = createContext(mockAuthValues);
+export const MockAuthContext = createContext(mockAuthValues);
 
 // Export hook to use the mock auth context
 export const useAuth = () => useContext(MockAuthContext);
