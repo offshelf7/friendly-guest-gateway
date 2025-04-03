@@ -1,22 +1,21 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/MockAuthContext";
 import { adminSidebarItems } from "./AdminSidebarItems";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, LogOut } from "lucide-react";
-import { hasRole } from "@/types/roleTypes";
+import { hasRole, UserRole } from "@/types/roleTypes";
 
 const AdminSidebar = () => {
   const location = useLocation();
   const { userRoles, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Filter items based on user roles
+  // Filter items based on user roles - ensure userRoles is treated as UserRole[]
   const filteredItems = adminSidebarItems.filter(
-    (item) => !item.roles || hasRole(userRoles, item.roles)
+    (item) => !item.roles || hasRole(userRoles as UserRole[], item.roles as UserRole[])
   );
 
   return (

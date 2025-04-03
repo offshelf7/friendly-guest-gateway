@@ -75,7 +75,7 @@ function App() {
         element={
           <RoleBasedRoute
             allowedRoles={["admin", "staff", "general_manager", "operational_manager", "front_office_manager", "finance_manager", "purchasing_manager"]}
-            redirectTo="/"
+            redirectPath="/"
           >
             <AdminHome />
           </RoleBasedRoute>

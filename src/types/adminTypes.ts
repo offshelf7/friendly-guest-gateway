@@ -66,3 +66,57 @@ export interface Room {
   created_at: string;
   updated_at: string;
 }
+
+// Add inventory and transaction types
+export type InventoryItemStatus = "in_stock" | "low_stock" | "out_of_stock";
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  category: string;
+  quantity: number;
+  min_quantity: number;
+  supplier: string;
+  unit_price: number;
+  last_order_date: string;
+  status: InventoryItemStatus;
+}
+
+export type TransactionType = "income" | "expense";
+
+export interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  status: string;
+  payment_method: string;
+  guest_name: string;
+  reference: string;
+}
+
+// Add supplier type
+export type SupplierStatus = "active" | "inactive";
+
+export interface Supplier {
+  id: string;
+  name: string;
+  category: string;
+  contact_person: string;
+  phone: string;
+  email: string;
+  address: string;
+  payment_terms: string;
+  status: SupplierStatus;
+}
+
+// Add MockUser type for AdminUsers page
+export interface MockUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string[];
+  status: string;
+  lastActive: string;
+}

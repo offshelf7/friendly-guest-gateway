@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,7 +64,7 @@ const FinanceReports = () => {
       if (error) throw error;
       
       // Calculate total revenue
-      const totalRevenue = bookings.reduce((sum, booking) => sum + parseFloat(booking.total_price), 0);
+      const totalRevenue = bookings.reduce((sum, booking) => sum + parseFloat(booking.total_price.toString()), 0);
       
       // Group bookings by month for chart data
       const monthlyData = bookings.reduce((acc, booking) => {
@@ -75,7 +74,7 @@ const FinanceReports = () => {
           acc[month] = { month, revenue: 0, bookings: 0 };
         }
         
-        acc[month].revenue += parseFloat(booking.total_price);
+        acc[month].revenue += parseFloat(booking.total_price.toString());
         acc[month].bookings += 1;
         
         return acc;
@@ -97,7 +96,7 @@ const FinanceReports = () => {
       
       if (previousError) throw previousError;
       
-      const previousRevenue = previousBookings.reduce((sum, booking) => sum + parseFloat(booking.total_price), 0);
+      const previousRevenue = previousBookings.reduce((sum, booking) => sum + parseFloat(booking.total_price.toString()), 0);
       
       // Calculate revenue change percentage
       const revenueChange = previousRevenue !== 0 
@@ -246,7 +245,7 @@ const FinanceReports = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip formatter={(value) => [`$${parseFloat(value).toFixed(2)}`, 'Revenue']} />
+                  <Tooltip formatter={(value) => [`$${parseFloat(value.toString()).toFixed(2)}`, 'Revenue']} />
                   <Legend />
                   <Bar dataKey="revenue" name="Revenue" fill="#6366f1" />
                   <Bar dataKey="bookings" name="Bookings" fill="#93c5fd" />

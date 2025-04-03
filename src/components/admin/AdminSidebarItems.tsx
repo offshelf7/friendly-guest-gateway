@@ -1,4 +1,3 @@
-
 import {
   Bed,
   Briefcase,
@@ -8,25 +7,24 @@ import {
   Hotel,
   MessageSquare,
   Package,
-  Server,
   Settings,
   ShoppingBag,
   User,
   Users,
   Utensils,
-  HelpCircle,
   BarChart,
   Receipt,
   BookOpen,
   ClipboardCheck,
   Calculator,
 } from "lucide-react";
+import { UserRole } from "@/types/roleTypes";
 
 type SidebarItem = {
   name: string;
   href: string;
   icon: any;
-  roles?: string[];
+  roles?: UserRole[];
 };
 
 export const adminSidebarItems: SidebarItem[] = [

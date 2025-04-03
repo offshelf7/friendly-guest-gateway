@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   ShoppingBag, 
@@ -40,9 +39,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Supplier, SupplierStatus } from '@/types/adminTypes';
 
-// Mock supplier data for demonstration
-const mockSuppliers = [
+const mockSuppliers: Supplier[] = [
   {
     id: '1',
     name: 'Premium Textiles',
@@ -100,18 +99,6 @@ const mockSuppliers = [
   }
 ];
 
-type Supplier = {
-  id: string;
-  name: string;
-  category: string;
-  contact_person: string;
-  phone: string;
-  email: string;
-  address: string;
-  payment_terms: string;
-  status: 'active' | 'inactive';
-};
-
 const Suppliers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -120,7 +107,6 @@ const Suppliers = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const { toast } = useToast();
   
-  // Filter suppliers based on search term and category
   const filteredSuppliers = suppliers.filter(supplier => {
     const matchesSearch = 
       supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -132,16 +118,13 @@ const Suppliers = () => {
     return matchesSearch && matchesCategory;
   });
   
-  // Get unique categories for the filter
   const categories = ['all', ...new Set(suppliers.map(supplier => supplier.category))];
   
-  // Handle editing a supplier
   const handleEditSupplier = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
     setNewSupplierOpen(true);
   };
   
-  // Handle adding a new supplier
   const handleAddSupplier = () => {
     toast({
       title: "Supplier Added",
@@ -151,9 +134,7 @@ const Suppliers = () => {
     setNewSupplierOpen(false);
   };
   
-  // Handle deleting a supplier
   const handleDeleteSupplier = (id: string) => {
-    // Delete logic would go here in a real application
     toast({
       title: "Supplier Deleted",
       description: "The supplier has been removed from your list",
@@ -312,7 +293,6 @@ const Suppliers = () => {
         </CardContent>
       </Card>
       
-      {/* Add/Edit Supplier Dialog */}
       <Dialog open={newSupplierOpen} onOpenChange={setNewSupplierOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>

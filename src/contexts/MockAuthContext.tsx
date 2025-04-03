@@ -19,8 +19,8 @@ const mockAuthValues = {
   userRoles: ['admin', 'staff'] as UserRole[],
   userSuspended: false,
   loading: false,
-  signUp: async () => ({ error: null }),
-  signIn: async () => ({ error: null }),
+  signUp: async (email: string, password: string, name: string) => ({ error: null }),
+  signIn: async (email: string, password: string) => ({ error: null }),
   signOut: async () => {},
 };
 

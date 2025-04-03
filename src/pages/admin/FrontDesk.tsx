@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,7 +30,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Tabs,
@@ -305,7 +303,7 @@ const FrontDesk = () => {
                         <TableCell>{format(new Date(booking.check_in_date), 'MMM d, yyyy')}</TableCell>
                         <TableCell>{format(new Date(booking.check_out_date), 'MMM d, yyyy')}</TableCell>
                         <TableCell>
-                          <Badge variant={booking.status === 'confirmed' ? 'outline' : booking.status === 'checked_in' ? 'success' : 'default'}>
+                          <Badge variant={booking.status === 'confirmed' ? 'outline' : booking.status === 'checked_in' ? 'secondary' : 'default'}>
                             {booking.status}
                           </Badge>
                         </TableCell>
@@ -360,7 +358,7 @@ const FrontDesk = () => {
                         <TableCell>{format(new Date(booking.check_in_date), 'MMM d, yyyy')}</TableCell>
                         <TableCell>{format(new Date(booking.check_out_date), 'MMM d, yyyy')}</TableCell>
                         <TableCell>
-                          <Badge variant={booking.status === 'checked_in' ? 'success' : booking.status === 'completed' ? 'default' : 'outline'}>
+                          <Badge variant={booking.status === 'checked_in' ? 'secondary' : booking.status === 'completed' ? 'default' : 'outline'}>
                             {booking.status}
                           </Badge>
                         </TableCell>
