@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
+import { MockUser } from '@/types/adminTypes';
 
 export interface UserData {
   id: string;

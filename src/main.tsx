@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './index.css'
 // import { AuthProvider } from './contexts/AuthContext'
-import { MockAuthContext } from './contexts/MockAuthContext'
+import { MockAuthContext, mockAuthValues } from './contexts/MockAuthContext'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       {/* AuthProvider temporarily disabled for debugging */}
-      <MockAuthContext.Provider value={MockAuthContext._defaultValue || mockAuthValues}>
+      <MockAuthContext.Provider value={mockAuthValues}>
         <App />
       </MockAuthContext.Provider>
     </BrowserRouter>

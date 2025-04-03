@@ -13,7 +13,7 @@ const mockUser: User = {
 };
 
 // Mock auth context values
-const mockAuthValues = {
+export const mockAuthValues = {
   session: { user: mockUser, access_token: 'mock-token', refresh_token: 'mock-refresh' },
   user: mockUser,
   userRoles: ['admin', 'staff'] as UserRole[],

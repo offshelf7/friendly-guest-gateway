@@ -1,443 +1,682 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { 
-  CheckSquare, 
-  XSquare, 
-  Bell, 
-  Search,
-  UserPlus,
-  Briefcase,
-  Calendar
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/MockAuthContext';
+import { MockUser } from '@/types/adminTypes';
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { 
+
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
 
-type GuestCheckIn = {
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, CheckCircle, Clock, Coffee, CreditCard, Search, UserCheck, Wifi, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+interface Booking {
   id: string;
-  user_id: string;
-  name: string;
   room_id: string;
-  room_name: string;
+  guest_id: string;
   check_in_date: string;
   check_out_date: string;
   status: string;
-};
+  total_price: number;
+  special_requests?: string;
+  created_at: string;
+  room: {
+    name: string;
+    room_number: string;
+    room_type: string;
+  };
+  profile?: {
+    full_name?: string;
+    email?: string;
+    phone?: string;
+  };
+}
+
+interface Room {
+  id: string;
+  name: string;
+  room_number: string;
+  room_type: string;
+  status: string;
+  price_per_night: number;
+  is_clean: boolean;
+  last_cleaned: string;
+  maintenance_notes?: string;
+}
 
 const FrontDesk = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [todayBookings, setTodayBookings] = useState<Booking[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const { toast } = useToast();
-  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<GuestCheckIn | null>(null);
+  const navigate = useNavigate();
   
-  // Query for fetching today's check-ins
-  const { data: todayCheckIns, refetch: refetchCheckIns } = useQuery({
-    queryKey: ['todayCheckIns'],
-    queryFn: async () => {
-      const today = format(new Date(), 'yyyy-MM-dd');
-      
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          user_id,
-          room_id,
-          check_in_date,
-          check_out_date,
-          status,
-          rooms:room_id(name),
-          users:user_id(full_name)
-        `)
-        .eq('check_in_date', today)
-        .order('check_in_date', { ascending: true });
-      
-      if (error) throw error;
-      
-      return data.map(booking => ({
-        id: booking.id,
-        user_id: booking.user_id,
-        name: booking.users?.full_name || 'Guest',
-        room_id: booking.room_id,
-        room_name: booking.rooms?.name || 'Unknown Room',
-        check_in_date: booking.check_in_date,
-        check_out_date: booking.check_out_date,
-        status: booking.status
-      }));
-    }
-  });
+  const mockAuthData = {
+    user: { id: 'mock-staff-id', email: 'staff@example.com' } as MockUser,
+    signOut: async () => { console.log('Mock sign out'); },
+    userRoles: ['staff'],
+    userSuspended: false,
+    session: null,
+    loading: false,
+    signUp: async () => ({ error: null }),
+    signIn: async () => ({ error: null }),
+  };
   
-  // Query for fetching today's check-outs
-  const { data: todayCheckOuts, refetch: refetchCheckOuts } = useQuery({
-    queryKey: ['todayCheckOuts'],
-    queryFn: async () => {
-      const today = format(new Date(), 'yyyy-MM-dd');
-      
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          user_id,
-          room_id,
-          check_in_date,
-          check_out_date,
-          status,
-          rooms:room_id(name),
-          users:user_id(full_name)
-        `)
-        .eq('check_out_date', today)
-        .order('check_out_date', { ascending: true });
-      
-      if (error) throw error;
-      
-      return data.map(booking => ({
-        id: booking.id,
-        user_id: booking.user_id,
-        name: booking.users?.full_name || 'Guest',
-        room_id: booking.room_id,
-        room_name: booking.rooms?.name || 'Unknown Room',
-        check_in_date: booking.check_in_date,
-        check_out_date: booking.check_out_date,
-        status: booking.status
-      }));
-    }
-  });
+  const [currentUser, setCurrentUser] = useState<MockUser>(mockAuthData.user);
   
-  // Handle check-in
-  const handleCheckIn = async () => {
-    if (!selectedBooking) return;
+  useEffect(() => {
+    const fetchAuthUser = async () => {
+      try {
+        const { useAuth } = await import('@/contexts/AuthContext');
+        try {
+          const auth = useAuth();
+          if (auth.user) {
+            setCurrentUser(auth.user as MockUser);
+          }
+        } catch (e) {
+          console.log('AuthProvider not available, using mock data');
+        }
+      } catch (e) {
+        console.log('Failed to import AuthContext, using mock data');
+      }
+    };
     
+    fetchAuthUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchTodayBookings = async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        
+        const { data, error } = await supabase
+          .from('bookings')
+          .select(`
+            *,
+            room:room_id (*),
+            profile:guest_id (*)
+          `)
+          .eq('status', 'confirmed')
+          .or(`check_in_date.eq.${today},check_out_date.eq.${today}`);
+
+        if (error) throw error;
+
+        setTodayBookings(data || []);
+      } catch (error: any) {
+        console.error('Error fetching today bookings:', error);
+        toast({
+          title: 'Error fetching bookings',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
+    };
+
+    const fetchRooms = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('rooms')
+          .select('*')
+          .order('room_number');
+
+        if (error) throw error;
+
+        setRooms(data || []);
+      } catch (error: any) {
+        console.error('Error fetching rooms:', error);
+        toast({
+          title: 'Error fetching rooms',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTodayBookings();
+    fetchRooms();
+  }, [toast]);
+
+  const handleCheckIn = async (bookingId: string) => {
     try {
       const { error } = await supabase
         .from('bookings')
         .update({ status: 'checked_in' })
-        .eq('id', selectedBooking.id);
-      
+        .eq('id', bookingId);
+
       if (error) throw error;
-      
+
+      setTodayBookings(
+        todayBookings.map((booking) =>
+          booking.id === bookingId
+            ? { ...booking, status: 'checked_in' }
+            : booking
+        )
+      );
+
       toast({
-        title: "Check-in successful",
-        description: `${selectedBooking.name} has been checked in to ${selectedBooking.room_name}`,
+        title: 'Check-in successful',
+        description: 'Guest has been checked in.',
       });
-      
-      setCheckInDialogOpen(false);
-      refetchCheckIns();
-    } catch (error) {
-      console.error('Error during check-in:', error);
+    } catch (error: any) {
+      console.error('Error checking in:', error);
       toast({
-        title: "Check-in failed",
-        description: "There was a problem processing the check-in",
-        variant: "destructive"
+        title: 'Error checking in',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   };
-  
-  // Handle check-out
-  const handleCheckOut = async (booking: GuestCheckIn) => {
+
+  const handleCheckOut = async (bookingId: string) => {
     try {
       const { error } = await supabase
         .from('bookings')
         .update({ status: 'completed' })
-        .eq('id', booking.id);
-      
+        .eq('id', bookingId);
+
       if (error) throw error;
-      
+
+      setTodayBookings(
+        todayBookings.map((booking) =>
+          booking.id === bookingId
+            ? { ...booking, status: 'completed' }
+            : booking
+        )
+      );
+
       toast({
-        title: "Check-out successful",
-        description: `${booking.name} has checked out from ${booking.room_name}`,
+        title: 'Check-out successful',
+        description: 'Guest has been checked out.',
       });
-      
-      refetchCheckOuts();
-    } catch (error) {
-      console.error('Error during check-out:', error);
+    } catch (error: any) {
+      console.error('Error checking out:', error);
       toast({
-        title: "Check-out failed",
-        description: "There was a problem processing the check-out",
-        variant: "destructive"
+        title: 'Error checking out',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   };
-  
-  // Filter function for search
-  const filteredCheckIns = todayCheckIns?.filter(booking => 
-    booking.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.room_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
-  const filteredCheckOuts = todayCheckOuts?.filter(booking => 
-    booking.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.room_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
+
+  const updateRoomStatus = async (roomId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('rooms')
+        .update({ status })
+        .eq('id', roomId);
+
+      if (error) throw error;
+
+      setRooms(
+        rooms.map((room) =>
+          room.id === roomId ? { ...room, status } : room
+        )
+      );
+
+      toast({
+        title: 'Room status updated',
+        description: `Room status has been updated to ${status}.`,
+      });
+    } catch (error: any) {
+      console.error('Error updating room status:', error);
+      toast({
+        title: 'Error updating room',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const markRoomCleaned = async (roomId: string) => {
+    try {
+      const { error } = await supabase
+        .from('rooms')
+        .update({ 
+          is_clean: true,
+          last_cleaned: new Date().toISOString(),
+          status: 'available'
+        })
+        .eq('id', roomId);
+
+      if (error) throw error;
+
+      setRooms(
+        rooms.map((room) =>
+          room.id === roomId
+            ? { 
+                ...room, 
+                is_clean: true,
+                last_cleaned: new Date().toISOString(),
+                status: 'available'
+              }
+            : room
+        )
+      );
+
+      toast({
+        title: 'Room marked as clean',
+        description: 'Room has been marked as clean and is now available.',
+      });
+    } catch (error: any) {
+      console.error('Error marking room as clean:', error);
+      toast({
+        title: 'Error updating room',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const maintenanceSchema = z.object({
+    notes: z
+      .string()
+      .min(1, { message: 'Please enter maintenance notes' })
+      .max(500, { message: 'Notes must be less than 500 characters' }),
+  });
+
+  const maintenanceForm = useForm<z.infer<typeof maintenanceSchema>>({
+    resolver: zodResolver(maintenanceSchema),
+    defaultValues: {
+      notes: '',
+    },
+  });
+
+  const submitMaintenanceRequest = async (data: z.infer<typeof maintenanceSchema>) => {
+    if (!selectedRoom) return;
+
+    try {
+      const { error } = await supabase
+        .from('rooms')
+        .update({ 
+          status: 'maintenance',
+          maintenance_notes: data.notes
+        })
+        .eq('id', selectedRoom.id);
+
+      if (error) throw error;
+
+      setRooms(
+        rooms.map((room) =>
+          room.id === selectedRoom.id
+            ? { 
+                ...room, 
+                status: 'maintenance',
+                maintenance_notes: data.notes
+              }
+            : room
+        )
+      );
+
+      toast({
+        title: 'Maintenance request submitted',
+        description: 'Room has been marked for maintenance.',
+      });
+
+      maintenanceForm.reset();
+    } catch (error: any) {
+      console.error('Error submitting maintenance request:', error);
+      toast({
+        title: 'Error updating room',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const filteredRooms = rooms.filter((room) => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    return (
+      room.room_number.toLowerCase().includes(query) ||
+      room.name.toLowerCase().includes(query) ||
+      room.room_type.toLowerCase().includes(query) ||
+      room.status.toLowerCase().includes(query)
+    );
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'available':
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Available</Badge>;
+      case 'occupied':
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Occupied</Badge>;
+      case 'cleaning':
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Cleaning</Badge>;
+      case 'maintenance':
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Maintenance</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight">Front Desk</h1>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search guests or rooms..."
-              className="w-[250px] pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Button>
-            <Calendar className="mr-2 h-4 w-4" />
-            Schedule
-          </Button>
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            New Guest
-          </Button>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Check-ins Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {todayCheckIns?.length || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Check-outs Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {todayCheckOuts?.length || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Available Rooms</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              Calculate based on bookings
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Ready for assignment
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="check-ins">
-        <TabsList>
-          <TabsTrigger value="check-ins" className="flex items-center">
-            <CheckSquare className="mr-2 h-4 w-4" />
-            Check-ins
-          </TabsTrigger>
-          <TabsTrigger value="check-outs" className="flex items-center">
-            <XSquare className="mr-2 h-4 w-4" />
-            Check-outs
-          </TabsTrigger>
-          <TabsTrigger value="current-guests" className="flex items-center">
-            <Briefcase className="mr-2 h-4 w-4" />
-            Current Guests
-          </TabsTrigger>
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-6">Front Desk</h1>
+
+      <Tabs defaultValue="today" className="mb-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="today">Today's Check-ins/outs</TabsTrigger>
+          <TabsTrigger value="rooms">Room Status</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="check-ins" className="space-y-4">
+
+        <TabsContent value="today">
           <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Guest Name</TableHead>
-                    <TableHead>Room</TableHead>
-                    <TableHead>Check-in Date</TableHead>
-                    <TableHead>Check-out Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCheckIns?.length ? (
-                    filteredCheckIns.map((booking) => (
+            <CardHeader>
+              <CardTitle>Today's Arrivals & Departures</CardTitle>
+              <CardDescription>
+                Manage check-ins and check-outs for {format(new Date(), 'MMMM d, yyyy')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {todayBookings.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No check-ins or check-outs scheduled for today</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Guest</TableHead>
+                      <TableHead>Room</TableHead>
+                      <TableHead>Check-in</TableHead>
+                      <TableHead>Check-out</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {todayBookings.map((booking) => (
                       <TableRow key={booking.id}>
-                        <TableCell className="font-medium">{booking.name}</TableCell>
-                        <TableCell>{booking.room_name}</TableCell>
-                        <TableCell>{format(new Date(booking.check_in_date), 'MMM d, yyyy')}</TableCell>
-                        <TableCell>{format(new Date(booking.check_out_date), 'MMM d, yyyy')}</TableCell>
                         <TableCell>
-                          <Badge variant={booking.status === 'confirmed' ? 'outline' : booking.status === 'checked_in' ? 'secondary' : 'default'}>
-                            {booking.status}
-                          </Badge>
+                          {booking.profile && booking.profile.full_name ? 
+                            booking.profile.full_name : 
+                            "Guest"}
                         </TableCell>
                         <TableCell>
+                          {booking.room.name} ({booking.room.room_number})
+                        </TableCell>
+                        <TableCell>
+                          {format(new Date(booking.check_in_date), 'MMM d, yyyy')}
+                        </TableCell>
+                        <TableCell>
+                          {format(new Date(booking.check_out_date), 'MMM d, yyyy')}
+                        </TableCell>
+                        <TableCell>
+                          {booking.status === 'confirmed' && (
+                            <Badge variant="outline">Confirmed</Badge>
+                          )}
+                          {booking.status === 'checked_in' && (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Checked In</Badge>
+                          )}
+                          {booking.status === 'completed' && (
+                            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Completed</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {booking.status === 'confirmed' && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleCheckIn(booking.id)}
+                            >
+                              <UserCheck className="mr-2 h-4 w-4" />
+                              Check In
+                            </Button>
+                          )}
+                          {booking.status === 'checked_in' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleCheckOut(booking.id)}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Check Out
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => navigate('/admin/bookings')}>
+                View All Bookings
+              </Button>
+              <Button onClick={() => navigate('/admin/bookings/new')}>
+                New Booking
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rooms">
+          <Card>
+            <CardHeader>
+              <CardTitle>Room Status</CardTitle>
+              <CardDescription>
+                Manage room availability, cleaning, and maintenance
+              </CardDescription>
+              <div className="relative mt-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search rooms..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredRooms.map((room) => (
+                  <Card key={room.id} className="overflow-hidden">
+                    <div className={cn(
+                      "h-2 w-full",
+                      room.status === 'available' && "bg-green-500",
+                      room.status === 'occupied' && "bg-blue-500",
+                      room.status === 'cleaning' && "bg-yellow-500",
+                      room.status === 'maintenance' && "bg-red-500",
+                    )} />
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{room.name}</CardTitle>
+                          <CardDescription>Room {room.room_number} • {room.room_type}</CardDescription>
+                        </div>
+                        {getStatusBadge(room.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      <div className="flex flex-col space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Price:</span>
+                          <span className="font-medium">${room.price_per_night}/night</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Clean:</span>
+                          <span className={cn(
+                            "font-medium",
+                            room.is_clean ? "text-green-600" : "text-red-600"
+                          )}>
+                            {room.is_clean ? 'Yes' : 'No'}
+                          </span>
+                        </div>
+                        {room.last_cleaned && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Last cleaned:</span>
+                            <span className="font-medium">
+                              {format(new Date(room.last_cleaned), 'MMM d, h:mm a')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-2">
+                      {room.status === 'cleaning' && (
+                        <Button 
+                          className="w-full" 
+                          size="sm"
+                          onClick={() => markRoomCleaned(room.id)}
+                        >
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Mark as Clean
+                        </Button>
+                      )}
+                      
+                      {room.status === 'available' && (
+                        <div className="flex w-full gap-2">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            disabled={booking.status === 'checked_in'}
-                            onClick={() => {
-                              setSelectedBooking(booking);
-                              setCheckInDialogOpen(true);
-                            }}
+                            className="flex-1"
+                            onClick={() => updateRoomStatus(room.id, 'cleaning')}
                           >
-                            Check In
+                            <Clock className="mr-2 h-4 w-4" />
+                            Needs Cleaning
                           </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        No check-ins for today
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="check-outs" className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Guest Name</TableHead>
-                    <TableHead>Room</TableHead>
-                    <TableHead>Check-in Date</TableHead>
-                    <TableHead>Check-out Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCheckOuts?.length ? (
-                    filteredCheckOuts.map((booking) => (
-                      <TableRow key={booking.id}>
-                        <TableCell className="font-medium">{booking.name}</TableCell>
-                        <TableCell>{booking.room_name}</TableCell>
-                        <TableCell>{format(new Date(booking.check_in_date), 'MMM d, yyyy')}</TableCell>
-                        <TableCell>{format(new Date(booking.check_out_date), 'MMM d, yyyy')}</TableCell>
-                        <TableCell>
-                          <Badge variant={booking.status === 'checked_in' ? 'secondary' : booking.status === 'completed' ? 'default' : 'outline'}>
-                            {booking.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            disabled={booking.status === 'completed'}
-                            onClick={() => handleCheckOut(booking)}
-                          >
-                            Check Out
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        No check-outs for today
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="current-guests" className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                Current guests will be displayed here
-              </p>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => setSelectedRoom(room)}
+                              >
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Maintenance
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Maintenance Request</DialogTitle>
+                                <DialogDescription>
+                                  Submit a maintenance request for Room {room.room_number}
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              <Form {...maintenanceForm}>
+                                <form onSubmit={maintenanceForm.handleSubmit(submitMaintenanceRequest)} className="space-y-4 mt-4">
+                                  <FormField
+                                    control={maintenanceForm.control}
+                                    name="notes"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>Maintenance Notes</FormLabel>
+                                        <FormControl>
+                                          <Textarea 
+                                            placeholder="Describe the maintenance issue..." 
+                                            className="min-h-[100px]"
+                                            {...field} 
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                  
+                                  <DialogFooter>
+                                    <Button type="submit">Submit Request</Button>
+                                  </DialogFooter>
+                                </form>
+                              </Form>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )}
+                      
+                      {room.status === 'maintenance' && (
+                        <Button 
+                          className="w-full" 
+                          size="sm"
+                          variant="outline"
+                          onClick={() => updateRoomStatus(room.id, 'cleaning')}
+                        >
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Maintenance Complete
+                        </Button>
+                      )}
+                      
+                      {room.status === 'occupied' && (
+                        <Button 
+                          className="w-full" 
+                          size="sm"
+                          variant="outline"
+                          disabled
+                        >
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          Currently Occupied
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-      
-      <Dialog open={checkInDialogOpen} onOpenChange={setCheckInDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Guest Check-in</DialogTitle>
-            <DialogDescription>
-              Complete the check-in process for this guest.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedBooking && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="font-semibold text-right">Guest:</div>
-                <div className="col-span-3">{selectedBooking.name}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="font-semibold text-right">Room:</div>
-                <div className="col-span-3">{selectedBooking.room_name}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="font-semibold text-right">Check-in Date:</div>
-                <div className="col-span-3">
-                  {format(new Date(selectedBooking.check_in_date), 'MMM d, yyyy')}
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="font-semibold text-right">Check-out Date:</div>
-                <div className="col-span-3">
-                  {format(new Date(selectedBooking.check_out_date), 'MMM d, yyyy')}
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCheckInDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleCheckIn}>Complete Check-in</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

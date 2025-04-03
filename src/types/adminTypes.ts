@@ -120,13 +120,3 @@ export interface Supplier {
   payment_terms: string;
   status: SupplierStatus;
 }
-
-// Add MockUser type for AdminUsers page
-export interface MockUser {
-  id: string;
-  name: string;
-  email: string;
-  role: string[];
-  status: string;
-  lastActive: string;
-}
