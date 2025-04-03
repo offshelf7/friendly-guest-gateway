@@ -59,7 +59,7 @@ const Reservations = () => {
 
         // Map the data to match the Booking interface with explicit room properties
         const mappedBookings = data?.map(booking => {
-          const room = booking.room as Record<string, any> || {};
+          const roomData = booking.room as Record<string, any> || {};
           return {
             ...booking,
             guest_id: booking.user_id, // Map user_id to guest_id
@@ -67,9 +67,9 @@ const Reservations = () => {
             payment_status: booking.payment_status || 'unpaid',
             guests_count: booking.guests_count || 1,
             room: {
-              name: room.name || 'Unknown Room',
-              room_number: room.room_number || (room.id ? room.id.toString() : 'N/A'),
-              room_type: room.room_type || 'Standard'
+              name: roomData.name || 'Unknown Room',
+              room_number: roomData.room_number || (roomData.id ? roomData.id.toString() : 'N/A'),
+              room_type: roomData.room_type || 'Standard'
             }
           };
         }) as Booking[];

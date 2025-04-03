@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -134,15 +135,15 @@ const FrontDesk = () => {
         if (error) throw error;
 
         const mappedBookings = data?.map(booking => {
-          const room = booking.room as Record<string, any> || {};
+          const roomData = booking.room as Record<string, any> || {};
           return {
             ...booking,
             guest_id: booking.user_id,
             profile: booking.profile || {},
             room: {
-              name: room.name || 'Unknown Room',
-              room_number: room.room_number || (room.id ? room.id.toString() : 'N/A'),
-              room_type: room.room_type || 'Standard'
+              name: roomData.name || 'Unknown Room',
+              room_number: roomData.room_number || (roomData.id ? roomData.id.toString() : 'N/A'),
+              room_type: roomData.room_type || 'Standard'
             }
           };
         }) as Booking[];
@@ -167,13 +168,17 @@ const FrontDesk = () => {
 
         if (error) throw error;
 
-        const mappedRooms = data?.map(room => ({
-          ...room,
-          status: (room.status as 'available' | 'occupied' | 'cleaning' | 'maintenance') || 'available',
-          room_number: room.room_number || room.id.toString(),
-          is_clean: room.is_clean !== undefined ? room.is_clean : true,
-          last_cleaned: room.last_cleaned || new Date().toISOString()
-        })) as FrontDeskRoom[];
+        const mappedRooms = data?.map(room => {
+          // Explicitly cast to ensure TypeScript understands the shape
+          const roomData = room as Record<string, any>;
+          return {
+            ...room,
+            status: (roomData.status as 'available' | 'occupied' | 'cleaning' | 'maintenance') || 'available',
+            room_number: roomData.room_number || roomData.id.toString(),
+            is_clean: roomData.is_clean !== undefined ? roomData.is_clean : true,
+            last_cleaned: roomData.last_cleaned || new Date().toISOString()
+          };
+        }) as FrontDeskRoom[];
 
         setRooms(mappedRooms || []);
       } catch (error: any) {

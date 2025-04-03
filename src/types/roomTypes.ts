@@ -48,6 +48,15 @@ export interface Booking {
   };
 }
 
+export interface Amenity {
+  id: string;
+  room_id: string;
+  amenity_name: string;
+  amenity_description?: string;
+  icon?: string;
+  created_at: string;
+}
+
 export type UserRole = 'guest' | 'staff' | 'admin' | 'general_manager' | 'operational_manager' | 'front_office_manager' | 'finance_manager' | 'purchasing_manager';
 
 export interface ServiceCategory {
