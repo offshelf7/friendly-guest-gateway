@@ -19,14 +19,14 @@ import AdminHome from "./pages/admin/AdminHome";
 
 import Dashboard from "./pages/admin/Dashboard";
 import GeneralManagerDashboard from "./pages/general-manager/GeneralManagerDashboard";
-import OperationalManagerDashboard from "./pages/admin/OperationalManagerDashboard";
+import OperationalManagerDashboard from "./pages/operation/OperationalManagerDashboard";
 import ServiceManagerDashboard from "./pages/service/ServiceManagerDashboard";
 import MaintenanceManagerDashboard from "./pages/admin/MaintenanceManagerDashboard";
 import MarketingManagerDashboard from "./pages/admin/MarketingManagerDashboard";
 import HRManagerDashboard from "./pages/hr/HRManagerDashboard";
 import FrontOfficeDashboard from "./pages/admin/FrontOfficeDashboard";
 import FinanceDashboard from "./pages/admin/FinanceDashboard";
-import PurchasingDashboard from "./pages/admin/PurchasingDashboard";
+import PurchasingDashboard from "./pages/inventory/PurchasingDashboard";
 import SuspendedUserDashboard from "./pages/users/SuspendedUserDashboard";
 
 import AdminUsers from "./pages/users/AdminUsers";
@@ -49,7 +49,7 @@ import Transactions from "./pages/admin/Transactions";
 import FrontDesk from "./pages/frontoffice/FrontDesk";
 import Reservations from "./pages/frontoffice/Reservations";
 
-import Inventory from "./pages/admin/Inventory";
+import Inventory from "./pages/inventory/Inventory";
 import Suppliers from "./pages/admin/Suppliers";
 
 import AdminSettings from "./pages/admin/AdminSettings";
