@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
@@ -7,12 +8,13 @@ import NavbarLogo from './NavbarLogo';
 import NavbarDesktopLinks from './NavbarDesktopLinks';
 import NavbarUserMenu from './NavbarUserMenu';
 import NavbarMobileMenu from './NavbarMobileMenu';
+import { hasDashboardAccess } from '@/types/roleTypes';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, signOut, userRoles } = useAuth();
 
   // Check if user has admin role
   const isAdmin = user && (user.email === 'admin@hotel.com' || 

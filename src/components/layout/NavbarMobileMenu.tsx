@@ -1,7 +1,9 @@
+
 import { cn } from '@/lib/utils';
-import { Home, Hotel, Phone, Calendar, Shield } from 'lucide-react';
+import { Home, Hotel, Phone, Calendar, Shield, LayoutDashboard } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/MockAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { hasDashboardAccess } from '@/types/roleTypes';
 
 type NavbarMobileMenuProps = {
   isMenuOpen: boolean;
@@ -31,7 +33,8 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
     auth = mockAuthData;
   }
   
-  const { user } = auth;
+  const { user, userRoles } = auth;
+  const canAccessDashboard = hasDashboardAccess(userRoles);
   
   // Assume admin role for demonstration - in a real app, this would come from the user object
   const isAdmin = user && user.email === 'admin@hotel.com';
@@ -75,6 +78,17 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           <Phone className="h-5 w-5" />
           Contact Us
         </Link>
+        
+        {user && canAccessDashboard && (
+          <Link
+            to="/admin"
+            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
+            onClick={toggleMenu}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            Dashboard
+          </Link>
+        )}
         
         {isAdmin && (
           <Link
