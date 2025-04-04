@@ -1,9 +1,10 @@
 
 import { cn } from '@/lib/utils';
-import { Home, Hotel, Phone, Calendar, Shield, LayoutDashboard } from 'lucide-react';
+import { Home, Hotel, Phone, Calendar, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasDashboardAccess } from '@/types/roleTypes';
+import { hasDashboardAccess, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
+import { Badge } from '@/components/ui/badge';
 
 type NavbarMobileMenuProps = {
   isMenuOpen: boolean;
@@ -34,11 +35,11 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
   }
   
   const { user, userRoles } = auth;
-  const canAccessDashboard = hasDashboardAccess(userRoles);
   
-  // Update admin check to include 'admin' role from userRoles
-  const isAdmin = user && (user.email === 'admin@hotel.com' || 
-                         (userRoles && (userRoles.includes('admin'))));
+  // Get the first role to display
+  const displayRole = userRoles && userRoles.length > 0 
+    ? ROLE_DISPLAY_NAMES[userRoles[0]] 
+    : user ? 'Guest' : '';
   
   return (
     <div 
@@ -80,26 +81,13 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           Contact Us
         </Link>
         
-        {user && canAccessDashboard && (
-          <Link
-            to="/admin"
-            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-            onClick={toggleMenu}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            Dashboard
-          </Link>
-        )}
-        
-        {isAdmin && (
-          <Link
-            to="/admin"
-            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-            onClick={toggleMenu}
-          >
-            <Shield className="h-5 w-5" />
-            Admin Dashboard
-          </Link>
+        {user && (
+          <div className="flex items-center justify-center gap-2 py-2">
+            <User className="h-5 w-5 text-slate-900" />
+            <Badge variant="outline" className="border-slate-900 text-slate-900">
+              {displayRole}
+            </Badge>
+          </div>
         )}
         
         {user ? (

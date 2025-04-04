@@ -1,9 +1,10 @@
 
 import { cn } from '@/lib/utils';
-import { Home, Hotel, Phone, Shield, Coffee, LayoutDashboard } from 'lucide-react';
+import { Home, Hotel, Phone, Coffee, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasDashboardAccess } from '@/types/roleTypes';
+import { hasDashboardAccess, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
+import { Badge } from '@/components/ui/badge';
 
 type NavbarDesktopLinksProps = {
   isScrolled: boolean;
@@ -13,6 +14,11 @@ type NavbarDesktopLinksProps = {
 const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) => {
   const { user, userRoles } = useAuth();
   const canAccessDashboard = hasDashboardAccess(userRoles);
+  
+  // Get the first role to display
+  const displayRole = userRoles && userRoles.length > 0 
+    ? ROLE_DISPLAY_NAMES[userRoles[0]] 
+    : user ? 'Guest' : '';
   
   return (
     <div className="hidden md:flex items-center space-x-8">
@@ -36,18 +42,13 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
         Contact Us
       </Link>
       
-      {user && canAccessDashboard && (
-        <Link to="/admin" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
-          <LayoutDashboard className="h-4 w-4" />
-          Dashboard
-        </Link>
-      )}
-      
-      {isAdmin && (
-        <Link to="/admin" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
-          <Shield className="h-4 w-4" />
-          Admin Dashboard
-        </Link>
+      {user && displayRole && (
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-white" />
+          <Badge variant="outline" className="border-amber-300 text-amber-300">
+            {displayRole}
+          </Badge>
+        </div>
       )}
     </div>
   );
