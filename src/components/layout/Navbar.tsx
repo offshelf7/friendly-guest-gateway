@@ -16,11 +16,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut, userRoles } = useAuth();
 
-  // Check if user has admin role
+  // Check if user has admin role - updated to include proper role checking
   const isAdmin = user && (user.email === 'admin@hotel.com' || 
-                           (user.user_metadata && 
-                           (user.user_metadata.role === 'admin' || 
-                            user.user_metadata.role === 'staff')));
+                           (userRoles && (userRoles.includes('admin') || 
+                            userRoles.includes('staff'))));
 
   useEffect(() => {
     const handleScroll = () => {

@@ -1,3 +1,4 @@
+
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole, hasRole, hasDashboardAccess } from '@/types/roleTypes';
@@ -40,6 +41,14 @@ export const RoleBasedRoute = ({
   // Special case for the suspended dashboard - only suspended users should access it
   if (window.location.pathname === '/admin/suspended' && !userSuspended) {
     return <Navigate to="/admin" replace />;
+  }
+  
+  // Special case for admin access - if user email is admin@hotel.com or has admin role
+  const isAdmin = user.email === 'admin@hotel.com' || 
+                 (userRoles && userRoles.includes('admin'));
+  
+  if (isAdmin && window.location.pathname.startsWith('/admin')) {
+    return children ? <>{children}</> : <Outlet />;
   }
   
   // If no specific roles are required, or user has at least one of the allowed roles, render the route

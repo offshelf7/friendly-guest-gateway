@@ -36,8 +36,9 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
   const { user, userRoles } = auth;
   const canAccessDashboard = hasDashboardAccess(userRoles);
   
-  // Assume admin role for demonstration - in a real app, this would come from the user object
-  const isAdmin = user && user.email === 'admin@hotel.com';
+  // Update admin check to include 'admin' role from userRoles
+  const isAdmin = user && (user.email === 'admin@hotel.com' || 
+                         (userRoles && (userRoles.includes('admin'))));
   
   return (
     <div 
