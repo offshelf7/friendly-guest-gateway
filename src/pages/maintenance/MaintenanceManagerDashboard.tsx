@@ -2,54 +2,54 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChartIcon } from '@/components/ui/line-chart-icon';
-import { Megaphone, TrendingUp, Users } from 'lucide-react';
+import { Wrench, AlertTriangle, CheckCircle } from 'lucide-react';
 
-const MarketingManagerDashboard = () => {
+const MaintenanceManagerDashboard = () => {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Marketing Dashboard</h1>
-        <p className="text-muted-foreground">Overview of marketing campaigns and performance</p>
+        <h1 className="text-3xl font-bold">Maintenance Dashboard</h1>
+        <p className="text-muted-foreground">Overview of maintenance operations</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Stats Cards */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
+            <CardTitle className="text-sm font-medium">Open Requests</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center">
-              <Megaphone className="h-5 w-5 text-purple-500 mr-2" />
-              <div className="text-3xl font-bold">5</div>
+              <AlertTriangle className="h-5 w-5 text-amber-500 mr-2" />
+              <div className="text-3xl font-bold">14</div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">2 ending this week</p>
+            <p className="text-xs text-muted-foreground mt-1">3 high priority</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Website Traffic</CardTitle>
+            <CardTitle className="text-sm font-medium">In Progress</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center">
-              <TrendingUp className="h-5 w-5 text-green-500 mr-2" />
-              <div className="text-3xl font-bold">2.4K</div>
+              <Wrench className="h-5 w-5 text-blue-500 mr-2" />
+              <div className="text-3xl font-bold">8</div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">↑ 12% from last week</p>
+            <p className="text-xs text-muted-foreground mt-1">2 assigned to team A</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">New Subscribers</CardTitle>
+            <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center">
-              <Users className="h-5 w-5 text-blue-500 mr-2" />
-              <div className="text-3xl font-bold">87</div>
+              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+              <div className="text-3xl font-bold">12</div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">↑ 23% from last month</p>
+            <p className="text-xs text-muted-foreground mt-1">↑ 4 from yesterday</p>
           </CardContent>
         </Card>
       </div>
@@ -57,7 +57,7 @@ const MarketingManagerDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Campaign Performance</CardTitle>
+            <CardTitle className="text-base">Maintenance Requests by Area</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px] flex items-center justify-center">
             <div className="text-center">
@@ -69,7 +69,7 @@ const MarketingManagerDashboard = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Revenue by Channel</CardTitle>
+            <CardTitle className="text-base">Resolution Time Trend</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px] flex items-center justify-center">
             <div className="text-center">
@@ -83,4 +83,4 @@ const MarketingManagerDashboard = () => {
   );
 };
 
-export default MarketingManagerDashboard;
+export default MaintenanceManagerDashboard;

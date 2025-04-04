@@ -20,12 +20,12 @@ import AdminHome from "./pages/admin/AdminHome";
 import Dashboard from "./pages/admin/Dashboard";
 import GeneralManagerDashboard from "./pages/general-manager/GeneralManagerDashboard";
 import OperationalManagerDashboard from "./pages/operation/OperationalManagerDashboard";
-import ServiceManagerDashboard from "./pages/service/ServiceManagerDashboard";
-import MaintenanceManagerDashboard from "./pages/admin/MaintenanceManagerDashboard";
-import MarketingManagerDashboard from "./pages/admin/MarketingManagerDashboard";
+import ServiceManagerDashboard from "./pages/services/ServiceManagerDashboard";
+import MaintenanceManagerDashboard from "./pages/maintenance/MaintenanceManagerDashboard";
+import MarketingManagerDashboard from "./pages/marketing/MarketingManagerDashboard";
 import HRManagerDashboard from "./pages/hr/HRManagerDashboard";
-import FrontOfficeDashboard from "./pages/admin/FrontOfficeDashboard";
-import FinanceDashboard from "./pages/admin/FinanceDashboard";
+import FrontOfficeDashboard from "./pages/frontoffice/FrontOfficeDashboard";
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import PurchasingDashboard from "./pages/inventory/PurchasingDashboard";
 import SuspendedUserDashboard from "./pages/users/SuspendedUserDashboard";
 
@@ -34,7 +34,7 @@ import AdminMessages from "./pages/admin/AdminMessages";
 import AdminRooms from "./pages/admin/AdminRooms";
 import AdminRoomTypes from "./pages/admin/AdminRoomTypes";
 import AdminGuests from "./pages/admin/AdminGuests";
-import GuestProfile from "./pages/admin/GuestProfile";
+import GuestProfile from "./pages/users/GuestProfile";
 
 import AdminServices from "./pages/admin/AdminServices";
 import AdminFoodAndDrink from "./pages/admin/AdminFoodAndDrink";
@@ -43,14 +43,14 @@ import AdminReports from "./pages/admin/AdminReports";
 
 import AdminBilling from "./pages/admin/AdminBilling";
 import AdminInvoice from "./pages/admin/AdminInvoice";
-import FinanceReports from "./pages/admin/FinanceReports";
+import FinanceReports from "./pages/finance/FinancialReports";
 import Transactions from "./pages/admin/Transactions";
 
 import FrontDesk from "./pages/frontoffice/FrontDesk";
 import Reservations from "./pages/frontoffice/Reservations";
 
 import Inventory from "./pages/inventory/Inventory";
-import Suppliers from "./pages/admin/Suppliers";
+import Suppliers from "./pages/inventory/Suppliers";
 
 import AdminSettings from "./pages/admin/AdminSettings";
 
