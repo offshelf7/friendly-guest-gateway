@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from 'react';
+import { useLanguage, languages } from '@/contexts/LanguageContext';
 
 type NavbarMobileMenuProps = {
   isMenuOpen: boolean;
@@ -20,24 +20,8 @@ type NavbarMobileMenuProps = {
   handleSignOut: () => void;
 };
 
-type Language = {
-  code: string;
-  name: string;
-  flag: string;
-};
-
-const languages: Language[] = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
-];
-
 const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobileMenuProps) => {
-  const [language, setLanguage] = useState('en');
+  const { language, setLanguage, t } = useLanguage();
   
   // Try to use the real auth context, but fall back to mock data if it's not available
   let auth;
@@ -79,7 +63,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           onClick={toggleMenu}
         >
           <Home className="h-5 w-5" />
-          Home
+          {t('nav.home')}
         </Link>
         <Link 
           to="/facilities" 
@@ -87,14 +71,14 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           onClick={toggleMenu}
         >
           <Hotel className="h-5 w-5" />
-          Facilities
+          {t('nav.facilities')}
         </Link>
         <Link 
           to="/rooms" 
           className="text-xl font-medium text-slate-900 py-2"
           onClick={toggleMenu}
         >
-          Rooms
+          {t('nav.rooms')}
         </Link>
         <Link 
           to="/contact" 
@@ -102,7 +86,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           onClick={toggleMenu}
         >
           <Phone className="h-5 w-5" />
-          Contact Us
+          {t('nav.contactUs')}
         </Link>
         
         {user && canAccessDashboard && (
@@ -112,7 +96,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
             onClick={toggleMenu}
           >
             <LayoutDashboard className="h-5 w-5" />
-            Dashboard
+            {t('nav.dashboard')}
           </Link>
         )}
         
@@ -157,7 +141,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
               className="text-xl font-medium text-slate-900 py-2"
               onClick={toggleMenu}
             >
-              My Profile
+              {t('nav.myProfile')}
             </Link>
             <Link
               to="/my-bookings"
@@ -165,7 +149,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
               onClick={toggleMenu}
             >
               <Calendar className="h-5 w-5" />
-              My Bookings
+              {t('nav.myBookings')}
             </Link>
             <button
               onClick={() => {
@@ -174,7 +158,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
               }}
               className="text-xl font-medium text-red-600 py-2"
             >
-              Sign Out
+              {t('nav.signOut')}
             </button>
           </>
         ) : (
@@ -183,7 +167,7 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
             className="text-xl font-medium text-slate-900 py-2"
             onClick={toggleMenu}
           >
-            Sign In
+            {t('nav.signIn')}
           </Link>
         )}
       </div>

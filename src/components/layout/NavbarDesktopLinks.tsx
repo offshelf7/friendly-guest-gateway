@@ -12,33 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from 'react';
+import { useLanguage, languages } from '@/contexts/LanguageContext';
 
 type NavbarDesktopLinksProps = {
   isScrolled: boolean;
   isAdmin: boolean;
 };
 
-type Language = {
-  code: string;
-  name: string;
-  flag: string;
-};
-
-const languages: Language[] = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'pt', name: 'Português', flag: '🇵🇹' },
-  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
-];
-
 const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) => {
   const { user, userRoles } = useAuth();
   const canAccessDashboard = hasDashboardAccess(userRoles);
-  const [language, setLanguage] = useState('en');
+  const { language, setLanguage, t } = useLanguage();
   
   // Get the first role to display
   const displayRole = userRoles && userRoles.length > 0 
@@ -49,28 +33,28 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
     <div className="hidden md:flex items-center space-x-8">
       <Link to="/" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
         <Home className="h-4 w-4" />
-        Home
+        {t('nav.home')}
       </Link>
       <Link to="/facilities" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
         <Hotel className="h-4 w-4" />
-        Facilities
+        {t('nav.facilities')}
       </Link>
       <Link to="/rooms" className="transition-colors text-white hover:text-white/80">
-        Rooms
+        {t('nav.rooms')}
       </Link>
       <Link to="/food-and-drink" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
         <Coffee className="h-4 w-4" />
-        Food & Drink
+        {t('nav.foodAndDrink')}
       </Link>
       <Link to="/contact" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
         <Phone className="h-4 w-4" />
-        Contact Us
+        {t('nav.contactUs')}
       </Link>
       
       {user && canAccessDashboard && (
         <Link to="/admin" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
           <LayoutDashboard className="h-4 w-4" />
-          Dashboard
+          {t('nav.dashboard')}
         </Link>
       )}
       

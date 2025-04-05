@@ -16,11 +16,13 @@ import { Room } from '@/types/roomTypes';
 import { useRooms } from '@/hooks/useRooms';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/home/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Rooms = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(new Date());
   const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000));
@@ -32,8 +34,8 @@ const Rooms = () => {
   const handleBookNow = (room: Room) => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please log in to book a room",
+        title: t('rooms.authRequired'),
+        description: t('rooms.loginRequired'),
         variant: "destructive"
       });
       navigate('/login');
@@ -42,8 +44,8 @@ const Rooms = () => {
 
     if (!checkInDate || !checkOutDate) {
       toast({
-        title: "Invalid dates",
-        description: "Please select check-in and check-out dates",
+        title: t('rooms.invalidDates'),
+        description: t('rooms.selectDates'),
         variant: "destructive"
       });
       return;
@@ -71,13 +73,13 @@ const Rooms = () => {
       
       <div className="flex-grow py-24 px-4 bg-slate-50">
         <div className="container mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-center">Available Rooms</h1>
+          <h1 className="text-3xl font-bold mb-8 text-center">{t('rooms.title')}</h1>
           
           {/* Search and Filter Section */}
           <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Check-in Date</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('rooms.checkIn')}</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -88,7 +90,7 @@ const Rooms = () => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {checkInDate ? format(checkInDate, "PPP") : <span>Pick a date</span>}
+                      {checkInDate ? format(checkInDate, "PPP") : <span>{t('rooms.pickDate')}</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -104,7 +106,7 @@ const Rooms = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Check-out Date</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('rooms.checkOut')}</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -115,7 +117,7 @@ const Rooms = () => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {checkOutDate ? format(checkOutDate, "PPP") : <span>Pick a date</span>}
+                      {checkOutDate ? format(checkOutDate, "PPP") : <span>{t('rooms.pickDate')}</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -131,7 +133,7 @@ const Rooms = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Guests</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('rooms.guests')}</label>
                 <Input
                   type="number"
                   min={1}
@@ -145,14 +147,14 @@ const Rooms = () => {
                   className="w-full" 
                   onClick={() => refetch()}
                 >
-                  Search Availability
+                  {t('rooms.searchAvailability')}
                 </Button>
               </div>
             </div>
             
             {calculateNights() > 0 && (
               <div className="mt-4 text-sm text-slate-600">
-                Searching for {calculateNights()} night{calculateNights() > 1 ? 's' : ''} • {guestsCount} guest{guestsCount > 1 ? 's' : ''}
+                {t('rooms.searching')} {calculateNights()} {calculateNights() > 1 ? t('rooms.nights') : t('rooms.night')} • {guestsCount} {guestsCount > 1 ? t('rooms.guests') : t('rooms.guest')}
               </div>
             )}
           </div>
@@ -179,9 +181,9 @@ const Rooms = () => {
             </div>
           ) : error ? (
             <div className="text-center py-16">
-              <h3 className="text-xl font-semibold mb-2 text-red-500">Error Loading Rooms</h3>
-              <p className="text-slate-600 mb-4">We encountered an error while loading the available rooms.</p>
-              <Button onClick={() => refetch()}>Try Again</Button>
+              <h3 className="text-xl font-semibold mb-2 text-red-500">{t('rooms.errorLoading')}</h3>
+              <p className="text-slate-600 mb-4">{t('rooms.errorDescription')}</p>
+              <Button onClick={() => refetch()}>{t('rooms.tryAgain')}</Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -206,7 +208,7 @@ const Rooms = () => {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-xl font-semibold">{room.name}</h3>
-                      <div className="text-lg font-bold text-blue-600">${room.price_per_night}/night</div>
+                      <div className="text-lg font-bold text-blue-600">${room.price_per_night}{t('rooms.pricePerNight')}</div>
                     </div>
                     
                     <p className="text-slate-600 mb-4 line-clamp-2">{room.description}</p>
@@ -234,10 +236,10 @@ const Rooms = () => {
                     
                     <div className="flex justify-between items-center">
                       <div className="text-sm text-slate-500">
-                        <span className="font-medium">Capacity:</span> {room.capacity} {room.capacity > 1 ? 'guests' : 'guest'}
+                        <span className="font-medium">{t('rooms.capacity')}</span> {room.capacity} {room.capacity > 1 ? t('rooms.guests') : t('rooms.guest')}
                       </div>
                       <Button onClick={() => handleBookNow(room)}>
-                        Book Now
+                        {t('rooms.bookNow')}
                       </Button>
                     </div>
                   </div>
@@ -248,9 +250,9 @@ const Rooms = () => {
           
           {!isLoading && !error && rooms.length === 0 && (
             <div className="text-center py-16 bg-white rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-2">No rooms available</h3>
-              <p className="text-slate-600 mb-4">Please try different dates or check back later.</p>
-              <Button onClick={() => refetch()}>Refresh Results</Button>
+              <h3 className="text-xl font-semibold mb-2">{t('rooms.noRooms')}</h3>
+              <p className="text-slate-600 mb-4">{t('rooms.tryDifferentDates')}</p>
+              <Button onClick={() => refetch()}>{t('rooms.refreshResults')}</Button>
             </div>
           )}
         </div>
