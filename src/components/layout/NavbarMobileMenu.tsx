@@ -1,9 +1,18 @@
 
 import { cn } from '@/lib/utils';
-import { Home, Hotel, Phone, Calendar, LayoutDashboard, Shield } from 'lucide-react';
+import { Home, Hotel, Phone, Calendar, LayoutDashboard, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasDashboardAccess } from '@/types/roleTypes';
+import { hasDashboardAccess, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from 'react';
 
 type NavbarMobileMenuProps = {
   isMenuOpen: boolean;
@@ -11,18 +20,24 @@ type NavbarMobileMenuProps = {
   handleSignOut: () => void;
 };
 
+type Language = {
+  code: string;
+  name: string;
+  flag: string;
+};
+
+const languages: Language[] = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'pt', name: 'Português', flag: '🇵🇹' },
+  { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+];
+
 const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobileMenuProps) => {
-  // Create mock auth data for debugging
-  const mockAuthData = {
-    user: null,
-    signOut: async () => { console.log('Mock sign out'); },
-    userRoles: null,
-    userSuspended: false,
-    session: null,
-    loading: false,
-    signUp: async () => ({ error: null }),
-    signIn: async () => ({ error: null }),
-  };
+  const [language, setLanguage] = useState('en');
   
   // Try to use the real auth context, but fall back to mock data if it's not available
   let auth;
@@ -30,15 +45,25 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
     auth = useAuth();
   } catch (e) {
     console.log('AuthProvider not available, using mock data');
-    auth = mockAuthData;
+    auth = {
+      user: null,
+      signOut: async () => { console.log('Mock sign out'); },
+      userRoles: null,
+      userSuspended: false,
+      session: null,
+      loading: false,
+      signUp: async () => ({ error: null }),
+      signIn: async () => ({ error: null }),
+    };
   }
   
   const { user, userRoles } = auth;
   const canAccessDashboard = hasDashboardAccess(userRoles);
   
-  // Update admin check to include 'admin' role from userRoles
-  const isAdmin = user && (user.email === 'admin@hotel.com' || 
-                         (userRoles && (userRoles.includes('admin'))));
+  // Get the first role to display
+  const displayRole = userRoles && userRoles.length > 0 
+    ? ROLE_DISPLAY_NAMES[userRoles[0]] 
+    : user ? 'Guest' : '';
   
   return (
     <div 
@@ -91,16 +116,36 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           </Link>
         )}
         
-        {isAdmin && (
-          <Link
-            to="/admin"
-            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-            onClick={toggleMenu}
-          >
-            <Shield className="h-5 w-5" />
-            Admin Dashboard
-          </Link>
+        {/* User Role Display */}
+        {user && (
+          <div className="flex items-center justify-center gap-2 py-2">
+            <Badge variant="outline" className="border-slate-900 text-slate-900">
+              {displayRole}
+            </Badge>
+          </div>
         )}
+        
+        {/* Language Selector */}
+        <div className="flex items-center justify-center py-2">
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-[160px]">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                <SelectValue placeholder="Language" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map((lang) => (
+                <SelectItem key={lang.code} value={lang.code}>
+                  <span className="flex items-center gap-2">
+                    <span>{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         
         {user ? (
           <>
