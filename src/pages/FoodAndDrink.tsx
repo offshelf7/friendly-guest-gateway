@@ -13,6 +13,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/home/Footer';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { FoodDrinkSidebar } from '@/components/food-drink/FoodDrinkSidebar';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Sample menu data (would normally come from an API/Supabase)
 const menuItems: MenuItem[] = [
@@ -142,6 +143,7 @@ const FoodAndDrink = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [activeCategory, setActiveCategory] = useState('all');
+  const { t } = useLanguage();
 
   const filterItems = (items: MenuItem[]): MenuItem[] => {
     // Filter by search term
@@ -185,8 +187,8 @@ const FoodAndDrink = () => {
             <div className="flex-1 p-6">
               <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">Food & Drink Menu</h1>
-                  <p className="text-muted-foreground">Explore our delicious food and refreshing drinks</p>
+                  <h1 className="text-3xl font-bold mb-2">{t('foodDrink.title')}</h1>
+                  <p className="text-muted-foreground">{t('foodDrink.subtitle')}</p>
                 </div>
                 
                 <div className="flex items-center mt-4 md:mt-0">
@@ -208,7 +210,7 @@ const FoodAndDrink = () => {
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="search"
-                      placeholder="Search menu..."
+                      placeholder={t('foodDrink.searchMenu')}
                       className="pl-8 w-[200px] md:w-[300px]"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -222,14 +224,14 @@ const FoodAndDrink = () => {
                 setActiveCategory('all');
               }} className="w-full">
                 <TabsList className="mb-8 flex justify-start overflow-x-auto">
-                  <TabsTrigger value="all">All Items</TabsTrigger>
+                  <TabsTrigger value="all">{t('foodDrink.allItems')}</TabsTrigger>
                   <TabsTrigger value="food" className="flex items-center gap-1">
                     <Utensils className="w-4 h-4" />
-                    Food
+                    {t('foodDrink.food')}
                   </TabsTrigger>
                   <TabsTrigger value="drink" className="flex items-center gap-1">
                     <Coffee className="w-4 h-4" />
-                    Drinks
+                    {t('foodDrink.drinks')}
                   </TabsTrigger>
                 </TabsList>
                 
@@ -269,6 +271,8 @@ const FoodAndDrink = () => {
 
 // Menu Item Card Component
 const MenuItemCard = ({ item, onAddToCart }: { item: MenuItem, onAddToCart: (item: MenuItem) => void }) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden h-full flex flex-col">
       <div className="h-48 overflow-hidden">
@@ -303,7 +307,7 @@ const MenuItemCard = ({ item, onAddToCart }: { item: MenuItem, onAddToCart: (ite
           onClick={() => onAddToCart(item)} 
           className="w-full"
         >
-          Add to Cart
+          {t('foodDrink.addToCart')}
         </Button>
       </CardFooter>
     </Card>

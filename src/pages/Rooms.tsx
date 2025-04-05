@@ -218,13 +218,13 @@ const Rooms = () => {
                       {room.has_wifi && (
                         <div className="flex items-center text-sm bg-slate-100 px-2 py-1 rounded">
                           <Wifi className="w-4 h-4 mr-1" />
-                          <span>WiFi</span>
+                          <span>{t('amenities.wifi')}</span>
                         </div>
                       )}
                       {room.has_breakfast && (
                         <div className="flex items-center text-sm bg-slate-100 px-2 py-1 rounded">
                           <Coffee className="w-4 h-4 mr-1" />
-                          <span>Breakfast</span>
+                          <span>{t('amenities.breakfast')}</span>
                         </div>
                       )}
                       {room.amenities?.slice(0, 3).map((amenity) => (

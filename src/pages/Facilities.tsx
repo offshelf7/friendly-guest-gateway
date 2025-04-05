@@ -8,6 +8,7 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/home/Footer';
 import FacilityDetailDialog from '../components/facilities/FacilityDetailDialog';
 import { Facility } from '@/types/facilityTypes';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock API function to fetch facilities data with extended information
 const fetchFacilities = async () => {
@@ -254,6 +255,7 @@ const Facilities = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { t } = useLanguage();
   
   // Use TanStack Query to fetch facilities data
   const { data: facilities = [], isLoading, error } = useQuery({
@@ -277,9 +279,9 @@ const Facilities = () => {
       
       <div className="container mx-auto py-24 px-4">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-4">Our Facilities</h1>
+          <h1 className="text-3xl font-bold mb-4">{t('facilities.title')}</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover our premium facilities designed to enhance your stay and provide unforgettable experiences.
+            {t('facilities.subtitle')}
           </p>
         </div>
         
@@ -289,38 +291,38 @@ const Facilities = () => {
             onClick={() => setActiveTab('all')}
             className="mb-2"
           >
-            All Facilities
+            {t('facilities.allFacilities')}
           </Button>
           <Button 
             variant={activeTab === 'dining' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('dining')}
             className="mb-2"
           >
-            Dining
+            {t('facilities.dining')}
           </Button>
           <Button 
             variant={activeTab === 'wellness' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('wellness')}
             className="mb-2"
           >
-            Wellness
+            {t('facilities.wellness')}
           </Button>
           <Button 
             variant={activeTab === 'services' ? 'default' : 'outline'} 
             onClick={() => setActiveTab('services')}
             className="mb-2"
           >
-            Services
+            {t('facilities.services')}
           </Button>
         </div>
         
         {isLoading ? (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p>Loading facilities...</p>
+            <p>{t('facilities.loading')}</p>
           </div>
         ) : error ? (
-          <div className="text-center py-10 text-red-500">Error loading facilities. Please try again later.</div>
+          <div className="text-center py-10 text-red-500">{t('facilities.error')}</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFacilities.map((facility) => (
@@ -337,7 +339,7 @@ const Facilities = () => {
                     variant="outline" 
                     onClick={() => handleLearnMore(facility)}
                   >
-                    Learn More
+                    {t('facilities.learnMore')}
                   </Button>
                 </CardContent>
               </Card>

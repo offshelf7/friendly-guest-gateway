@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -45,6 +46,7 @@ const formSchema = z.object({
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,8 +65,8 @@ const Contact = () => {
     setTimeout(() => {
       console.log(values);
       toast({
-        title: "Message Sent!",
-        description: "We'll get back to you as soon as possible.",
+        title: t('contact.messageSent'),
+        description: t('contact.responseMessage'),
       });
       form.reset();
       setIsSubmitting(false);
@@ -74,22 +76,22 @@ const Contact = () => {
   const contactDetails = [
     {
       icon: <MapPin className="h-6 w-6 text-primary" />,
-      title: "Address",
+      title: t('contact.address'),
       details: ["123 Luxury Avenue", "New York, NY 10001", "United States"]
     },
     {
       icon: <Phone className="h-6 w-6 text-primary" />,
-      title: "Phone",
+      title: t('contact.phone'),
       details: ["+1 (555) 123-4567", "+1 (555) 765-4321"]
     },
     {
       icon: <Mail className="h-6 w-6 text-primary" />,
-      title: "Email",
+      title: t('contact.email'),
       details: ["info@luxuryhotels.com", "reservations@luxuryhotels.com"]
     },
     {
       icon: <Clock className="h-6 w-6 text-primary" />,
-      title: "Hours",
+      title: t('contact.hours'),
       details: ["Check-in: 3:00 PM", "Check-out: 12:00 PM", "Front Desk: 24/7"]
     }
   ];
@@ -102,9 +104,9 @@ const Contact = () => {
       <div className="relative h-[250px] md:h-[350px] bg-gradient-to-r from-blue-800 to-blue-600 overflow-hidden">
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center items-center text-center">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Contact Us</h1>
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">{t('contact.title')}</h1>
           <p className="text-lg md:text-xl text-white/90 max-w-2xl">
-            We'd love to hear from you. Reach out to us with any questions or requests.
+            {t('contact.subtitle')}
           </p>
         </div>
       </div>
@@ -113,10 +115,9 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Details */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Get in Touch</h2>
+            <h2 className="text-2xl font-bold">{t('contact.getInTouch')}</h2>
             <p className="text-slate-600">
-              Have questions about your reservation, our facilities, or anything else? 
-              We're here to help you make the most of your stay with us.
+              {t('contact.getInTouchText')}
             </p>
             
             <div className="space-y-6 mt-8">
@@ -140,7 +141,7 @@ const Contact = () => {
           <div className="lg:col-span-2">
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+                <h2 className="text-2xl font-bold mb-6">{t('contact.sendMessage')}</h2>
                 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -150,9 +151,9 @@ const Contact = () => {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>{t('contact.name')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Your name" {...field} />
+                              <Input placeholder={t('contact.yourName')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -164,9 +165,9 @@ const Contact = () => {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{t('contact.email')}</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="Your email" {...field} />
+                              <Input type="email" placeholder={t('contact.yourEmail')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -179,22 +180,22 @@ const Contact = () => {
                       name="subject"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Subject</FormLabel>
+                          <FormLabel>{t('contact.subject')}</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a subject" />
+                                <SelectValue placeholder={t('contact.selectSubject')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="reservation">Reservation Inquiry</SelectItem>
-                              <SelectItem value="services">Services Information</SelectItem>
-                              <SelectItem value="feedback">Feedback</SelectItem>
-                              <SelectItem value="complaint">Complaint</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="reservation">{t('contact.reservation')}</SelectItem>
+                              <SelectItem value="services">{t('contact.services')}</SelectItem>
+                              <SelectItem value="feedback">{t('contact.feedback')}</SelectItem>
+                              <SelectItem value="complaint">{t('contact.complaint')}</SelectItem>
+                              <SelectItem value="other">{t('contact.other')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -207,10 +208,10 @@ const Contact = () => {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Message</FormLabel>
+                          <FormLabel>{t('contact.message')}</FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="Your message" 
+                              placeholder={t('contact.yourMessage')} 
                               className="min-h-[150px]" 
                               {...field} 
                             />
@@ -225,7 +226,7 @@ const Contact = () => {
                       className="w-full md:w-auto"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Sending..." : "Send Message"}
+                      {isSubmitting ? t('contact.sending') : t('contact.send')}
                     </Button>
                   </form>
                 </Form>
