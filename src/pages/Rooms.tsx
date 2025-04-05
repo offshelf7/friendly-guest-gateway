@@ -154,11 +154,12 @@ const Rooms = () => {
             
             {calculateNights() > 0 && (
               <div className="mt-4 text-sm text-slate-600">
-                {t('rooms.searching')} {calculateNights()} {calculateNights() > 1 ? t('rooms.nights') : t('rooms.night')} • {guestsCount} {guestsCount > 1 ? t('rooms.guests') : t('rooms.guest')}
+                {t('rooms.searching')} {calculateNights()} {calculateNights() > 1 ? t('rooms.nights') : t('rooms.night')} • {guestsCount} {guestsCount > 1 ? t('rooms.guestsPlural') : t('rooms.guest')}
               </div>
             )}
           </div>
           
+          {/* Room listing section */}
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -236,7 +237,7 @@ const Rooms = () => {
                     
                     <div className="flex justify-between items-center">
                       <div className="text-sm text-slate-500">
-                        <span className="font-medium">{t('rooms.capacity')}</span> {room.capacity} {room.capacity > 1 ? t('rooms.guests') : t('rooms.guest')}
+                        <span className="font-medium">{t('rooms.capacity')}</span> {room.capacity} {room.capacity > 1 ? t('rooms.guestsPlural') : t('rooms.guest')}
                       </div>
                       <Button onClick={() => handleBookNow(room)}>
                         {t('rooms.bookNow')}

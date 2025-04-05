@@ -31,7 +31,14 @@ const Routes = () => {
       <Route path="/my-bookings" element={<MyBookings />} />
       
       {/* Admin routes */}
-      <Route path="/admin/*" element={<RoleBasedRoute element={<Dashboard />} allowedRoles={['admin', 'staff']} />} />
+      <Route 
+        path="/admin/*" 
+        element={
+          <RoleBasedRoute allowedRoles={['admin', 'staff']}>
+            <Dashboard />
+          </RoleBasedRoute>
+        } 
+      />
       
       {/* 404 page */}
       <Route path="/404" element={<NotFound />} />
