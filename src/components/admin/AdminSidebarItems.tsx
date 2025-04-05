@@ -52,37 +52,37 @@ export const adminSidebarItems: SidebarItem[] = [
     children: [
       {
         name: "General Manager",
-        href: "/admin/dashboards/general-manager",
+        href: "/admin/general-manager/dashboard",
         icon: Building,
         roles: ["admin", "general_manager"],
       },
       {
         name: "Operations Manager",
-        href: "/admin/dashboards/operational-manager",
+        href: "/admin/operation/dashboard",
         icon: Building2,
         roles: ["admin", "operational_manager"],
       },
       {
         name: "Service Manager",
-        href: "/admin/dashboards/service-manager",
+        href: "/admin/services/manager",
         icon: Briefcase,
         roles: ["admin", "operational_manager"],
       },
       {
         name: "Maintenance Manager",
-        href: "/admin/dashboards/maintenance-manager",
+        href: "/admin/maintenance/dashboard",
         icon: Building,
         roles: ["admin", "operational_manager"],
       },
       {
         name: "Marketing Manager",
-        href: "/admin/dashboards/marketing-manager",
+        href: "/admin/marketing/dashboard",
         icon: Building,
         roles: ["admin", "general_manager"],
       },
       {
         name: "HR Manager",
-        href: "/admin/dashboards/hr-manager",
+        href: "/admin/hr/dashboard",
         icon: Users,
         roles: ["admin", "general_manager"],
       },
@@ -98,19 +98,19 @@ export const adminSidebarItems: SidebarItem[] = [
     children: [
       {
         name: "Front Office",
-        href: "/admin/departments/front-office",
+        href: "/admin/frontoffice/dashboard",
         icon: BookOpen,
         roles: ["admin", "general_manager", "front_office_manager", "staff"],
       },
       {
         name: "Finance",
-        href: "/admin/departments/finance",
+        href: "/admin/finance/dashboard",
         icon: PiggyBank,
         roles: ["admin", "general_manager", "finance_manager"],
       },
       {
         name: "Purchasing",
-        href: "/admin/departments/purchasing",
+        href: "/admin/inventory/purchasing-dashboard",
         icon: ShoppingCart,
         roles: ["admin", "general_manager", "purchasing_manager"],
       },
@@ -154,7 +154,7 @@ export const adminSidebarItems: SidebarItem[] = [
     children: [
       {
         name: "Dashboard",
-        href: "/admin/services",
+        href: "/admin/services/dashboard",
         icon: BarChart,
         roles: ["admin", "staff", "general_manager", "operational_manager"],
       },
@@ -192,7 +192,7 @@ export const adminSidebarItems: SidebarItem[] = [
   // Finance
   {
     name: "Finance",
-    href: "/admin/finance",
+    href: "/admin/finance/dashboard",
     icon: DollarSign,
     roles: ["admin", "staff", "general_manager", "finance_manager"],
     children: [
@@ -232,25 +232,25 @@ export const adminSidebarItems: SidebarItem[] = [
   // Front Office
   {
     name: "Front Office",
-    href: "/admin/front-office",
+    href: "/admin/frontoffice/dashboard",
     icon: BookOpen,
     roles: ["admin", "general_manager", "front_office_manager", "staff"],
     children: [
       {
         name: "Dashboard",
-        href: "/admin/front-office/dashboard",
+        href: "/admin/frontoffice/dashboard",
         icon: BarChart,
         roles: ["admin", "general_manager", "front_office_manager", "staff"],
       },
       {
         name: "Front Desk",
-        href: "/admin/front-office/front-desk",
+        href: "/admin/frontoffice/front-desk",
         icon: BookOpen,
         roles: ["admin", "general_manager", "front_office_manager", "staff"],
       },
       {
         name: "Reservations",
-        href: "/admin/front-office/reservations",
+        href: "/admin/frontoffice/reservations",
         icon: ClipboardCheck,
         roles: ["admin", "general_manager", "front_office_manager", "staff"],
       },
@@ -260,7 +260,7 @@ export const adminSidebarItems: SidebarItem[] = [
   // Inventory/Purchasing
   {
     name: "Inventory",
-    href: "/admin/inventory",
+    href: "/admin/inventory/dashboard",
     icon: Package,
     roles: ["admin", "general_manager", "purchasing_manager"],
     children: [
