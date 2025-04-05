@@ -1,5 +1,4 @@
 
-import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -14,10 +13,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LanguageProvider>
-          <Router>
-            <Routes />
-            <Toaster />
-          </Router>
+          <Routes />
+          <Toaster />
         </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>
