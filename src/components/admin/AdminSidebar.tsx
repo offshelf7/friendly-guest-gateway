@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronDown, ChevronLeft, LogOut } from "lucide-react";
 import { hasRole, UserRole } from "@/types/roleTypes";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Collapsible,
   CollapsibleContent,
