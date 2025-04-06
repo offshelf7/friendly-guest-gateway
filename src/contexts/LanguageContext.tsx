@@ -654,5 +654,5 @@ const translations: Record<string, Record<string, string>> = {
     'amenities.wifi': 'واي فاي',
     'amenities.breakfast': 'إفطار',
     
-    // Facilities page
-    'facilities.title': '
+    // Admin Sidebar
+    'admin.sidebar.title
