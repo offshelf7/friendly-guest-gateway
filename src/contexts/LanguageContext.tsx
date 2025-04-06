@@ -56,7 +56,6 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 // Translations object containing all text in different languages
 const translations: Record<string, Record<string, string>> = {
   en: {
-    // Navbar
     'nav.home': 'Home',
     'nav.facilities': 'Facilities',
     'nav.rooms': 'Rooms',
@@ -68,7 +67,6 @@ const translations: Record<string, Record<string, string>> = {
     'nav.signOut': 'Sign Out',
     'nav.signIn': 'Sign In',
     
-    // Rooms page
     'rooms.title': 'Available Rooms',
     'rooms.checkIn': 'Check-in Date',
     'rooms.checkOut': 'Check-out Date',
@@ -94,11 +92,9 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.invalidDates': 'Invalid dates',
     'rooms.selectDates': 'Please select check-in and check-out dates',
     
-    // Room amenities
     'amenities.wifi': 'WiFi',
     'amenities.breakfast': 'Breakfast',
     
-    // Facilities page
     'facilities.title': 'Our Facilities',
     'facilities.subtitle': 'Discover our premium facilities designed to enhance your stay and provide unforgettable experiences.',
     'facilities.allFacilities': 'All Facilities',
@@ -109,7 +105,6 @@ const translations: Record<string, Record<string, string>> = {
     'facilities.error': 'Error loading facilities. Please try again later.',
     'facilities.learnMore': 'Learn More',
     
-    // Contact page
     'contact.title': 'Contact Us',
     'contact.subtitle': "We'd love to hear from you. Reach out to us with any questions or requests.",
     'contact.getInTouch': 'Get in Touch',
@@ -136,7 +131,6 @@ const translations: Record<string, Record<string, string>> = {
     'contact.messageSent': 'Message Sent!',
     'contact.responseMessage': "We'll get back to you as soon as possible.",
     
-    // Food and Drink page
     'foodDrink.title': 'Food & Drink Menu',
     'foodDrink.subtitle': 'Explore our delicious food and refreshing drinks',
     'foodDrink.allItems': 'All Items',
@@ -155,7 +149,6 @@ const translations: Record<string, Record<string, string>> = {
     'foodDrink.categories.soft': 'Soft Drinks',
     'foodDrink.searchMenu': 'Search menu...',
 
-    // Admin Sidebar
     'admin.sidebar.title': 'Admin Dashboard',
     'admin.sidebar.mainDashboard': 'Main Dashboard',
     'admin.sidebar.managerDashboards': 'Manager Dashboards',
@@ -194,8 +187,8 @@ const translations: Record<string, Record<string, string>> = {
     'admin.sidebar.settings': 'Settings',
     'admin.sidebar.logout': 'Logout',
   },
+  
   fr: {
-    // Navbar
     'nav.home': 'Accueil',
     'nav.facilities': 'Installations',
     'nav.rooms': 'Chambres',
@@ -207,7 +200,6 @@ const translations: Record<string, Record<string, string>> = {
     'nav.signOut': 'Déconnexion',
     'nav.signIn': 'Connexion',
     
-    // Rooms page
     'rooms.title': 'Chambres disponibles',
     'rooms.checkIn': 'Date d\'arrivée',
     'rooms.checkOut': 'Date de départ',
@@ -233,11 +225,9 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.invalidDates': 'Dates invalides',
     'rooms.selectDates': 'Veuillez sélectionner les dates d\'arrivée et de départ',
     
-    // Room amenities
     'amenities.wifi': 'WiFi',
     'amenities.breakfast': 'Petit-déjeuner',
     
-    // Facilities page
     'facilities.title': 'Nos Installations',
     'facilities.subtitle': 'Découvrez nos installations haut de gamme conçues pour améliorer votre séjour et offrir des expériences inoubliables.',
     'facilities.allFacilities': 'Toutes les installations',
@@ -248,7 +238,6 @@ const translations: Record<string, Record<string, string>> = {
     'facilities.error': 'Erreur lors du chargement des installations. Veuillez réessayer plus tard.',
     'facilities.learnMore': 'En savoir plus',
     
-    // Contact page
     'contact.title': 'Contactez-nous',
     'contact.subtitle': "Nous aimerions avoir de vos nouvelles. Contactez-nous pour toute question ou demande.",
     'contact.getInTouch': 'Prenez contact',
@@ -275,7 +264,6 @@ const translations: Record<string, Record<string, string>> = {
     'contact.messageSent': 'Message envoyé!',
     'contact.responseMessage': "Nous vous répondrons dès que possible.",
     
-    // Food and Drink page
     'foodDrink.title': 'Menu Nourriture & Boissons',
     'foodDrink.subtitle': 'Explorez notre délicieuse nourriture et nos boissons rafraîchissantes',
     'foodDrink.allItems': 'Tous les articles',
@@ -294,7 +282,6 @@ const translations: Record<string, Record<string, string>> = {
     'foodDrink.categories.soft': 'Boissons sans alcool',
     'foodDrink.searchMenu': 'Rechercher dans le menu...',
 
-    // Admin Sidebar
     'admin.sidebar.title': 'Tableau de Bord Admin',
     'admin.sidebar.mainDashboard': 'Tableau de Bord Principal',
     'admin.sidebar.managerDashboards': 'Tableaux de Bord des Managers',
@@ -333,8 +320,8 @@ const translations: Record<string, Record<string, string>> = {
     'admin.sidebar.settings': 'Paramètres',
     'admin.sidebar.logout': 'Déconnexion',
   },
+  
   es: {
-    // Navbar
     'nav.home': 'Inicio',
     'nav.facilities': 'Instalaciones',
     'nav.rooms': 'Habitaciones',
@@ -346,7 +333,6 @@ const translations: Record<string, Record<string, string>> = {
     'nav.signOut': 'Cerrar sesión',
     'nav.signIn': 'Iniciar sesión',
     
-    // Rooms page
     'rooms.title': 'Habitaciones disponibles',
     'rooms.checkIn': 'Fecha de llegada',
     'rooms.checkOut': 'Fecha de salida',
@@ -372,11 +358,9 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.invalidDates': 'Fechas inválidas',
     'rooms.selectDates': 'Por favor seleccione fechas de llegada y salida',
     
-    // Room amenities
     'amenities.wifi': 'WiFi',
     'amenities.breakfast': 'Desayuno',
     
-    // Facilities page
     'facilities.title': 'Nuestras Instalaciones',
     'facilities.subtitle': 'Descubra nuestras instalaciones premium diseñadas para mejorar su estancia y proporcionar experiencias inolvidables.',
     'facilities.allFacilities': 'Todas las instalaciones',
@@ -387,7 +371,6 @@ const translations: Record<string, Record<string, string>> = {
     'facilities.error': 'Error al cargar las instalaciones. Por favor intente más tarde.',
     'facilities.learnMore': 'Más información',
     
-    // Contact page
     'contact.title': 'Contáctenos',
     'contact.subtitle': "Nos encantaría saber de usted. Comuníquese con nosotros para cualquier pregunta o solicitud.",
     'contact.getInTouch': 'Póngase en contacto',
@@ -414,7 +397,6 @@ const translations: Record<string, Record<string, string>> = {
     'contact.messageSent': '¡Mensaje enviado!',
     'contact.responseMessage': "Nos pondremos en contacto con usted lo antes posible.",
     
-    // Food and Drink page
     'foodDrink.title': 'Menú de Comida y Bebida',
     'foodDrink.subtitle': 'Explore nuestra deliciosa comida y refrescantes bebidas',
     'foodDrink.allItems': 'Todos los artículos',
@@ -433,7 +415,6 @@ const translations: Record<string, Record<string, string>> = {
     'foodDrink.categories.soft': 'Refrescos',
     'foodDrink.searchMenu': 'Buscar en el menú...',
 
-    // Admin Sidebar
     'admin.sidebar.title': 'Panel de Administración',
     'admin.sidebar.mainDashboard': 'Panel Principal',
     'admin.sidebar.managerDashboards': 'Paneles de Gerentes',
@@ -472,8 +453,8 @@ const translations: Record<string, Record<string, string>> = {
     'admin.sidebar.settings': 'Configuración',
     'admin.sidebar.logout': 'Cerrar Sesión',
   },
+  
   de: {
-    // Navbar
     'nav.home': 'Startseite',
     'nav.facilities': 'Einrichtungen',
     'nav.rooms': 'Zimmer',
@@ -485,7 +466,6 @@ const translations: Record<string, Record<string, string>> = {
     'nav.signOut': 'Abmelden',
     'nav.signIn': 'Anmelden',
     
-    // Rooms page
     'rooms.title': 'Verfügbare Zimmer',
     'rooms.checkIn': 'Anreisedatum',
     'rooms.checkOut': 'Abreisedatum',
@@ -501,7 +481,7 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.capacity': 'Kapazität:',
     'rooms.bookNow': 'Jetzt buchen',
     'rooms.noRooms': 'Keine Zimmer verfügbar',
-    'rooms.tryDifferentDates': 'Bitte versuchen Sie andere Daten oder schauen Sie später wieder vorbei.',
+    'rooms.tryDifferentDates': 'Bitte versuchen Sie andere Daten oder schauen Sie später vorbei.',
     'rooms.refreshResults': 'Ergebnisse aktualisieren',
     'rooms.errorLoading': 'Fehler beim Laden der Zimmer',
     'rooms.errorDescription': 'Beim Laden der verfügbaren Zimmer ist ein Fehler aufgetreten.',
@@ -511,11 +491,9 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.invalidDates': 'Ungültige Daten',
     'rooms.selectDates': 'Bitte An- und Abreisedatum auswählen',
     
-    // Room amenities
     'amenities.wifi': 'WLAN',
     'amenities.breakfast': 'Frühstück',
     
-    // Facilities page
     'facilities.title': 'Unsere Einrichtungen',
     'facilities.subtitle': 'Entdecken Sie unsere erstklassigen Einrichtungen, die Ihren Aufenthalt verbessern und unvergessliche Erlebnisse bieten.',
     'facilities.allFacilities': 'Alle Einrichtungen',
@@ -526,7 +504,6 @@ const translations: Record<string, Record<string, string>> = {
     'facilities.error': 'Fehler beim Laden der Einrichtungen. Bitte versuchen Sie es später erneut.',
     'facilities.learnMore': 'Mehr erfahren',
     
-    // Contact page
     'contact.title': 'Kontakt',
     'contact.subtitle': "Wir würden uns freuen, von Ihnen zu hören. Kontaktieren Sie uns bei Fragen oder Wünschen.",
     'contact.getInTouch': 'Nehmen Sie Kontakt auf',
@@ -553,7 +530,6 @@ const translations: Record<string, Record<string, string>> = {
     'contact.messageSent': 'Nachricht gesendet!',
     'contact.responseMessage': "Wir melden uns so schnell wie möglich bei Ihnen.",
     
-    // Food and Drink page
     'foodDrink.title': 'Speisen & Getränke Menü',
     'foodDrink.subtitle': 'Entdecken Sie unsere köstlichen Speisen und erfrischenden Getränke',
     'foodDrink.allItems': 'Alle Artikel',
@@ -572,7 +548,6 @@ const translations: Record<string, Record<string, string>> = {
     'foodDrink.categories.soft': 'Erfrischungsgetränke',
     'foodDrink.searchMenu': 'Menü durchsuchen...',
 
-    // Admin Sidebar
     'admin.sidebar.title': 'Admin-Dashboard',
     'admin.sidebar.mainDashboard': 'Haupt-Dashboard',
     'admin.sidebar.managerDashboards': 'Manager-Dashboards',
@@ -611,8 +586,8 @@ const translations: Record<string, Record<string, string>> = {
     'admin.sidebar.settings': 'Einstellungen',
     'admin.sidebar.logout': 'Abmelden',
   },
+  
   ar: {
-    // Navbar - Note: Arabic is right-to-left
     'nav.home': 'الرئيسية',
     'nav.facilities': 'المرافق',
     'nav.rooms': 'الغرف',
@@ -624,7 +599,6 @@ const translations: Record<string, Record<string, string>> = {
     'nav.signOut': 'تسجيل الخروج',
     'nav.signIn': 'تسجيل الدخول',
     
-    // Rooms page
     'rooms.title': 'الغرف المتاحة',
     'rooms.checkIn': 'تاريخ الوصول',
     'rooms.checkOut': 'تاريخ المغادرة',
@@ -650,9 +624,125 @@ const translations: Record<string, Record<string, string>> = {
     'rooms.invalidDates': 'تواريخ غير صالحة',
     'rooms.selectDates': 'يرجى تحديد تواريخ الوصول والمغادرة',
     
-    // Room amenities
     'amenities.wifi': 'واي فاي',
     'amenities.breakfast': 'إفطار',
     
-    // Admin Sidebar
-    'admin.sidebar.title
+    'admin.sidebar.title': 'لوحة المدير',
+    'admin.sidebar.mainDashboard': 'اللوحة الرئيسية',
+    'admin.sidebar.managerDashboards': 'لوحات المدراء',
+    'admin.sidebar.departmentDashboards': 'لوحات الأقسام',
+    'admin.sidebar.generalManager': 'المدير العام',
+    'admin.sidebar.operationsManager': 'مدير العمليات',
+    'admin.sidebar.serviceManager': 'مدير الخدمة',
+    'admin.sidebar.maintenanceManager': 'مدير الصيانة',
+    'admin.sidebar.marketingManager': 'مدير التسويق',
+    'admin.sidebar.hrManager': 'مدير الموارد البشرية',
+    'admin.sidebar.frontOffice': 'مكتب الاستقبال',
+    'admin.sidebar.finance': 'المالية',
+    'admin.sidebar.purchasing': 'المشتريات',
+    'admin.sidebar.users': 'المستخدمين',
+    'admin.sidebar.messages': 'الرسائل',
+    'admin.sidebar.rooms': 'الغرف',
+    'admin.sidebar.roomTypes': 'أنواع الغرف',
+    'admin.sidebar.services': 'الخدمات',
+    'admin.sidebar.servicesDashboard': 'لوحة التحكم',
+    'admin.sidebar.allServices': 'جميع الخدمات',
+    'admin.sidebar.foodAndDrink': 'الطعام والشراب',
+    'admin.sidebar.guests': 'الضيوف',
+    'admin.sidebar.reports': 'التقارير',
+    'admin.sidebar.financeDashboard': 'لوحة المالية',
+    'admin.sidebar.billing': 'الفواتير',
+    'admin.sidebar.invoices': 'الإيصالات',
+    'admin.sidebar.financialReports': 'التقارير المالية',
+    'admin.sidebar.transactions': 'المعاملات',
+    'admin.sidebar.frontOfficeDashboard': 'لوحة الاستقبال',
+    'admin.sidebar.frontDesk': 'مكتب الاستقبال',
+    'admin.sidebar.reservations': 'الحجوزات',
+    'admin.sidebar.inventory': 'المخزون',
+    'admin.sidebar.inventoryDashboard': 'لوحة المخزون',
+    'admin.sidebar.inventoryItems': 'العناصر',
+    'admin.sidebar.suppliers': 'الموردين',
+    'admin.sidebar.settings': 'الإعدادات',
+    'admin.sidebar.logout': 'تسجيل الخروج',
+  },
+  
+  pt: {
+    'admin.sidebar.title': 'Painel de Administração',
+    'admin.sidebar.mainDashboard': 'Painel Principal',
+    'admin.sidebar.managerDashboards': 'Painéis de Gerentes',
+    'admin.sidebar.departmentDashboards': 'Painéis de Departamentos',
+    'admin.sidebar.generalManager': 'Gerente Geral',
+    'admin.sidebar.operationsManager': 'Gerente de Operações',
+    'admin.sidebar.serviceManager': 'Gerente de Serviços',
+    'admin.sidebar.maintenanceManager': 'Gerente de Manutenção',
+    'admin.sidebar.marketingManager': 'Gerente de Marketing',
+    'admin.sidebar.hrManager': 'Gerente de RH',
+    'admin.sidebar.frontOffice': 'Recepção',
+    'admin.sidebar.finance': 'Finanças',
+    'admin.sidebar.purchasing': 'Compras',
+    'admin.sidebar.users': 'Usuários',
+    'admin.sidebar.messages': 'Mensagens',
+    'admin.sidebar.rooms': 'Quartos',
+    'admin.sidebar.roomTypes': 'Tipos de Quartos',
+    'admin.sidebar.services': 'Serviços',
+    'admin.sidebar.servicesDashboard': 'Painel',
+    'admin.sidebar.allServices': 'Todos os Serviços',
+    'admin.sidebar.foodAndDrink': 'Comida e Bebida',
+    'admin.sidebar.guests': 'Hóspedes',
+    'admin.sidebar.reports': 'Relatórios',
+    'admin.sidebar.financeDashboard': 'Painel Financeiro',
+    'admin.sidebar.billing': 'Faturamento',
+    'admin.sidebar.invoices': 'Faturas',
+    'admin.sidebar.financialReports': 'Relatórios Financeiros',
+    'admin.sidebar.transactions': 'Transações',
+    'admin.sidebar.frontOfficeDashboard': 'Painel da Recepção',
+    'admin.sidebar.frontDesk': 'Balcão da Recepção',
+    'admin.sidebar.reservations': 'Reservas',
+    'admin.sidebar.inventory': 'Inventário',
+    'admin.sidebar.inventoryDashboard': 'Painel de Inventário',
+    'admin.sidebar.inventoryItems': 'Itens',
+    'admin.sidebar.suppliers': 'Fornecedores',
+    'admin.sidebar.settings': 'Configurações',
+    'admin.sidebar.logout': 'Sair',
+  },
+  
+  sv: {
+    'admin.sidebar.title': 'Administratörspanel',
+    'admin.sidebar.mainDashboard': 'Huvudpanel',
+    'admin.sidebar.managerDashboards': 'Chefsöversikter',
+    'admin.sidebar.departmentDashboards': 'Avdelningspaneler',
+    'admin.sidebar.generalManager': 'Verkställande Direktör',
+    'admin.sidebar.operationsManager': 'Verksamhetschef',
+    'admin.sidebar.serviceManager': 'Servicechef',
+    'admin.sidebar.maintenanceManager': 'Underhållschef',
+    'admin.sidebar.marketingManager': 'Marknadschef',
+    'admin.sidebar.hrManager': 'HR-chef',
+    'admin.sidebar.frontOffice': 'Reception',
+    'admin.sidebar.finance': 'Ekonomi',
+    'admin.sidebar.purchasing': 'Inköp',
+    'admin.sidebar.users': 'Användare',
+    'admin.sidebar.messages': 'Meddelanden',
+    'admin.sidebar.rooms': 'Rum',
+    'admin.sidebar.roomTypes': 'Rumstyper',
+    'admin.sidebar.services': 'Tjänster',
+    'admin.sidebar.servicesDashboard': 'Panel',
+    'admin.sidebar.allServices': 'Alla Tjänster',
+    'admin.sidebar.foodAndDrink': 'Mat & Dryck',
+    'admin.sidebar.guests': 'Gäster',
+    'admin.sidebar.reports': 'Rapporter',
+    'admin.sidebar.financeDashboard': 'Ekonomipanel',
+    'admin.sidebar.billing': 'Fakturering',
+    'admin.sidebar.invoices': 'Fakturor',
+    'admin.sidebar.financialReports': 'Ekonomiska Rapporter',
+    'admin.sidebar.transactions': 'Transaktioner',
+    'admin.sidebar.frontOfficeDashboard': 'Receptionspanel',
+    'admin.sidebar.frontDesk': 'Reception',
+    'admin.sidebar.reservations': 'Bokningar',
+    'admin.sidebar.inventory': 'Inventarier',
+    'admin.sidebar.inventoryDashboard': 'Inventariepanel',
+    'admin.sidebar.inventoryItems': 'Artiklar',
+    'admin.sidebar.suppliers': 'Leverantörer',
+    'admin.sidebar.settings': 'Inställningar',
+    'admin.sidebar.logout': 'Logga ut',
+  },
+};
