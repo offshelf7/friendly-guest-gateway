@@ -89,7 +89,7 @@ const AdminSidebar = () => {
                     }`}>
                       <div className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
-                        {!collapsed && <span>{t(item.translationKey || item.name)}</span>}
+                        {!collapsed && <span>{t(item.translationKey)}</span>}
                       </div>
                       {!collapsed && (
                         <ChevronDown className={`h-4 w-4 transition-transform ${
@@ -113,7 +113,7 @@ const AdminSidebar = () => {
                           }`}
                         >
                           <child.icon className="h-4 w-4" />
-                          <span>{t(child.translationKey || child.name)}</span>
+                          <span>{t(child.translationKey)}</span>
                         </Link>
                       ))}
                     </div>
@@ -130,7 +130,7 @@ const AdminSidebar = () => {
                   } ${collapsed ? "justify-center" : ""}`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {!collapsed && <span>{t(item.translationKey || item.name)}</span>}
+                  {!collapsed && <span>{t(item.translationKey)}</span>}
                 </Link>
               )
             ))}

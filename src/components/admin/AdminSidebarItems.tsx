@@ -29,7 +29,7 @@ import { UserRole } from "@/types/roleTypes";
 
 type SidebarItem = {
   name: string;
-  translationKey?: string;
+  translationKey: string;
   href: string;
   icon: any;
   roles?: UserRole[];
