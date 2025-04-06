@@ -29,10 +29,10 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
     ? ROLE_DISPLAY_NAMES[userRoles[0]] 
     : user ? 'Guest' : '';
   
-  const linkClasses = "flex items-center gap-2 px-4 py-2 transition-colors text-white hover:text-amber-300 font-medium";
+  const linkClasses = "flex items-center gap-2 px-3 py-2 transition-colors text-white hover:text-amber-300 font-medium whitespace-nowrap";
   
   return (
-    <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+    <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
       <Link to="/" className={linkClasses}>
         <Home className="h-4 w-4" />
         {t('nav.home')}
@@ -46,11 +46,13 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
       </Link>
       <Link to="/food-and-drink" className={linkClasses}>
         <Coffee className="h-4 w-4" />
-        {t('nav.foodAndDrink')}
+        {/* Use shorter text for Food & Drink */}
+        {t('nav.dining')}
       </Link>
       <Link to="/contact" className={linkClasses}>
         <Phone className="h-4 w-4" />
-        {t('nav.contactUs')}
+        {/* Use shorter text for Contact Us */}
+        {t('nav.contact')}
       </Link>
       
       {user && canAccessDashboard && (
@@ -72,7 +74,7 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
       {/* Language Selector */}
       <div className="hidden lg:flex items-center">
         <Select value={language} onValueChange={setLanguage}>
-          <SelectTrigger className="w-[130px] bg-transparent border-white/20 hover:border-white/40 text-white">
+          <SelectTrigger className="w-[110px] bg-transparent border-white/20 hover:border-white/40 text-white">
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-white" />
               <SelectValue placeholder="Language" />

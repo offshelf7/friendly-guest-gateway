@@ -110,7 +110,8 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           onClick={toggleMenu}
         >
           <Coffee className="h-5 w-5" />
-          {t('nav.foodAndDrink')}
+          {/* Use consistent name in mobile menu */}
+          {t('nav.dining')}
         </Link>
         <Link 
           to="/contact" 
@@ -118,7 +119,8 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           onClick={toggleMenu}
         >
           <Phone className="h-5 w-5" />
-          {t('nav.contactUs')}
+          {/* Use consistent name in mobile menu */}
+          {t('nav.contact')}
         </Link>
         
         {user && canAccessDashboard && (
