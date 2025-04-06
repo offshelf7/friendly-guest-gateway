@@ -191,6 +191,7 @@ const translations: Record<string, Record<string, string>> = {
     'auth.registerSuccess': 'Registration successful!',
     'auth.logoutSuccess': 'Logout successful!',
   },
+  
   fr: {
     // Navbar
     'nav.home': 'Accueil',
@@ -325,6 +326,7 @@ const translations: Record<string, Record<string, string>> = {
     'auth.registerSuccess': 'Inscription réussie!',
     'auth.logoutSuccess': 'Déconnexion réussie!',
   },
+  
   es: {
     // Navbar
     'nav.home': 'Inicio',
@@ -354,7 +356,7 @@ const translations: Record<string, Record<string, string>> = {
     'home.getInTouch': 'Póngase en contacto',
     'home.newsletter': 'Suscríbase a nuestro boletín',
     'home.enterEmail': 'Ingrese su correo electrónico',
-    'home.subscribe': 'Suscribirse',
+    'home.subscribe': 'Suscríbase',
     'home.footerText': '© 2024 Hoteles de Lujo. Todos los derechos reservados.',
     
     // Rooms Page
@@ -389,8 +391,8 @@ const translations: Record<string, Record<string, string>> = {
     
     // Contact Page
     'contact.title': 'Contáctenos',
-    'contact.subtitle': 'Póngase en contacto con nosotros para consultas, reservas y más.',
-    'contact.getInTouch': 'Póngase en contacto',
+    'contact.subtitle': 'Contactez-nous pour consultas, reservas y más.',
+    'contact.getInTouch': 'Contactez-nous',
     'contact.getInTouchText': 'Estamos aquí para ayudarle con cualquier pregunta o inquietud.',
     'contact.address': 'Dirección',
     'contact.phone': 'Teléfono',
@@ -459,6 +461,7 @@ const translations: Record<string, Record<string, string>> = {
     'auth.registerSuccess': '¡Registro exitoso!',
     'auth.logoutSuccess': '¡Cierre de sesión exitoso!',
   },
+  
   de: {
     // Navbar
     'nav.home': 'Startseite',
@@ -593,6 +596,7 @@ const translations: Record<string, Record<string, string>> = {
     'auth.registerSuccess': 'Registrierung erfolgreich!',
     'auth.logoutSuccess': 'Abmeldung erfolgreich!',
   },
+  
   ar: {
     // Navbar - Note: Arabic is right-to-left
     'nav.home': 'الرئيسية',
@@ -704,4 +708,75 @@ const translations: Record<string, Record<string, string>> = {
     'admin.manageRooms': 'إدارة الغرف',
     'admin.manageBookings': 'إدارة الحجوزات',
     'admin.manageUsers': 'إدارة المستخدمين',
-    'admin.viewReports
+    'admin.viewReports': 'عرض التقارير',
+    
+    // Account Profile
+    'profile.title': 'ملفي الشخصي',
+    'profile.updateInfo': 'تحديث المعلومات',
+    'profile.changePassword': 'تغيير كلمة المرور',
+    'profile.viewBookings': 'عرض الحجوزات',
+    
+    // Authentication
+    'auth.login': 'تسجيل الدخول',
+    'auth.register': 'التسجيل',
+    'auth.email': 'البريد الإلكتروني',
+    'auth.password': 'كلمة المرور',
+    'auth.forgotPassword': 'نسيت كلمة المرور؟',
+    'auth.resetPassword': 'إعادة تعيين كلمة المرور',
+    'auth.name': 'الاسم',
+    'auth.confirmPassword': 'تأكيد كلمة المرور',
+    'auth.alreadyAccount': 'هل لديك حساب بالفعل؟',
+    'auth.needAccount': 'تحتاج إلى حساب؟',
+    'auth.loginSuccess': 'تم تسجيل الدخول بنجاح!',
+    'auth.registerSuccess': 'تم التسجيل بنجاح!',
+    'auth.logoutSuccess': 'تم تسجيل الخروج بنجاح!',
+  },
+  
+  pt: {
+    // Navbar
+    'nav.home': 'Início',
+    'nav.facilities': 'Instalações',
+    'nav.rooms': 'Quartos',
+    'nav.foodAndDrink': 'Comida e Bebida',
+    'nav.dining': 'Restaurante', // Shorter alternative
+    'nav.contactUs': 'Contacte-nos',
+    'nav.contact': 'Contacto', // Shorter alternative
+    'nav.dashboard': 'Painel',
+    'nav.myProfile': 'Meu Perfil',
+    'nav.myBookings': 'Minhas Reservas',
+    'nav.signOut': 'Sair',
+    'nav.signIn': 'Entrar',
+    
+    // Admin Dashboard
+    'admin.dashboard': 'Painel',
+    'admin.welcome': 'Bem-vindo ao Painel de Administração',
+    'admin.manageRooms': 'Gerir Quartos',
+    'admin.manageBookings': 'Gerir Reservas',
+    'admin.manageUsers': 'Gerir Utilizadores',
+    'admin.viewReports': 'Ver Relatórios',
+  },
+  
+  sv: {
+    // Navbar
+    'nav.home': 'Hem',
+    'nav.facilities': 'Faciliteter',
+    'nav.rooms': 'Rum',
+    'nav.foodAndDrink': 'Mat & Dryck',
+    'nav.dining': 'Matsal', // Shorter alternative
+    'nav.contactUs': 'Kontakta oss',
+    'nav.contact': 'Kontakt', // Shorter alternative
+    'nav.dashboard': 'Kontrollpanel',
+    'nav.myProfile': 'Min profil',
+    'nav.myBookings': 'Mina bokningar',
+    'nav.signOut': 'Logga ut',
+    'nav.signIn': 'Logga in',
+    
+    // Admin Dashboard
+    'admin.dashboard': 'Kontrollpanel',
+    'admin.welcome': 'Välkommen till administratörspanelen',
+    'admin.manageRooms': 'Hantera rum',
+    'admin.manageBookings': 'Hantera bokningar',
+    'admin.manageUsers': 'Hantera användare',
+    'admin.viewReports': 'Visa rapporter',
+  }
+};
