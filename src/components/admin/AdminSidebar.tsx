@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronDown, ChevronLeft, LogOut } from "lucide-react";
 import { hasRole, UserRole } from "@/types/roleTypes";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,6 +18,7 @@ import {
 const AdminSidebar = () => {
   const location = useLocation();
   const { userRoles, signOut } = useAuth();
+  const { t } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
@@ -48,7 +50,7 @@ const AdminSidebar = () => {
         <div className="flex items-center justify-between w-full">
           {!collapsed && (
             <Link to="/admin" className="font-semibold text-lg">
-              Hotel Admin
+              {t('admin.sidebar.title')}
             </Link>
           )}
           <Button
@@ -87,7 +89,7 @@ const AdminSidebar = () => {
                     }`}>
                       <div className="flex items-center gap-3">
                         <item.icon className="h-4 w-4" />
-                        {!collapsed && <span>{item.name}</span>}
+                        {!collapsed && <span>{t(item.translationKey || item.name)}</span>}
                       </div>
                       {!collapsed && (
                         <ChevronDown className={`h-4 w-4 transition-transform ${
@@ -111,7 +113,7 @@ const AdminSidebar = () => {
                           }`}
                         >
                           <child.icon className="h-4 w-4" />
-                          <span>{child.name}</span>
+                          <span>{t(child.translationKey || child.name)}</span>
                         </Link>
                       ))}
                     </div>
@@ -128,7 +130,7 @@ const AdminSidebar = () => {
                   } ${collapsed ? "justify-center" : ""}`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {!collapsed && <span>{item.name}</span>}
+                  {!collapsed && <span>{t(item.translationKey || item.name)}</span>}
                 </Link>
               )
             ))}
@@ -143,7 +145,7 @@ const AdminSidebar = () => {
               onClick={signOut}
             >
               <LogOut className="h-4 w-4" />
-              {!collapsed && <span>Logout</span>}
+              {!collapsed && <span>{t('admin.sidebar.logout')}</span>}
             </Button>
           </div>
         </div>

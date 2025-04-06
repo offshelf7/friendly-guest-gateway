@@ -6,9 +6,11 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Edit, Trash, UserPlus, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useLanguage();
   
   // Mock user data
   const users = [
@@ -69,34 +71,34 @@ const AdminUsers = () => {
   const getRoleBadge = (role) => {
     switch (role) {
       case 'admin':
-        return <Badge className="bg-red-100 text-red-800">Admin</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('admin.roles.admin')}</Badge>;
       case 'general_manager':
-        return <Badge className="bg-purple-100 text-purple-800">General Manager</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800">{t('admin.roles.generalManager')}</Badge>;
       case 'operational_manager':
-        return <Badge className="bg-blue-100 text-blue-800">Operational Manager</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">{t('admin.roles.operationalManager')}</Badge>;
       case 'staff':
-        return <Badge className="bg-green-100 text-green-800">Staff</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('admin.roles.staff')}</Badge>;
       default:
-        return <Badge>{role}</Badge>;
+        return <Badge>{t(`admin.roles.${role}`)}</Badge>;
     }
   };
   
   const getStatusBadge = (status) => {
     return status === 'active' 
-      ? <Badge className="bg-green-100 text-green-800">Active</Badge>
-      : <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>;
+      ? <Badge className="bg-green-100 text-green-800">{t('admin.userStatus.active')}</Badge>
+      : <Badge className="bg-gray-100 text-gray-800">{t('admin.userStatus.inactive')}</Badge>;
   };
   
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Users</h1>
-          <p className="text-muted-foreground">Manage system users and permissions</p>
+          <h1 className="text-2xl font-bold">{t('admin.users.title')}</h1>
+          <p className="text-muted-foreground">{t('admin.users.subtitle')}</p>
         </div>
         <Button>
           <UserPlus className="mr-2 h-4 w-4" />
-          Add User
+          {t('admin.users.addUser')}
         </Button>
       </div>
       
@@ -105,7 +107,7 @@ const AdminUsers = () => {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search users..."
+            placeholder={t('admin.users.searchPlaceholder')}
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,7 +115,7 @@ const AdminUsers = () => {
         </div>
         <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" />
-          Filter
+          {t('admin.users.filter')}
         </Button>
       </div>
       
@@ -122,13 +124,13 @@ const AdminUsers = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Login</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('admin.users.table.name')}</TableHead>
+                <TableHead>{t('admin.users.table.email')}</TableHead>
+                <TableHead>{t('admin.users.table.role')}</TableHead>
+                <TableHead>{t('admin.users.table.department')}</TableHead>
+                <TableHead>{t('admin.users.table.status')}</TableHead>
+                <TableHead>{t('admin.users.table.lastLogin')}</TableHead>
+                <TableHead className="text-right">{t('admin.users.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -137,15 +139,15 @@ const AdminUsers = () => {
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
-                  <TableCell>{user.department}</TableCell>
+                  <TableCell>{t(`admin.departments.${user.department.toLowerCase().replace(/\s+/g, '')}`, user.department)}</TableCell>
                   <TableCell>{getStatusBadge(user.status)}</TableCell>
                   <TableCell>{user.lastLogin}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" title={t('admin.users.actions.edit')}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" title={t('admin.users.actions.delete')}>
                         <Trash className="h-4 w-4" />
                       </Button>
                     </div>
