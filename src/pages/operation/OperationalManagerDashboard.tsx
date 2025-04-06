@@ -32,7 +32,7 @@ const OperationalManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">85</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('admin.operations.stats.occupancyRate', { rate: '71%' })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('admin.operations.stats.occupancyRate')}</p>
           </CardContent>
         </Card>
         
@@ -42,7 +42,7 @@ const OperationalManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">$14,500</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('admin.operations.stats.revenueChange', { percent: '12%' })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('admin.operations.stats.revenueChange')}</p>
           </CardContent>
         </Card>
       </div>

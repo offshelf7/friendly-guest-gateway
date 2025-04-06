@@ -22,7 +22,7 @@ const ServiceManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.premiumServices', { count: 8 })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.premiumServices')}</p>
           </CardContent>
         </Card>
         
@@ -32,7 +32,7 @@ const ServiceManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">16</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.pendingApproval', { count: 4 })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.pendingApproval')}</p>
           </CardContent>
         </Card>
         
@@ -42,7 +42,7 @@ const ServiceManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">$3,200</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.revenueChange', { percent: '8%' })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('admin.serviceManager.stats.revenueChange')}</p>
           </CardContent>
         </Card>
       </div>

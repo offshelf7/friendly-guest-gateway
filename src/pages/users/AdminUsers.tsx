@@ -139,7 +139,7 @@ const AdminUsers = () => {
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{getRoleBadge(user.role)}</TableCell>
-                  <TableCell>{t(`admin.departments.${user.department.toLowerCase().replace(/\s+/g, '')}`, user.department)}</TableCell>
+                  <TableCell>{t(`admin.departments.${user.department.toLowerCase().replace(/\s+/g, '')}`)}</TableCell>
                   <TableCell>{getStatusBadge(user.status)}</TableCell>
                   <TableCell>{user.lastLogin}</TableCell>
                   <TableCell className="text-right">
