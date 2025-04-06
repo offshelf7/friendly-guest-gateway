@@ -29,30 +29,32 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
     ? ROLE_DISPLAY_NAMES[userRoles[0]] 
     : user ? 'Guest' : '';
   
+  const linkClasses = "flex items-center gap-2 px-4 py-2 transition-colors text-white hover:text-amber-300 font-medium";
+  
   return (
-    <div className="hidden md:flex items-center space-x-8">
-      <Link to="/" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
+    <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+      <Link to="/" className={linkClasses}>
         <Home className="h-4 w-4" />
         {t('nav.home')}
       </Link>
-      <Link to="/facilities" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
+      <Link to="/facilities" className={linkClasses}>
         <Hotel className="h-4 w-4" />
         {t('nav.facilities')}
       </Link>
-      <Link to="/rooms" className="transition-colors text-white hover:text-white/80">
+      <Link to="/rooms" className={linkClasses}>
         {t('nav.rooms')}
       </Link>
-      <Link to="/food-and-drink" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
+      <Link to="/food-and-drink" className={linkClasses}>
         <Coffee className="h-4 w-4" />
         {t('nav.foodAndDrink')}
       </Link>
-      <Link to="/contact" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
+      <Link to="/contact" className={linkClasses}>
         <Phone className="h-4 w-4" />
         {t('nav.contactUs')}
       </Link>
       
       {user && canAccessDashboard && (
-        <Link to="/admin" className="flex items-center gap-2 transition-colors text-white hover:text-white/80">
+        <Link to="/admin" className={linkClasses}>
           <LayoutDashboard className="h-4 w-4" />
           {t('nav.dashboard')}
         </Link>
@@ -60,7 +62,7 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
       
       {/* User Role Display */}
       {user && (
-        <div className="flex items-center gap-2">
+        <div className="hidden lg:flex items-center ml-1">
           <Badge variant="outline" className="border-amber-300 text-amber-300">
             {displayRole}
           </Badge>
@@ -68,9 +70,9 @@ const NavbarDesktopLinks = ({ isScrolled, isAdmin }: NavbarDesktopLinksProps) =>
       )}
       
       {/* Language Selector */}
-      <div className="flex items-center">
+      <div className="hidden lg:flex items-center">
         <Select value={language} onValueChange={setLanguage}>
-          <SelectTrigger className="w-[130px] bg-transparent border-white/20 text-white">
+          <SelectTrigger className="w-[130px] bg-transparent border-white/20 hover:border-white/40 text-white">
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-white" />
               <SelectValue placeholder="Language" />

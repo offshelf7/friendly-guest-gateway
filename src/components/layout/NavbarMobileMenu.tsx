@@ -1,6 +1,6 @@
 
 import { cn } from '@/lib/utils';
-import { Home, Hotel, Phone, Calendar, LayoutDashboard, Globe } from 'lucide-react';
+import { Home, Hotel, Phone, Calendar, LayoutDashboard, Globe, Coffee, User, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasDashboardAccess, ROLE_DISPLAY_NAMES } from '@/types/roleTypes';
@@ -52,67 +52,16 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
   return (
     <div 
       className={cn(
-        "fixed inset-0 bg-white z-40 pt-20 px-6 transition-transform duration-300 ease-in-out transform md:hidden",
+        "fixed inset-0 bg-white z-40 transition-transform duration-300 ease-in-out transform md:hidden overflow-y-auto",
         isMenuOpen ? "translate-x-0" : "translate-x-full"
       )}
+      style={{ paddingTop: "5rem" }}
     >
-      <div className="flex flex-col space-y-6 text-center">
-        <Link
-          to="/"
-          className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-          onClick={toggleMenu}
-        >
-          <Home className="h-5 w-5" />
-          {t('nav.home')}
-        </Link>
-        <Link 
-          to="/facilities" 
-          className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-          onClick={toggleMenu}
-        >
-          <Hotel className="h-5 w-5" />
-          {t('nav.facilities')}
-        </Link>
-        <Link 
-          to="/rooms" 
-          className="text-xl font-medium text-slate-900 py-2"
-          onClick={toggleMenu}
-        >
-          {t('nav.rooms')}
-        </Link>
-        <Link 
-          to="/contact" 
-          className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-          onClick={toggleMenu}
-        >
-          <Phone className="h-5 w-5" />
-          {t('nav.contactUs')}
-        </Link>
-        
-        {user && canAccessDashboard && (
-          <Link
-            to="/admin"
-            className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-            onClick={toggleMenu}
-          >
-            <LayoutDashboard className="h-5 w-5" />
-            {t('nav.dashboard')}
-          </Link>
-        )}
-        
-        {/* User Role Display */}
-        {user && (
-          <div className="flex items-center justify-center gap-2 py-2">
-            <Badge variant="outline" className="border-slate-900 text-slate-900">
-              {displayRole}
-            </Badge>
-          </div>
-        )}
-        
-        {/* Language Selector */}
-        <div className="flex items-center justify-center py-2">
+      <div className="flex flex-col space-y-2 px-6 pb-8">
+        {/* Language Selector for mobile - at top for visibility */}
+        <div className="flex items-center justify-center py-4 border-b border-gray-100">
           <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[180px]">
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
                 <SelectValue placeholder="Language" />
@@ -131,45 +80,111 @@ const NavbarMobileMenu = ({ isMenuOpen, toggleMenu, handleSignOut }: NavbarMobil
           </Select>
         </div>
         
-        {user ? (
-          <>
-            <div className="text-xl font-medium text-slate-900 py-2">
-              {user.email}
-            </div>
-            <Link
-              to="/profile"
-              className="text-xl font-medium text-slate-900 py-2"
-              onClick={toggleMenu}
-            >
-              {t('nav.myProfile')}
-            </Link>
-            <Link
-              to="/my-bookings"
-              className="text-xl font-medium text-slate-900 py-2 flex items-center justify-center gap-2"
-              onClick={toggleMenu}
-            >
-              <Calendar className="h-5 w-5" />
-              {t('nav.myBookings')}
-            </Link>
-            <button
-              onClick={() => {
-                handleSignOut();
-                toggleMenu();
-              }}
-              className="text-xl font-medium text-red-600 py-2"
-            >
-              {t('nav.signOut')}
-            </button>
-          </>
-        ) : (
+        {/* Navigation Links */}
+        <Link
+          to="/"
+          className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+          onClick={toggleMenu}
+        >
+          <Home className="h-5 w-5" />
+          {t('nav.home')}
+        </Link>
+        <Link 
+          to="/facilities" 
+          className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+          onClick={toggleMenu}
+        >
+          <Hotel className="h-5 w-5" />
+          {t('nav.facilities')}
+        </Link>
+        <Link 
+          to="/rooms" 
+          className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+          onClick={toggleMenu}
+        >
+          {t('nav.rooms')}
+        </Link>
+        <Link 
+          to="/food-and-drink" 
+          className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+          onClick={toggleMenu}
+        >
+          <Coffee className="h-5 w-5" />
+          {t('nav.foodAndDrink')}
+        </Link>
+        <Link 
+          to="/contact" 
+          className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+          onClick={toggleMenu}
+        >
+          <Phone className="h-5 w-5" />
+          {t('nav.contactUs')}
+        </Link>
+        
+        {user && canAccessDashboard && (
           <Link
-            to="/login"
-            className="text-xl font-medium text-slate-900 py-2"
+            to="/admin"
+            className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
             onClick={toggleMenu}
           >
-            {t('nav.signIn')}
+            <LayoutDashboard className="h-5 w-5" />
+            {t('nav.dashboard')}
           </Link>
         )}
+        
+        {/* User Section */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          {/* User Role Display */}
+          {user && (
+            <div className="flex items-center px-4 py-2">
+              <Badge variant="outline" className="border-slate-900 text-slate-900 w-full justify-center py-1">
+                {displayRole}
+              </Badge>
+            </div>
+          )}
+          
+          {user ? (
+            <>
+              <div className="text-sm font-medium text-slate-900 py-3 px-4 opacity-75 flex items-center">
+                <User className="h-4 w-4 mr-2" />
+                {user.email}
+              </div>
+              <Link
+                to="/profile"
+                className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+                onClick={toggleMenu}
+              >
+                {t('nav.myProfile')}
+              </Link>
+              <Link
+                to="/my-bookings"
+                className="text-lg font-medium text-slate-900 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg"
+                onClick={toggleMenu}
+              >
+                <Calendar className="h-5 w-5" />
+                {t('nav.myBookings')}
+              </Link>
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  toggleMenu();
+                }}
+                className="text-lg font-medium text-red-600 py-3 flex items-center gap-3 hover:bg-gray-50 px-4 rounded-lg w-full text-left"
+              >
+                <LogOut className="h-5 w-5" />
+                {t('nav.signOut')}
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-amber-300 hover:bg-amber-400 text-slate-900 font-medium py-3 px-4 rounded-lg block text-center mt-2"
+              onClick={toggleMenu}
+            >
+              {t('nav.signIn')}
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
